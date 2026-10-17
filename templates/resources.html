@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Recursos | Método Productivo{% endblock %}
+{% block main_class %}interior-main resources-main{% endblock %}
+{% block content %}
+{% include 'includes/breadcrumb.html' with current='Recursos' %}
+<section class="resource-intro" aria-labelledby="page-title">
+  <div><p class="eyebrow">Recursos · Fase A</p><h1 id="page-title">{{ page.title }}</h1><p class="interior-lead">{{ page.intro }}</p></div>
+  <span class="resource-tag">Plantilla Excel gratuita<br><strong>01 recurso previsto</strong></span>
+</section>
+<section class="resource-feature" aria-labelledby="resource-title">
+  <div class="resource-number" aria-hidden="true">13<span>semanas</span></div>
+  <div class="resource-detail"><span class="small-status">Archivo pendiente de integración · A-03</span><h2 id="resource-title">Flujo de efectivo de 13 semanas</h2><p>Una plantilla para organizar entradas y salidas previstas por semana y observar necesidades de efectivo con anticipación.</p><a class="text-link" href="{% url 'cash_flow_resource' %}">Ver el recurso previsto <span aria-hidden="true">→</span></a></div>
+</section>
+<p class="resource-footnote">El archivo definitivo será proporcionado externamente. La solicitud por correo y la descarga todavía no están disponibles.</p>
+{% endblock %}

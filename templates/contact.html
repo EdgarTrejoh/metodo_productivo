@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block title %}Contacto | Método Productivo{% endblock %}
+{% block main_class %}interior-main contact-main{% endblock %}
+{% block content %}
+{% include 'includes/breadcrumb.html' with current='Contacto' %}
+<section class="contact-intro" aria-labelledby="page-title"><p class="eyebrow">Contacto</p><h1 id="page-title">{{ page.title }}</h1><p class="interior-lead">{{ page.intro }}</p><p class="inline-status">El formulario aún no está disponible · A-07</p><a class="text-link" href="{% url 'home' %}">Volver al inicio <span aria-hidden="true">→</span></a></section>
+{% endblock %}

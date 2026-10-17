@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}{{ page.title }} | Método Productivo{% endblock %}
+{% block main_class %}section-main{% endblock %}
+{% block content %}
+{% include 'includes/breadcrumb.html' with current=page.eyebrow %}
+
+<section class="section-hero" aria-labelledby="page-title"><p class="eyebrow">{{ page.eyebrow }}</p><h1 id="page-title">{{ page.title }}</h1><p class="section-lead">{{ page.intro }}</p></section>
+{% if page.legal %}<div class="legal-warning" role="note"><strong>{{ page.status }}</strong><p>{{ page.note }}</p></div>{% else %}<p class="inline-status">{{ page.status }} · {{ page.note }}</p>{% endif %}
+
+{% if page.cards %}
+<section class="section-content" aria-label="Contenido de la sección">
+  <h2>{{ page.section_heading }}</h2>
+  <div class="section-card-grid">
+    {% for card in page.cards %}
+    <article class="section-card">
+      <span class="section-card-index">0{{ forloop.counter }}</span>
+      <h3>{{ card.title }}</h3>
+      <p>{{ card.text }}</p>
+      {% if card.url %}<a href="{% url card.url %}">{{ card.label }} <span aria-hidden="true">→</span></a>{% endif %}
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<div class="section-bottom-links"><a href="{% url 'home' %}">← Volver al inicio</a></div>
+{% endblock %}

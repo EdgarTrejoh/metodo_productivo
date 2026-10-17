@@ -1,1 +1,64 @@
-{% load static %}<!doctype html><html lang="es-MX"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Método Productivo | Check PyME</title><link rel="stylesheet" href="{% static 'app.css' %}"></head><body><header><a href="{% url 'home' %}">Método Productivo</a><span>Productividad con sentido</span></header><aside>Desarrollo local · Usa exclusivamente datos ficticios · Sin envíos de correo</aside><main>{% block content %}{% endblock %}</main><footer>Check v1.3 · Las respuestas declaradas no constituyen evaluación crediticia ni dictamen financiero.</footer></body></html>
+{% load static %}
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Método Productivo: conocimiento práctico de finanzas, negocios, datos y tecnología para tomar decisiones con más claridad.">
+  <title>{% block title %}Método Productivo{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'app.css' %}">
+</head>
+<body>
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+  <div class="development-banner" role="note">Entorno de desarrollo <span aria-hidden="true">·</span> Usa datos ficticios</div>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="{% url 'home' %}" aria-label="Método Productivo, ir a inicio">
+        <img src="{% static 'brand/metodo-productivo.png' %}" width="220" height="88" alt="Método Productivo">
+      </a>
+      <nav class="site-nav" aria-label="Navegación principal">
+        <ul>
+          <li><a href="{% url 'tools' %}"{% if request.resolver_match.url_name == 'tools' or request.resolver_match.url_name == 'break_even' %} aria-current="location"{% endif %}>Herramientas</a></li>
+          <li><a href="{% url 'blog' %}"{% if request.resolver_match.url_name == 'blog' %} aria-current="location"{% endif %}>Contenidos</a></li>
+          <li><a href="{% url 'resources' %}"{% if request.resolver_match.url_name == 'resources' or request.resolver_match.url_name == 'cash_flow_resource' %} aria-current="location"{% endif %}>Recursos</a></li>
+          <li><a href="{% url 'entry' %}"{% if request.resolver_match.url_name == 'entry' or request.resolver_match.url_name == 'question' or request.resolver_match.url_name == 'capture' or request.resolver_match.url_name == 'result' %} aria-current="location"{% endif %}>Check PyME</a></li>
+          <li><a href="{% url 'contact' %}"{% if request.resolver_match.url_name == 'contact' %} aria-current="location"{% endif %}>Contacto</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="contenido" class="site-main {% block main_class %}{% endblock %}">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-about">
+        <strong>Método Productivo</strong>
+        <p>Productividad con sentido. Finanzas, negocios, datos y tecnología para tomar mejores decisiones.</p>
+        <span class="footer-dev">Portal en desarrollo</span>
+      </div>
+      <div>
+        <h2>Explorar</h2>
+        <ul>
+          <li><a href="{% url 'tools' %}">Herramientas</a></li>
+          <li><a href="{% url 'resources' %}">Recursos</a></li>
+          <li><a href="{% url 'blog' %}">Contenidos</a></li>
+          <li><a href="{% url 'entry' %}">Check PyME</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>El portal</h2>
+        <ul>
+          <li><a href="{% url 'about' %}">Acerca de</a></li>
+          <li><a href="{% url 'contact' %}">Contacto</a></li>
+          <li><a href="{% url 'privacy' %}">Privacidad · provisional</a></li>
+          <li><a href="{% url 'terms' %}">Términos · provisionales</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">© Método Productivo · Vista local de desarrollo. El Check es una lectura de prácticas declaradas, no una calificación crediticia ni un dictamen financiero.</div>
+  </footer>
+</body>
+</html>

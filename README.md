@@ -1,6 +1,6 @@
-# Método Productivo - Bloque inicial B0
+# Método Productivo — portal Fase A en desarrollo
 
-Base Django SSR del Check PyME, para desarrollo local con datos sintéticos.
+Aplicación Django con el Check PyME B0 y la primera estructura navegable del portal. La Entrega 1 fue aprobada con salvedades el 17 de octubre de 2026; A-01 sigue en curso. Las páginas de herramientas, recursos, contenidos, contacto y textos legales muestran contenido provisional; sus funciones aún no están disponibles.
 No está publicada. La aplicación bloquea DJANGO_DEBUG=0 hasta resolver docs/ESTADO.md.
 
 ## Estructura del proyecto
@@ -32,6 +32,8 @@ python manage.py migrate
 python manage.py runserver
 ```
 Abrir http://127.0.0.1:8000. No se envían correos ni se usan claves externas.
+Si el puerto 8000 está ocupado, ejecutar `python manage.py runserver 127.0.0.1:8765` y abrir http://127.0.0.1:8765.
+Desde la Home se puede recorrer la estructura pública y entrar al Check existente. Usar únicamente datos ficticios. Las páginas provisionales no contienen formularios funcionales; los avisos legales definitivos permanecen pendientes de revisión.
 SQLite es solo para la prueba local. Ver .env.example para PostgreSQL.
 No crear usuarios públicos; solo personal interno en el backoffice.
 

@@ -1,1 +1,58 @@
-{% extends 'base.html' %}{% block content %}<p class="eyebrow">Información para decidir mejor</p><h1>Conoce mejor la gestión de tu negocio.</h1><p>Herramientas prácticas para dar el siguiente paso con método.</p><a class="button" href="{% url 'entry' %}">Hacer el Check PyME</a><p>Primera entrega de desarrollo: cuestionario, resultado, PDF y orientación.</p>{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Método Productivo | Productividad con sentido{% endblock %}
+{% block main_class %}home-main{% endblock %}
+{% block content %}
+<section class="hero" aria-labelledby="hero-title">
+  <div class="hero-copy">
+    <p class="hero-kicker">Método Productivo · Conocimiento aplicable</p>
+    <h1 id="hero-title">Conocimiento práctico para <span>decidir mejor.</span></h1>
+    <p class="hero-lead">Finanzas, negocios, datos y tecnología explicados con claridad. Ideas y herramientas que puedes aplicar a proyectos, trabajo y negocios.</p>
+    <div class="hero-actions">
+      <a class="button" href="#explorar">Explorar el portal <span aria-hidden="true">↓</span></a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <p class="hero-visual-kicker">Cuatro perspectivas</p>
+    <p class="hero-visual-title">Una forma más completa de mirar tu negocio.</p>
+    <div class="hero-visual-lines"><span>Finanzas</span><span>Negocios</span><span>Datos</span><span>Tecnología</span></div>
+  </div>
+</section>
+
+<section class="intro-section" aria-labelledby="pillars-title">
+  <div class="section-heading">
+    <div><p class="eyebrow">Áreas de conocimiento</p><h2 id="pillars-title">Cuatro miradas para un mismo negocio.</h2></div>
+  </div>
+  <div class="pillar-grid">
+    <div class="pillar pillar-finance"><span class="pillar-number">01</span><h3>Finanzas</h3><p>Flujos, costos y decisiones de inversión.</p></div>
+    <div class="pillar pillar-business"><span class="pillar-number">02</span><h3>Negocios</h3><p>Márgenes, procesos y estrategia comercial.</p></div>
+    <div class="pillar pillar-data"><span class="pillar-number">03</span><h3>Datos</h3><p>Indicadores para entender qué está cambiando.</p></div>
+    <div class="pillar pillar-tech"><span class="pillar-number">04</span><h3>Tecnología</h3><p>Herramientas digitales aplicadas a la operación.</p></div>
+  </div>
+</section>
+
+<section class="explore-section" id="explorar" aria-labelledby="explore-title">
+  <div class="section-heading section-heading-stack"><p class="eyebrow">Explora el portal</p><h2 id="explore-title">Elige lo que necesitas hoy.</h2></div>
+  <div class="feature-grid">
+    <article class="feature-card">
+      <div class="feature-top"><span class="feature-symbol" aria-hidden="true">◈</span><span class="status-pill">Cálculo pendiente</span></div>
+      <h3>Calculadoras</h3><p>Explora la propuesta de punto de equilibrio mensual para un producto o servicio.</p>
+      <a href="{% url 'tools' %}">Ver calculadoras <span aria-hidden="true">→</span></a>
+    </article>
+    <article class="feature-card">
+      <div class="feature-top"><span class="feature-symbol" aria-hidden="true">✳</span><span class="status-pill">Artículos pendientes</span></div>
+      <h3>Contenidos</h3><p>Lecturas prácticas de finanzas, negocios, datos y tecnología.</p>
+      <a href="{% url 'blog' %}">Explorar contenidos <span aria-hidden="true">→</span></a>
+    </article>
+    <article class="feature-card feature-check">
+      <div class="feature-top"><span class="feature-symbol" aria-hidden="true">↗</span><span class="status-pill status-live">Disponible en desarrollo</span></div>
+      <h3>Diagnóstico inicial</h3><p>El Check PyME ofrece una primera lectura de tus prácticas de gestión en ocho preguntas.</p>
+      <a href="{% url 'entry' %}">Conocer el Check PyME <span aria-hidden="true">→</span></a>
+    </article>
+    <article class="feature-card">
+      <div class="feature-top"><span class="feature-symbol" aria-hidden="true">▤</span><span class="status-pill">Entrega pendiente</span></div>
+      <h3>Recursos</h3><p>Conoce la plantilla gratuita de flujo de efectivo de 13 semanas prevista para Fase A.</p>
+      <a href="{% url 'resources' %}">Ver recursos <span aria-hidden="true">→</span></a>
+    </article>
+  </div>
+</section>
+{% endblock %}

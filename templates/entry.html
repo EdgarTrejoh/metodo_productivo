@@ -1,1 +1,13 @@
-{% extends 'base.html' %}{% block content %}<p class="eyebrow">Check PyME</p><h1>Ocho preguntas. Una vista inicial de tu gestión.</h1><p>Al terminar, deja tus datos para ver y descargar tu informe gratuito, sin crear cuenta.</p><p>Podrás descargarlo mientras permanezcas en el resultado. Después de salir, generar otro informe requiere contestar nuevamente.</p><form method="post" action="{% url 'start' %}">{% csrf_token %}<button>Iniciar Check PyME</button></form>{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Check PyME | Método Productivo{% endblock %}
+{% block main_class %}check-entry-main{% endblock %}
+{% block content %}
+{% include 'includes/breadcrumb.html' with current='Check PyME' %}
+<section class="check-entry-card" aria-labelledby="check-entry-title">
+  <p class="eyebrow">Check PyME</p>
+  <h1 id="check-entry-title">Ocho preguntas. Una vista inicial de tu gestión.</h1>
+  <p>Al terminar, deja tus datos para ver y descargar tu informe gratuito, sin crear cuenta.</p>
+  <p>Podrás descargarlo mientras permanezcas en el resultado. Después de salir, generar otro informe requiere contestar nuevamente.</p>
+  <form method="post" action="{% url 'start' %}">{% csrf_token %}<button>Iniciar Check PyME</button></form>
+</section>
+{% endblock %}

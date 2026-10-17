@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Contenidos | Método Productivo{% endblock %}
+{% block main_class %}interior-main blog-main{% endblock %}
+{% block content %}
+{% include 'includes/breadcrumb.html' with current='Contenidos' %}
+<section class="blog-intro" aria-labelledby="page-title"><p class="eyebrow">Contenidos · Fase A</p><h1 id="page-title">{{ page.title }}</h1><p class="interior-lead">{{ page.intro }}</p><p class="inline-status">Artículos en preparación · A-05</p></section>
+<section class="editorial-areas" aria-labelledby="areas-title"><h2 id="areas-title">Las líneas editoriales</h2><div class="editorial-grid">
+  <div class="editorial-area editorial-finance"><span>01</span><h3>Finanzas</h3><p>Flujos, costos y decisiones financieras.</p></div>
+  <div class="editorial-area editorial-business"><span>02</span><h3>Negocios</h3><p>Operación, margen y estrategia.</p></div>
+  <div class="editorial-area editorial-data"><span>03</span><h3>Datos</h3><p>Indicadores para decidir con evidencia.</p></div>
+  <div class="editorial-area editorial-tech"><span>04</span><h3>Tecnología</h3><p>Herramientas digitales con propósito.</p></div>
+</div></section>
+<p class="blog-footnote">Todavía no hay artículos publicados. Este índice muestra la organización editorial prevista, sin publicaciones de ejemplo.</p>
+{% endblock %}
