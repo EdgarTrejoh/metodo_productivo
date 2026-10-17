@@ -1,0 +1,830 @@
+{
+  "catalog_version": "0.1",
+  "check_version": "1.3",
+  "status": "aprobado",
+  "scope_approved_on": "2026-10-12",
+  "scope": "Acciones realizables en 30 días con registros existentes o Excel, sin contratar servicios ni comprar software.",
+  "selection_policy": {
+    "version": "0.1",
+    "status": "aprobada",
+    "count": 3,
+    "eligible_dimensions": "Todas las dimensiones con puntuación 0 o 1; si no hay, todas las de 2.",
+    "dimension_order": "Puntuación ascendente y después dimension_id ascendente.",
+    "action_order": "Recorrer primero la acción 1 de cada dimensión elegible; después acción 2 y acción 3, hasta reunir tres.",
+    "deduplication": "ID de acción único; no repetir una acción dentro del mismo informe.",
+    "invalid_input": "No producir resultado si faltan respuestas o no son enteros 0, 1 o 2.",
+    "funding": "Opciones a, b y e usan puntuación 2; c usa 1 y d usa 0, según BRD.",
+    "persistence": "Conservar IDs elegidos, versión del catálogo y versión de selección junto con el diagnóstico.",
+    "approved_on": "2026-10-12"
+  },
+  "examples": [
+    {
+      "scores": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "selected_action_ids": [
+        "CP-D01-P0-A01",
+        "CP-D02-P0-A01",
+        "CP-D03-P0-A01"
+      ]
+    },
+    {
+      "scores": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "selected_action_ids": [
+        "CP-D01-P2-A01",
+        "CP-D02-P2-A01",
+        "CP-D03-P2-A01"
+      ]
+    },
+    {
+      "scores": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        1
+      ],
+      "selected_action_ids": [
+        "CP-D08-P1-A01",
+        "CP-D08-P1-A02",
+        "CP-D08-P1-A03"
+      ]
+    },
+    {
+      "scores": [
+        1,
+        2,
+        0,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "selected_action_ids": [
+        "CP-D03-P0-A01",
+        "CP-D01-P1-A01",
+        "CP-D03-P0-A02"
+      ]
+    }
+  ],
+  "verification": {
+    "valid_score_combinations_checked": 6561,
+    "unique_actions": 72,
+    "selected_per_result": 3,
+    "implementation_status": "Comprobación del catálogo propuesto; no prueba de la aplicación oficial."
+  },
+  "actions": [
+    {
+      "id": "CP-D01-P0-A01",
+      "dimension_id": 1,
+      "dimension": "Históricos de ventas",
+      "response_score": 0,
+      "order": 1,
+      "action": "Reúne los registros y comprobantes de ventas disponibles y ordénalos por fecha, sin completar datos faltantes con estimaciones.",
+      "completion_evidence": "Carpeta o tabla ordenada y faltantes señalados.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D01-P0-A02",
+      "dimension_id": 1,
+      "dimension": "Históricos de ventas",
+      "response_score": 0,
+      "order": 2,
+      "action": "Registra diariamente las ventas de los próximos 30 días en una tabla con fecha, importe y producto o servicio.",
+      "completion_evidence": "Registro diario de ventas.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D01-P0-A03",
+      "dimension_id": 1,
+      "dimension": "Históricos de ventas",
+      "response_score": 0,
+      "order": 3,
+      "action": "Al cerrar el mes, compara el total registrado con los comprobantes disponibles e identifica diferencias.",
+      "completion_evidence": "Resumen mensual y diferencias documentadas.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D01-P1-A01",
+      "dimension_id": 1,
+      "dimension": "Históricos de ventas",
+      "response_score": 1,
+      "order": 1,
+      "action": "Identifica qué meses o registros faltan y recupera únicamente información respaldada por tus fuentes disponibles.",
+      "completion_evidence": "Lista de faltantes y registros recuperados.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D01-P1-A02",
+      "dimension_id": 1,
+      "dimension": "Históricos de ventas",
+      "response_score": 1,
+      "order": 2,
+      "action": "Unifica tus registros en una tabla mensual con el mismo criterio de importe y fecha.",
+      "completion_evidence": "Tabla mensual y criterio escrito.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D01-P1-A03",
+      "dimension_id": 1,
+      "dimension": "Históricos de ventas",
+      "response_score": 1,
+      "order": 3,
+      "action": "Agenda una revisión semanal de ventas y asigna quién actualiza los registros.",
+      "completion_evidence": "Responsable y calendario de revisión.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D01-P2-A01",
+      "dimension_id": 1,
+      "dimension": "Históricos de ventas",
+      "response_score": 2,
+      "order": 1,
+      "action": "Comprueba una muestra de ventas contra sus registros originales y corrige diferencias documentadas.",
+      "completion_evidence": "Muestra revisada y correcciones.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D01-P2-A02",
+      "dimension_id": 1,
+      "dimension": "Históricos de ventas",
+      "response_score": 2,
+      "order": 2,
+      "action": "Compara el último mes con el mes anterior y, si existe información comparable, con el mismo mes del año pasado.",
+      "completion_evidence": "Comparativo con periodos y límites claros.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D01-P2-A03",
+      "dimension_id": 1,
+      "dimension": "Históricos de ventas",
+      "response_score": 2,
+      "order": 3,
+      "action": "Documenta el procedimiento de actualización y guarda una copia de respaldo del histórico.",
+      "completion_evidence": "Procedimiento breve y respaldo disponible.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D02-P0-A01",
+      "dimension_id": 2,
+      "dimension": "Evolución de costos",
+      "response_score": 0,
+      "order": 1,
+      "action": "Lista los principales costos del negocio utilizando recibos, facturas o registros disponibles.",
+      "completion_evidence": "Listado con concepto, fecha e importe.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D02-P0-A02",
+      "dimension_id": 2,
+      "dimension": "Evolución de costos",
+      "response_score": 0,
+      "order": 2,
+      "action": "Registra durante 30 días los pagos y compromisos de esos costos, distinguiendo pagos de obligaciones pendientes.",
+      "completion_evidence": "Registro de costos y estado de pago.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D02-P0-A03",
+      "dimension_id": 2,
+      "dimension": "Evolución de costos",
+      "response_score": 0,
+      "order": 3,
+      "action": "Elige hasta tres costos relevantes y revisa qué información necesitas para seguir su evolución mensual.",
+      "completion_evidence": "Conceptos y fuentes identificados.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D02-P1-A01",
+      "dimension_id": 2,
+      "dimension": "Evolución de costos",
+      "response_score": 1,
+      "order": 1,
+      "action": "Completa los meses disponibles de tus principales costos y señala los periodos sin información.",
+      "completion_evidence": "Tabla de costos con faltantes visibles.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D02-P1-A02",
+      "dimension_id": 2,
+      "dimension": "Evolución de costos",
+      "response_score": 1,
+      "order": 2,
+      "action": "Compara los mismos conceptos entre dos periodos disponibles y anota cambios de precio o cantidad.",
+      "completion_evidence": "Comparativo con causas conocidas o pendientes.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D02-P1-A03",
+      "dimension_id": 2,
+      "dimension": "Evolución de costos",
+      "response_score": 1,
+      "order": 3,
+      "action": "Asigna una revisión mensual y un responsable para actualizar los principales costos.",
+      "completion_evidence": "Calendario y responsable definidos.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D02-P2-A01",
+      "dimension_id": 2,
+      "dimension": "Evolución de costos",
+      "response_score": 2,
+      "order": 1,
+      "action": "Revisa los cambios más relevantes del último periodo y documenta qué los explica, cuando tengas evidencia.",
+      "completion_evidence": "Variaciones y explicación respaldada.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D02-P2-A02",
+      "dimension_id": 2,
+      "dimension": "Evolución de costos",
+      "response_score": 2,
+      "order": 2,
+      "action": "Contrasta una muestra de costos con sus comprobantes para detectar duplicados o conceptos mal clasificados.",
+      "completion_evidence": "Muestra revisada y ajustes.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D02-P2-A03",
+      "dimension_id": 2,
+      "dimension": "Evolución de costos",
+      "response_score": 2,
+      "order": 3,
+      "action": "Define señales de revisión para tus principales costos y acuerda qué hacer cuando se activen.",
+      "completion_evidence": "Señales y pasos de revisión escritos.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D03-P0-A01",
+      "dimension_id": 3,
+      "dimension": "Concentración de clientes",
+      "response_score": 0,
+      "order": 1,
+      "action": "Agrupa las ventas de un periodo disponible por cliente usando una clave interna y conserva el periodo de referencia.",
+      "completion_evidence": "Ventas por cliente y periodo.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D03-P0-A02",
+      "dimension_id": 3,
+      "dimension": "Concentración de clientes",
+      "response_score": 0,
+      "order": 2,
+      "action": "Calcula la participación de cada cliente dividiendo sus ventas entre el total del mismo periodo.",
+      "completion_evidence": "Participaciones y total conciliado.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D03-P0-A03",
+      "dimension_id": 3,
+      "dimension": "Concentración de clientes",
+      "response_score": 0,
+      "order": 3,
+      "action": "Identifica hasta tres clientes con mayor participación y anota qué ocurriría operativamente si uno dejara de comprar.",
+      "completion_evidence": "Clientes principales y efectos descritos.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D03-P1-A01",
+      "dimension_id": 3,
+      "dimension": "Concentración de clientes",
+      "response_score": 1,
+      "order": 1,
+      "action": "Sustituye las estimaciones por ventas registradas de un periodo común para todos los clientes.",
+      "completion_evidence": "Base comparable de ventas por cliente.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D03-P1-A02",
+      "dimension_id": 3,
+      "dimension": "Concentración de clientes",
+      "response_score": 1,
+      "order": 2,
+      "action": "Calcula y ordena las participaciones de clientes; verifica que los importes coincidan con el total y los porcentajes sumen 100%.",
+      "completion_evidence": "Tabla ordenada y conciliada.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D03-P1-A03",
+      "dimension_id": 3,
+      "dimension": "Concentración de clientes",
+      "response_score": 1,
+      "order": 3,
+      "action": "Agenda una revisión mensual de concentración y registra cambios en los principales clientes.",
+      "completion_evidence": "Calendario y primera revisión.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D03-P2-A01",
+      "dimension_id": 3,
+      "dimension": "Concentración de clientes",
+      "response_score": 2,
+      "order": 1,
+      "action": "Compara la concentración de clientes en dos periodos comparables y señala los principales cambios.",
+      "completion_evidence": "Comparativo de participaciones.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D03-P2-A02",
+      "dimension_id": 3,
+      "dimension": "Concentración de clientes",
+      "response_score": 2,
+      "order": 2,
+      "action": "Simula en tu tabla la pérdida de ventas del cliente principal, sin tratarla como pronóstico.",
+      "completion_evidence": "Escenario simple y supuestos explícitos.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D03-P2-A03",
+      "dimension_id": 3,
+      "dimension": "Concentración de clientes",
+      "response_score": 2,
+      "order": 3,
+      "action": "Documenta cómo atenderías la pérdida de un cliente relevante y qué datos revisarías primero.",
+      "completion_evidence": "Lista de respuesta operativa.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D04-P0-A01",
+      "dimension_id": 4,
+      "dimension": "Concentración de proveedores",
+      "response_score": 0,
+      "order": 1,
+      "action": "Agrupa las compras o insumos de un periodo disponible por proveedor, usando una base de importe consistente.",
+      "completion_evidence": "Compras por proveedor y periodo.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D04-P0-A02",
+      "dimension_id": 4,
+      "dimension": "Concentración de proveedores",
+      "response_score": 0,
+      "order": 2,
+      "action": "Calcula la participación de cada proveedor sobre el total del mismo periodo.",
+      "completion_evidence": "Participaciones y total conciliado.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D04-P0-A03",
+      "dimension_id": 4,
+      "dimension": "Concentración de proveedores",
+      "response_score": 0,
+      "order": 3,
+      "action": "Relaciona a los principales proveedores con los insumos o servicios que sostienen la operación.",
+      "completion_evidence": "Mapa simple de proveedor e insumo.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D04-P1-A01",
+      "dimension_id": 4,
+      "dimension": "Concentración de proveedores",
+      "response_score": 1,
+      "order": 1,
+      "action": "Completa las compras registradas por proveedor y señala los importes o periodos que faltan.",
+      "completion_evidence": "Base de compras y faltantes.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D04-P1-A02",
+      "dimension_id": 4,
+      "dimension": "Concentración de proveedores",
+      "response_score": 1,
+      "order": 2,
+      "action": "Calcula las participaciones reales de proveedores y compara el resultado con tu percepción inicial.",
+      "completion_evidence": "Tabla y diferencias identificadas.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D04-P1-A03",
+      "dimension_id": 4,
+      "dimension": "Concentración de proveedores",
+      "response_score": 1,
+      "order": 3,
+      "action": "Agenda una revisión mensual de compras y concentración, con un responsable de actualización.",
+      "completion_evidence": "Calendario y responsable.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D04-P2-A01",
+      "dimension_id": 4,
+      "dimension": "Concentración de proveedores",
+      "response_score": 2,
+      "order": 1,
+      "action": "Compara las participaciones de proveedores entre periodos equivalentes y revisa cambios relevantes.",
+      "completion_evidence": "Comparativo de concentración.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D04-P2-A02",
+      "dimension_id": 4,
+      "dimension": "Concentración de proveedores",
+      "response_score": 2,
+      "order": 2,
+      "action": "Identifica qué insumos se verían afectados si el proveedor principal interrumpiera el suministro.",
+      "completion_evidence": "Lista de insumos y efectos operativos.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D04-P2-A03",
+      "dimension_id": 4,
+      "dimension": "Concentración de proveedores",
+      "response_score": 2,
+      "order": 3,
+      "action": "Documenta opciones de respuesta ante una interrupción usando información y contactos existentes, sin realizar compras.",
+      "completion_evidence": "Plan breve y contactos disponibles.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D05-P0-A01",
+      "dimension_id": 5,
+      "dimension": "Concentración de productos o servicios",
+      "response_score": 0,
+      "order": 1,
+      "action": "Agrupa las ventas de un periodo disponible por producto, servicio o línea, sin confundir ingresos con ganancias.",
+      "completion_evidence": "Ventas por línea y periodo.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D05-P0-A02",
+      "dimension_id": 5,
+      "dimension": "Concentración de productos o servicios",
+      "response_score": 0,
+      "order": 2,
+      "action": "Calcula la participación de cada línea sobre los ingresos totales del mismo periodo.",
+      "completion_evidence": "Participaciones y total conciliado.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D05-P0-A03",
+      "dimension_id": 5,
+      "dimension": "Concentración de productos o servicios",
+      "response_score": 0,
+      "order": 3,
+      "action": "Identifica hasta tres líneas que más ingresos generan y anota qué necesitas para mantener su entrega.",
+      "completion_evidence": "Líneas principales y necesidades operativas.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D05-P1-A01",
+      "dimension_id": 5,
+      "dimension": "Concentración de productos o servicios",
+      "response_score": 1,
+      "order": 1,
+      "action": "Unifica nombres o códigos de tus productos y servicios para evitar separar una misma línea en varios registros.",
+      "completion_evidence": "Catálogo interno consistente.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D05-P1-A02",
+      "dimension_id": 5,
+      "dimension": "Concentración de productos o servicios",
+      "response_score": 1,
+      "order": 2,
+      "action": "Completa las ventas por línea de un periodo común y calcula sus participaciones sobre ingresos.",
+      "completion_evidence": "Tabla de ventas y participaciones.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D05-P1-A03",
+      "dimension_id": 5,
+      "dimension": "Concentración de productos o servicios",
+      "response_score": 1,
+      "order": 3,
+      "action": "Agenda una revisión mensual para actualizar qué líneas generan la mayor parte de los ingresos.",
+      "completion_evidence": "Calendario y primera revisión.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D05-P2-A01",
+      "dimension_id": 5,
+      "dimension": "Concentración de productos o servicios",
+      "response_score": 2,
+      "order": 1,
+      "action": "Compara la participación de tus líneas entre dos periodos equivalentes y señala cambios relevantes.",
+      "completion_evidence": "Comparativo de ingresos por línea.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D05-P2-A02",
+      "dimension_id": 5,
+      "dimension": "Concentración de productos o servicios",
+      "response_score": 2,
+      "order": 2,
+      "action": "Simula la reducción de ventas de la línea principal y documenta los supuestos del escenario.",
+      "completion_evidence": "Escenario simple sin promesa de resultado.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D05-P2-A03",
+      "dimension_id": 5,
+      "dimension": "Concentración de productos o servicios",
+      "response_score": 2,
+      "order": 3,
+      "action": "Documenta necesidades operativas de las líneas principales y posibles puntos de interrupción.",
+      "completion_evidence": "Lista de necesidades y puntos críticos.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D06-P0-A01",
+      "dimension_id": 6,
+      "dimension": "Procesos documentados",
+      "response_score": 0,
+      "order": 1,
+      "action": "Elige un proceso frecuente, como vender, cobrar o entregar, y escribe sus pasos tal como ocurre hoy.",
+      "completion_evidence": "Procedimiento de una página.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D06-P0-A02",
+      "dimension_id": 6,
+      "dimension": "Procesos documentados",
+      "response_score": 0,
+      "order": 2,
+      "action": "Añade responsables, entradas y resultado esperado a los pasos del proceso elegido.",
+      "completion_evidence": "Responsables y entregables identificados.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D06-P0-A03",
+      "dimension_id": 6,
+      "dimension": "Procesos documentados",
+      "response_score": 0,
+      "order": 3,
+      "action": "Usa el procedimiento en una ejecución real y corrige pasos omitidos o confusos.",
+      "completion_evidence": "Procedimiento probado y actualizado.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D06-P1-A01",
+      "dimension_id": 6,
+      "dimension": "Procesos documentados",
+      "response_score": 1,
+      "order": 1,
+      "action": "Reúne los procedimientos existentes y marca cuáles están incompletos o ya no reflejan la operación.",
+      "completion_evidence": "Inventario y pendientes.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D06-P1-A02",
+      "dimension_id": 6,
+      "dimension": "Procesos documentados",
+      "response_score": 1,
+      "order": 2,
+      "action": "Completa un proceso prioritario con responsables, pasos, excepciones frecuentes y resultado esperado.",
+      "completion_evidence": "Procedimiento completo y fechado.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D06-P1-A03",
+      "dimension_id": 6,
+      "dimension": "Procesos documentados",
+      "response_score": 1,
+      "order": 3,
+      "action": "Prueba ese procedimiento con otra persona del equipo, si existe, y registra las dudas; si trabajas solo, úsalo tú.",
+      "completion_evidence": "Dudas y ajustes documentados.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D06-P2-A01",
+      "dimension_id": 6,
+      "dimension": "Procesos documentados",
+      "response_score": 2,
+      "order": 1,
+      "action": "Revisa un proceso documentado frente a una ejecución real y actualiza diferencias.",
+      "completion_evidence": "Revisión y versión actualizada.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D06-P2-A02",
+      "dimension_id": 6,
+      "dimension": "Procesos documentados",
+      "response_score": 2,
+      "order": 2,
+      "action": "Define quién revisa y autoriza cambios en los procedimientos y cómo se conserva su versión.",
+      "completion_evidence": "Regla simple de cambios.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D06-P2-A03",
+      "dimension_id": 6,
+      "dimension": "Procesos documentados",
+      "response_score": 2,
+      "order": 3,
+      "action": "Comprueba que las personas que realizan el proceso pueden localizar y usar la versión vigente.",
+      "completion_evidence": "Ubicación compartida y uso comprobado.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D07-P0-A01",
+      "dimension_id": 7,
+      "dimension": "Información para decidir",
+      "response_score": 0,
+      "order": 1,
+      "action": "Elige una decisión frecuente y escribe qué datos necesitas para tomarla.",
+      "completion_evidence": "Decisión y datos requeridos.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D07-P0-A02",
+      "dimension_id": 7,
+      "dimension": "Información para decidir",
+      "response_score": 0,
+      "order": 2,
+      "action": "Crea una tabla sencilla con esos datos, su fuente, fecha de actualización y responsable.",
+      "completion_evidence": "Tabla con fuentes y responsables.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D07-P0-A03",
+      "dimension_id": 7,
+      "dimension": "Información para decidir",
+      "response_score": 0,
+      "order": 3,
+      "action": "Revisa la tabla en una decisión real y registra qué información faltó o no fue confiable.",
+      "completion_evidence": "Decisión registrada y faltantes.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D07-P1-A01",
+      "dimension_id": 7,
+      "dimension": "Información para decidir",
+      "response_score": 1,
+      "order": 1,
+      "action": "Identifica qué datos están incompletos o desactualizados y qué decisiones dependen de ellos.",
+      "completion_evidence": "Lista de datos y decisiones afectadas.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D07-P1-A02",
+      "dimension_id": 7,
+      "dimension": "Información para decidir",
+      "response_score": 1,
+      "order": 2,
+      "action": "Actualiza un conjunto prioritario desde sus fuentes y verifica algunos registros contra el origen.",
+      "completion_evidence": "Datos actualizados y muestra revisada.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D07-P1-A03",
+      "dimension_id": 7,
+      "dimension": "Información para decidir",
+      "response_score": 1,
+      "order": 3,
+      "action": "Define una frecuencia de revisión y usa la información actualizada en una decisión documentada.",
+      "completion_evidence": "Calendario y decisión registrada.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D07-P2-A01",
+      "dimension_id": 7,
+      "dimension": "Información para decidir",
+      "response_score": 2,
+      "order": 1,
+      "action": "Revisa una muestra de datos clave contra sus fuentes para confirmar vigencia y consistencia.",
+      "completion_evidence": "Muestra y diferencias documentadas.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D07-P2-A02",
+      "dimension_id": 7,
+      "dimension": "Información para decidir",
+      "response_score": 2,
+      "order": 2,
+      "action": "Registra una decisión reciente, los datos usados y cómo revisarás su resultado.",
+      "completion_evidence": "Bitácora breve de decisión.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D07-P2-A03",
+      "dimension_id": 7,
+      "dimension": "Información para decidir",
+      "response_score": 2,
+      "order": 3,
+      "action": "Documenta las definiciones de tus indicadores clave, responsables y frecuencia de actualización.",
+      "completion_evidence": "Diccionario sencillo de indicadores.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D08-P0-A01",
+      "dimension_id": 8,
+      "dimension": "Financiamiento",
+      "response_score": 0,
+      "order": 1,
+      "action": "Anota qué necesidades del negocio podrían requerir recursos adicionales y para qué se usarían.",
+      "completion_evidence": "Lista de necesidades y finalidades.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D08-P0-A02",
+      "dimension_id": 8,
+      "dimension": "Financiamiento",
+      "response_score": 0,
+      "order": 2,
+      "action": "Ordena cobros y pagos previstos para los próximos 30 días con datos disponibles y señala supuestos o faltantes.",
+      "completion_evidence": "Calendario simple de cobros y pagos.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D08-P0-A03",
+      "dimension_id": 8,
+      "dimension": "Financiamiento",
+      "response_score": 0,
+      "order": 3,
+      "action": "Con esa información, registra si necesitas seguir evaluando financiamiento y qué datos faltan para decidir.",
+      "completion_evidence": "Conclusión provisional y pendientes.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D08-P1-A01",
+      "dimension_id": 8,
+      "dimension": "Financiamiento",
+      "response_score": 1,
+      "order": 1,
+      "action": "Reúne la información disponible de tu financiamiento vigente: saldo, pagos, plazo, costos y finalidad original.",
+      "completion_evidence": "Ficha con datos y faltantes.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D08-P1-A02",
+      "dimension_id": 8,
+      "dimension": "Financiamiento",
+      "response_score": 1,
+      "order": 2,
+      "action": "Compara la finalidad original con el uso actual de los recursos e identifica diferencias.",
+      "completion_evidence": "Comparativo de finalidad y uso.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D08-P1-A03",
+      "dimension_id": 8,
+      "dimension": "Financiamiento",
+      "response_score": 1,
+      "order": 3,
+      "action": "Registra las preguntas que necesitas aclarar sobre el financiamiento y consulta tus documentos o canales existentes, sin contratar nada nuevo.",
+      "completion_evidence": "Lista de preguntas y respuestas obtenidas.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D08-P2-A01",
+      "dimension_id": 8,
+      "dimension": "Financiamiento",
+      "response_score": 2,
+      "order": 1,
+      "action": "Documenta por qué el financiamiento actual o la decisión de no contratarlo responde a una necesidad del negocio.",
+      "completion_evidence": "Justificación de la decisión vigente.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D08-P2-A02",
+      "dimension_id": 8,
+      "dimension": "Financiamiento",
+      "response_score": 2,
+      "order": 2,
+      "action": "Revisa los cobros y pagos previstos de 30 días y verifica si sostienen tu decisión; señala supuestos.",
+      "completion_evidence": "Calendario y revisión documentada.",
+      "horizon_days": 30
+    },
+    {
+      "id": "CP-D08-P2-A03",
+      "dimension_id": 8,
+      "dimension": "Financiamiento",
+      "response_score": 2,
+      "order": 3,
+      "action": "Define qué cambios de ventas, cobros, pagos o inversión te llevarían a volver a evaluar la necesidad de financiamiento.",
+      "completion_evidence": "Señales de reevaluación escritas.",
+      "horizon_days": 30
+    }
+  ],
+  "data_limits": "Si no hay registros, señalar el faltante y comenzar a reunirlos. No inventar datos. Si el total de ingresos o compras es cero, no calcular participaciones; indicar que no son calculables en ese periodo.",
+  "approved_on": "2026-10-12",
+  "approval_evidence": "Confirmación del usuario en la conversación del 12 de octubre de 2026: de acuerdo, incorpora al BRD.",
+  "compatible_check_versions": [
+    "1.2",
+    "1.3"
+  ],
+  "references": {
+    "brd": "0.6",
+    "concept": "0.8"
+  },
+  "compatibility_note": "Compatibilidad actualizada el 13 de octubre de 2026; 72 acciones y selección aprobada v0.1 sin cambios."
+}

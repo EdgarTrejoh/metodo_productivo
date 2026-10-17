@@ -1,0 +1,2321 @@
+import os
+
+html_content = """<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Método Productivo · Propuesta Visual y Prototipo Interactivo Fase A</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Brand Color Tokens */
+      --azul-profundo: #07345F;
+      --azul-hover: #052646;
+      --azul-suave: #0E487E;
+      --azul-light: #EBF3FA;
+      --verde-productivo: #00A987;
+      --verde-hover: #008f72;
+      --verde-suave: #19B89A;
+      --verde-light: #E6F8F3;
+      --verde-border: #A2E6D5;
+      --gris-fondo: #F5F7F9;
+      --gris-card: #FFFFFF;
+      --gris-borde: #E2E8F0;
+      --gris-borde-hover: #CBD5E1;
+      --grafito-texto: #17212B;
+      --grafito-muted: #5A6B82;
+      --grafito-light: #8E9FAA;
+      --alerta-rojo: #DC2626;
+      --alerta-fondo: #FEF2F2;
+      --alerta-amarillo: #D97706;
+      --alerta-amarillo-bg: #FEF3C7;
+      --shadow-sm: 0 1px 3px rgba(7, 52, 95, 0.04);
+      --shadow-md: 0 4px 14px rgba(7, 52, 95, 0.08);
+      --shadow-lg: 0 12px 30px -4px rgba(7, 52, 95, 0.12);
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --radius-full: 9999px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--grafito-texto);
+      background-color: #0b1a29;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3, h4, .brand-font {
+      font-family: 'Manrope', sans-serif;
+      letter-spacing: -0.02em;
+      color: var(--azul-profundo);
+    }
+
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Top Suite Navigation Bar */
+    .suite-bar {
+      background: #061523;
+      border-bottom: 1px solid #14283d;
+      color: #fff;
+      padding: 10px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 2000;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .suite-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .suite-tag {
+      background: rgba(0, 169, 135, 0.2);
+      color: var(--verde-productivo);
+      border: 1px solid var(--verde-productivo);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+    }
+
+    .suite-tabs {
+      display: flex;
+      gap: 6px;
+      background: #0e2236;
+      padding: 4px;
+      border-radius: var(--radius-md);
+      flex-wrap: wrap;
+    }
+
+    .suite-tab-btn {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .suite-tab-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .suite-tab-btn.active {
+      background: var(--verde-productivo);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(0, 169, 135, 0.4);
+    }
+
+    .view-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .vp-btn {
+      background: #0e2236;
+      border: 1px solid #1f3954;
+      color: #94a3b8;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .vp-btn.active {
+      background: #173757;
+      color: #38bdf8;
+      border-color: #38bdf8;
+    }
+
+    /* Outer Wrapper */
+    .preview-canvas {
+      min-height: calc(100vh - 60px);
+      padding: 24px;
+      display: flex;
+      justify-content: center;
+      background: #0a1928;
+      overflow-y: auto;
+    }
+
+    .preview-frame {
+      width: 100%;
+      max-width: 1280px;
+      background: #fff;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+      transition: max-width 0.35s cubic-bezier(0.16, 1, 0.3, 1), border 0.2s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .preview-frame.mobile-mode {
+      max-width: 390px;
+      border: 12px solid #14283d;
+      border-radius: 44px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+    }
+
+    /* Screen Views */
+    .screen-view {
+      display: none;
+      width: 100%;
+      background: var(--gris-fondo);
+      min-height: 800px;
+    }
+
+    .screen-view.active {
+      display: block;
+    }
+
+    /* ==============================================
+       COMMON PORTAL COMPONENTS (NAVBAR, BUTTONS, FOOTER)
+       ============================================== */
+    .portal-announcement {
+      background: var(--azul-profundo);
+      color: #fff;
+      font-size: 12.5px;
+      font-weight: 500;
+      text-align: center;
+      padding: 8px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .portal-announcement strong {
+      color: var(--verde-suave);
+    }
+
+    .portal-header {
+      background: #ffffff;
+      border-bottom: 1px solid var(--gris-borde);
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .portal-logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+
+    .portal-logo-img {
+      height: 44px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .portal-nav {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .portal-nav a {
+      color: var(--grafito-texto);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .portal-nav a:hover {
+      color: var(--verde-productivo);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 10px 20px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+      line-height: 1.2;
+    }
+
+    .btn-primary {
+      background: var(--verde-productivo);
+      color: #ffffff;
+    }
+    .btn-primary:hover {
+      background: var(--verde-hover);
+      box-shadow: 0 4px 12px rgba(0, 169, 135, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: #ffffff;
+      color: var(--azul-profundo);
+      border-color: var(--gris-borde);
+    }
+    .btn-secondary:hover {
+      border-color: var(--azul-profundo);
+      background: var(--azul-light);
+    }
+
+    .btn-dark {
+      background: var(--azul-profundo);
+      color: #ffffff;
+    }
+    .btn-dark:hover {
+      background: var(--azul-hover);
+    }
+
+    .btn-sm {
+      font-size: 13px;
+      padding: 7px 14px;
+    }
+    .btn-lg {
+      font-size: 16px;
+      padding: 14px 28px;
+    }
+
+    /* Common Footer */
+    .portal-footer {
+      background: #071e33;
+      color: #94a3b8;
+      padding: 48px 32px 32px;
+      border-top: 1px solid #142d47;
+      margin-top: auto;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1.5fr;
+      gap: 32px;
+      margin-bottom: 40px;
+    }
+
+    .footer-title {
+      color: #ffffff;
+      font-family: 'Manrope', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 16px;
+    }
+
+    .footer-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .footer-links a {
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 13.5px;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover {
+      color: var(--verde-suave);
+    }
+
+    .footer-bottom {
+      border-top: 1px solid #12283f;
+      padding-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: 12.5px;
+    }
+
+    .magic-recovery-link {
+      color: var(--verde-suave);
+      font-weight: 600;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    /* ==============================================
+       PANTALLA 1: HOME PORTAL
+       ============================================== */
+    .hero-section {
+      background: linear-gradient(180deg, #FFFFFF 0%, #F5F7F9 100%);
+      padding: 64px 32px 56px;
+      border-bottom: 1px solid var(--gris-borde);
+    }
+
+    .hero-container {
+      max-width: 1180px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 48px;
+      align-items: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--azul-light);
+      color: var(--azul-profundo);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: var(--radius-full);
+      margin-bottom: 20px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .hero-badge-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--verde-productivo);
+    }
+
+    .hero-title {
+      font-size: 44px;
+      line-height: 1.15;
+      font-weight: 800;
+      margin-bottom: 18px;
+    }
+
+    .hero-subtitle {
+      font-size: 17px;
+      color: var(--grafito-muted);
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+
+    .hero-checks {
+      display: flex;
+      gap: 20px;
+      font-size: 13px;
+      color: var(--grafito-muted);
+      flex-wrap: wrap;
+    }
+
+    .hero-check-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .hero-check-item span {
+      color: var(--verde-productivo);
+      font-weight: 700;
+    }
+
+    /* Hero Card Showcase */
+    .hero-card {
+      background: #ffffff;
+      border: 1px solid var(--gris-borde);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+    }
+
+    .hero-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--gris-borde);
+      padding-bottom: 16px;
+    }
+
+    .hero-card-tag {
+      background: var(--verde-light);
+      color: var(--verde-productivo);
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+    }
+
+    .score-dial-wrap {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .score-dial-circle {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      background: conic-gradient(var(--verde-productivo) 0% 68%, #e2e8f0 68% 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .score-dial-inner {
+      width: 74px;
+      height: 74px;
+      border-radius: 50%;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .score-dial-num {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--azul-profundo);
+      line-height: 1;
+    }
+
+    .score-dial-max {
+      font-size: 11px;
+      color: var(--grafito-muted);
+    }
+
+    .score-info-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--azul-profundo);
+      margin-bottom: 4px;
+    }
+
+    .score-info-level {
+      display: inline-block;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #92400e;
+      background: #fef3c7;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-bottom: 6px;
+    }
+
+    .hero-dim-bars {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .hero-dim-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12.5px;
+      margin-bottom: 3px;
+    }
+
+    .progress-bar {
+      height: 7px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--verde-productivo);
+      border-radius: 4px;
+    }
+
+    /* Submarcas / Categorías */
+    .section-wrap {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 56px 32px;
+    }
+
+    .section-header {
+      margin-bottom: 36px;
+      text-align: center;
+    }
+
+    .section-eyebrow {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--verde-productivo);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+
+    .section-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--azul-profundo);
+      margin-bottom: 10px;
+    }
+
+    .section-desc {
+      font-size: 15px;
+      color: var(--grafito-muted);
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    .cat-card {
+      background: #ffffff;
+      border: 1px solid var(--gris-borde);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      transition: all 0.25s ease;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .cat-card:hover {
+      border-color: var(--azul-profundo);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .cat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--azul-profundo);
+      border-radius: var(--radius-md) var(--radius-md) 0 0;
+    }
+    .cat-card.cat-finanzas::before { background: var(--azul-profundo); }
+    .cat-card.cat-negocios::before { background: var(--verde-productivo); }
+    .cat-card.cat-datos::before { background: #0E7490; }
+    .cat-card.cat-tecnologia::before { background: #475569; }
+
+    .cat-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: var(--gris-fondo);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin-bottom: 16px;
+    }
+
+    .cat-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--azul-profundo);
+      margin-bottom: 8px;
+    }
+
+    .cat-desc {
+      font-size: 13px;
+      color: var(--grafito-muted);
+      line-height: 1.5;
+    }
+
+    /* Tools & Lead Magnet Grid */
+    .feature-banner-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 16px;
+    }
+
+    .feature-card {
+      background: #ffffff;
+      border: 1px solid var(--gris-borde);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-badge {
+      align-self: flex-start;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 4px 8px;
+      border-radius: 4px;
+      margin-bottom: 16px;
+    }
+
+    .feature-card-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--azul-profundo);
+      margin-bottom: 10px;
+    }
+
+    .feature-card-desc {
+      font-size: 14px;
+      color: var(--grafito-muted);
+      margin-bottom: 24px;
+      line-height: 1.55;
+    }
+
+    /* ==============================================
+       PANTALLA 2: CHECK PYME (CUESTIONARIO)
+       ============================================== */
+    .survey-container {
+      max-width: 680px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .survey-header-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .survey-progress-pill {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--azul-profundo);
+      background: var(--azul-light);
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+    }
+
+    .survey-track {
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 3px;
+      margin-bottom: 32px;
+      overflow: hidden;
+    }
+
+    .survey-track-fill {
+      height: 100%;
+      background: var(--verde-productivo);
+      transition: width 0.3s ease;
+    }
+
+    .survey-card {
+      background: #ffffff;
+      border: 1px solid var(--gris-borde);
+      border-radius: var(--radius-lg);
+      padding: 36px 32px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .survey-dim-name {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--verde-productivo);
+      margin-bottom: 8px;
+    }
+
+    .survey-question {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--azul-profundo);
+      line-height: 1.3;
+      margin-bottom: 8px;
+    }
+
+    .survey-hint {
+      font-size: 13.5px;
+      color: var(--grafito-muted);
+      margin-bottom: 28px;
+    }
+
+    .options-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .option-radio-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 16px 18px;
+      border: 1.5px solid var(--gris-borde);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: #fff;
+    }
+
+    .option-radio-card:hover {
+      border-color: var(--azul-profundo);
+      background: #fafcff;
+    }
+
+    .option-radio-card.selected {
+      border-color: var(--verde-productivo);
+      background: var(--verde-light);
+      box-shadow: 0 0 0 1px var(--verde-productivo);
+    }
+
+    .option-circle {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+      transition: all 0.2s ease;
+    }
+
+    .option-radio-card.selected .option-circle {
+      border-color: var(--verde-productivo);
+      background: var(--verde-productivo);
+    }
+
+    .option-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #fff;
+      display: none;
+    }
+
+    .option-radio-card.selected .option-dot {
+      display: block;
+    }
+
+    .option-text-main {
+      font-size: 14.5px;
+      font-weight: 600;
+      color: var(--grafito-texto);
+      line-height: 1.35;
+    }
+
+    .option-text-sub {
+      font-size: 12.5px;
+      color: var(--grafito-muted);
+      margin-top: 3px;
+    }
+
+    .survey-nav-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--gris-borde);
+      padding-top: 24px;
+    }
+
+    /* ==============================================
+       PANTALLA 3: RESULTADO PRELIMINAR & MAGIC LINK
+       ============================================== */
+    .result-container {
+      max-width: 840px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .result-header-card {
+      background: #ffffff;
+      border: 1px solid var(--gris-borde);
+      border-radius: var(--radius-lg);
+      padding: 40px 36px;
+      box-shadow: var(--shadow-md);
+      margin-bottom: 24px;
+    }
+
+    .result-top-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 24px;
+      margin-bottom: 32px;
+      padding-bottom: 28px;
+      border-bottom: 1px solid var(--gris-borde);
+    }
+
+    .gauge-col {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .big-gauge {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: conic-gradient(var(--verde-productivo) 0% 69%, #e2e8f0 69% 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .big-gauge-inner {
+      width: 94px;
+      height: 94px;
+      border-radius: 50%;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .big-gauge-score {
+      font-size: 36px;
+      font-weight: 800;
+      color: var(--azul-profundo);
+      line-height: 1;
+    }
+
+    .big-gauge-sub {
+      font-size: 12px;
+      color: var(--grafito-muted);
+    }
+
+    .badge-level-pill {
+      font-size: 13.5px;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+
+    .badge-level-desarrollo {
+      background: #FEF3C7;
+      color: #92400E;
+      border: 1px solid #FCD34D;
+    }
+
+    .insights-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 24px;
+    }
+
+    .insight-box {
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+    }
+
+    .insight-strengths {
+      background: var(--verde-light);
+      border: 1px solid var(--verde-border);
+    }
+
+    .insight-gaps {
+      background: #fff8eb;
+      border: 1px solid #fde68a;
+    }
+
+    .insight-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .insight-strengths .insight-title { color: #047857; }
+    .insight-gaps .insight-title { color: #b45309; }
+
+    .insight-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--grafito-texto);
+    }
+
+    /* Gate / Unlock Form Card */
+    .gate-unlock-card {
+      background: #072744;
+      color: #fff;
+      border-radius: var(--radius-lg);
+      padding: 36px 36px;
+      box-shadow: var(--shadow-lg);
+      margin-bottom: 24px;
+    }
+
+    .gate-badge {
+      background: var(--verde-productivo);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      display: inline-block;
+      margin-bottom: 12px;
+    }
+
+    .gate-title {
+      color: #fff;
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .gate-desc {
+      color: #cbd5e1;
+      font-size: 14.5px;
+      margin-bottom: 24px;
+      max-width: 600px;
+    }
+
+    .unlock-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      text-align: left;
+    }
+
+    .form-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+
+    .form-input {
+      background: #0c1d30;
+      border: 1px solid #1e3a57;
+      color: #fff;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      outline: none;
+      transition: border 0.2s;
+    }
+
+    .form-input:focus {
+      border-color: var(--verde-productivo);
+      box-shadow: 0 0 0 2px rgba(0, 169, 135, 0.2);
+    }
+
+    .consent-checks {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 12.5px;
+      color: #94a3b8;
+      cursor: pointer;
+    }
+
+    .checkbox-label input {
+      margin-top: 3px;
+      accent-color: var(--verde-productivo);
+    }
+
+    /* Modal Simulation */
+    .magic-modal-alert {
+      display: none;
+      background: #064e3b;
+      border: 1px solid #059669;
+      color: #ecfdf5;
+      padding: 16px 20px;
+      border-radius: var(--radius-md);
+      margin-top: 16px;
+      font-size: 14px;
+    }
+
+    /* Disclaimer */
+    .disclaimer-box {
+      font-size: 12px;
+      color: var(--grafito-muted);
+      border-left: 3px solid #cbd5e1;
+      padding-left: 14px;
+      margin-top: 20px;
+      line-height: 1.5;
+    }
+
+    /* ==============================================
+       PANTALLA 4: CALCULADORA FINANCIERA
+       ============================================== */
+    .calc-container {
+      max-width: 980px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .calc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.25fr;
+      gap: 28px;
+    }
+
+    .calc-card-input {
+      background: #ffffff;
+      border: 1px solid var(--gris-borde);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .calc-card-output {
+      background: #ffffff;
+      border: 1px solid var(--gris-borde);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .input-row {
+      margin-bottom: 20px;
+    }
+
+    .input-label-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--grafito-texto);
+      margin-bottom: 8px;
+    }
+
+    .calc-slider {
+      width: 100%;
+      accent-color: var(--verde-productivo);
+      height: 6px;
+      cursor: pointer;
+    }
+
+    .calc-kpi-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .calc-kpi-card {
+      background: var(--gris-fondo);
+      border: 1px solid var(--gris-borde);
+      border-radius: var(--radius-md);
+      padding: 16px;
+    }
+
+    .calc-kpi-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--grafito-muted);
+      margin-bottom: 4px;
+    }
+
+    .calc-kpi-value {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--azul-profundo);
+    }
+
+    .calc-kpi-sub {
+      font-size: 11.5px;
+      color: var(--verde-productivo);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    /* ==============================================
+       PANTALLA 5: DESIGN SYSTEM & UI KIT
+       ============================================== */
+    .ds-container {
+      max-width: 1100px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .ds-section {
+      background: #ffffff;
+      border: 1px solid var(--gris-borde);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      margin-bottom: 28px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .ds-section-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--azul-profundo);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ds-section-desc {
+      font-size: 14px;
+      color: var(--grafito-muted);
+      margin-bottom: 24px;
+    }
+
+    .swatches-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+    }
+
+    .swatch-card {
+      border: 1px solid var(--gris-borde);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .swatch-color {
+      height: 72px;
+      width: 100%;
+    }
+
+    .swatch-info {
+      padding: 12px;
+      background: #fff;
+    }
+
+    .swatch-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--grafito-texto);
+    }
+
+    .swatch-hex {
+      font-size: 12px;
+      color: var(--grafito-muted);
+      font-family: monospace;
+    }
+
+    .swatch-role {
+      font-size: 11px;
+      color: var(--grafito-light);
+      margin-top: 4px;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 860px) {
+      .hero-container { grid-template-columns: 1fr; }
+      .categories-grid { grid-template-columns: 1fr 1fr; }
+      .feature-banner-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .calc-grid { grid-template-columns: 1fr; }
+      .insights-grid { grid-template-columns: 1fr; }
+      .unlock-form-grid { grid-template-columns: 1fr; }
+      .portal-nav { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP SUITE CONTROLLER (FIGMA / PROTOTYPE REVIEW BAR) -->
+  <div class="suite-bar">
+    <div class="suite-brand">
+      <span class="suite-tag">Fase A · v0.1</span>
+      <span style="font-weight:700; font-size:14.5px; font-family:'Manrope'; letter-spacing:-0.01em;">
+        Método Productivo · Propuesta Visual
+      </span>
+    </div>
+
+    <!-- TABS TO TOGGLE KEY SCREENS -->
+    <div class="suite-tabs">
+      <button class="suite-tab-btn active" id="tab-btn-home" onclick="showScreen('home')">
+        🏠 1. Home Portal
+      </button>
+      <button class="suite-tab-btn" id="tab-btn-survey" onclick="showScreen('survey')">
+        ⚡ 2. Cuestionario Check
+      </button>
+      <button class="suite-tab-btn" id="tab-btn-result" onclick="showScreen('result')">
+        📊 3. Resultado & Magic Link
+      </button>
+      <button class="suite-tab-btn" id="tab-btn-calc" onclick="showScreen('calc')">
+        🧮 4. Calculadora
+      </button>
+      <button class="suite-tab-btn" id="tab-btn-ds" onclick="showScreen('ds')">
+        🎨 5. Design System
+      </button>
+    </div>
+
+    <!-- VIEWPORT TOGGLE (DESKTOP VS MOBILE FIRST SIMULATION) -->
+    <div class="view-controls">
+      <button class="vp-btn active" id="btn-desktop" onclick="setViewport('desktop')">💻 Escritorio</button>
+      <button class="vp-btn" id="btn-mobile" onclick="setViewport('mobile')">📱 Móvil (390px)</button>
+    </div>
+  </div>
+
+  <!-- MAIN CANVAS -->
+  <div class="preview-canvas">
+    <div class="preview-frame" id="previewFrame">
+
+      <!-- ==============================================
+           VISTA 1: HOME PORTAL
+           ============================================== -->
+      <div id="screen-home" class="screen-view active">
+        <!-- Notification Ribbon -->
+        <div class="portal-announcement">
+          🎯 <strong>Check PyME v1.1 disponible:</strong> Diagnóstico de 8 dimensiones en 3 minutos sin registro previo.
+        </div>
+
+        <!-- Global Header -->
+        <header class="portal-header">
+          <a href="#" class="portal-logo-wrap" onclick="showScreen('home')">
+            <img src="Logotipo Método Productivo.png" alt="Método Productivo" class="portal-logo-img" onerror="this.outerHTML='<span style=\\'font-family:Manrope; font-weight:800; font-size:20px; color:#07345F;\\'>Método<span style=\\'color:#00A987\\'>Productivo</span></span>'"/>
+          </a>
+          <nav class="portal-nav">
+            <a href="#" onclick="showScreen('calc')">Herramientas</a>
+            <a href="#" onclick="showScreen('survey')">Check PyME</a>
+            <a href="#recursos">Recursos</a>
+            <a href="#blog">Blog</a>
+          </nav>
+          <button class="btn btn-primary btn-sm" onclick="showScreen('survey')">
+            Hacer Check PyME →
+          </button>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero-section">
+          <div class="hero-container">
+            <div>
+              <div class="hero-badge">
+                <span class="hero-badge-dot"></span>
+                Herramienta de Diagnóstico PyME Gratuita
+              </div>
+              <h1 class="hero-title">
+                Decisiones financieras y empresariales con método, claridad y datos.
+              </h1>
+              <p class="hero-subtitle">
+                Herramientas de cálculo inmediato, diagnósticos sin fricción y contenidos aplicados para dueños de negocio y líderes que buscan control y crecimiento sin rodeos.
+              </p>
+              <div class="hero-actions">
+                <button class="btn btn-primary btn-lg" onclick="showScreen('survey')">
+                  Evaluar mi PyME gratis (Check PyME) →
+                </button>
+                <button class="btn btn-secondary btn-lg" onclick="showScreen('calc')">
+                  Ver calculadora de punto de equilibrio
+                </button>
+              </div>
+              <div class="hero-checks">
+                <div class="hero-check-item"><span>✓</span> Sin contraseñas ni registros previos</div>
+                <div class="hero-check-item"><span>✓</span> Score 0–100 inmediato en pantalla</div>
+                <div class="hero-check-item"><span>✓</span> Basado en evidencia y números</div>
+              </div>
+            </div>
+
+            <!-- Hero Interactive Preview Card -->
+            <div class="hero-card">
+              <div class="hero-card-header">
+                <div>
+                  <div style="font-size:12px; font-weight:700; color:var(--grafito-muted); text-transform:uppercase;">Tu Diagnóstico en Tiempo Real</div>
+                  <div style="font-size:16px; font-weight:800; color:var(--azul-profundo);">Check PyME v1.1</div>
+                </div>
+                <span class="hero-card-tag">Ejemplo de Resultado</span>
+              </div>
+              <div class="score-dial-wrap">
+                <div class="score-dial-circle">
+                  <div class="score-dial-inner">
+                    <span class="score-dial-num tabular-nums">68</span>
+                    <span class="score-dial-max">/100</span>
+                  </div>
+                </div>
+                <div>
+                  <div class="score-info-title">Nivel de Madurez Operativa</div>
+                  <span class="score-info-level">Gestión en desarrollo (40–69 pts)</span>
+                  <p style="font-size:12px; color:var(--grafito-muted);">Existen datos y prácticas útiles, pero hay controles aislados e informales.</p>
+                </div>
+              </div>
+              <div class="hero-dim-bars">
+                <div>
+                  <div class="hero-dim-row">
+                    <span>Histórico de ventas (12 meses)</span>
+                    <strong class="tabular-nums">100%</strong>
+                  </div>
+                  <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
+                </div>
+                <div>
+                  <div class="hero-dim-row">
+                    <span>Evolución de costos fijos y variables</span>
+                    <strong class="tabular-nums">50%</strong>
+                  </div>
+                  <div class="progress-bar"><div class="progress-fill" style="width:50%; background:var(--verde-suave)"></div></div>
+                </div>
+                <div>
+                  <div class="hero-dim-row">
+                    <span>Concentración de clientes</span>
+                    <strong class="tabular-nums">0% (Riesgo detectado)</strong>
+                  </div>
+                  <div class="progress-bar"><div class="progress-fill" style="width:10%; background:#d97706"></div></div>
+                </div>
+              </div>
+              <button class="btn btn-primary" style="width:100%;" onclick="showScreen('survey')">
+                Iniciar mi evaluación ahora (3 mins) →
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Submarcas Editoriales / Ejes de Método -->
+        <section class="section-wrap">
+          <div class="section-header">
+            <div class="section-eyebrow">Arquitectura de Contenido y Soluciones</div>
+            <h2 class="section-title">Especialidades con Método</h2>
+            <p class="section-desc">Cuatro disciplinas integradas para elevar el rigor operativo y financiero de tu negocio.</p>
+          </div>
+          <div class="categories-grid">
+            <div class="cat-card cat-finanzas">
+              <div class="cat-icon">💼</div>
+              <h3 class="cat-name">Finanzas con Método</h3>
+              <p class="cat-desc">Opciones de crédito para PyMEs, evaluación de proyectos, flujos de caja y análisis de estados financieros.</p>
+            </div>
+            <div class="cat-card cat-negocios">
+              <div class="cat-icon">📈</div>
+              <h3 class="cat-name">Negocios con Método</h3>
+              <p class="cat-desc">Control de márgenes, estructura operativa, compras, formalización de procesos y gobierno del negocio.</p>
+            </div>
+            <div class="cat-card cat-datos">
+              <div class="cat-icon">📊</div>
+              <h3 class="cat-name">Datos con Método</h3>
+              <p class="cat-desc">Modelos aplicados en Excel y Python, indicadores clave (KPIs), proyecciones y toma de decisiones basada en evidencia.</p>
+            </div>
+            <div class="cat-card cat-tecnologia">
+              <div class="cat-icon">⚙️</div>
+              <h3 class="cat-name">Tecnología con Método</h3>
+              <p class="cat-desc">Automatización de tareas repetitivas, adopción de inteligencia artificial práctica y herramientas digitales útiles.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Dual Showcase: Calculadora Inmediata + Lead Magnet -->
+        <section class="section-wrap" style="padding-top:0;">
+          <div class="feature-banner-grid">
+            <!-- Herramienta Interactiva -->
+            <div class="feature-card" style="border-top: 4px solid var(--verde-productivo);">
+              <div>
+                <span class="feature-badge" style="background:var(--verde-light); color:var(--verde-productivo);">
+                  Herramienta Gratuita
+                </span>
+                <h3 class="feature-card-title">Calculadora de Punto de Equilibrio</h3>
+                <p class="feature-card-desc">
+                  Descubre el volumen de ventas e ingresos mínimos que tu empresa necesita cada mes para cubrir costos fijos y variables. Uso inmediato y sin registro.
+                </p>
+              </div>
+              <button class="btn btn-secondary" onclick="showScreen('calc')">
+                Abrir Calculadora sin registro →
+              </button>
+            </div>
+
+            <!-- Lead Magnet -->
+            <div class="feature-card" style="border-top: 4px solid var(--azul-profundo);">
+              <div>
+                <span class="feature-badge" style="background:var(--azul-light); color:var(--azul-profundo);">
+                  Recurso Descargable
+                </span>
+                <h3 class="feature-card-title">Plantilla de Flujo de Efectivo a 13 Semanas</h3>
+                <p class="feature-card-desc">
+                  La herramienta en hoja de cálculo que usan los directores financieros para anticipar baches de liquidez antes de que comprometan la nómina.
+                </p>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <input type="email" placeholder="Tu correo corporativo..." class="form-input" style="background:#fff; color:var(--grafito-texto); border-color:var(--gris-borde); flex:1;"/>
+                <button class="btn btn-primary" onclick="alert('¡Excelente! Se ha enviado el enlace de descarga a tu correo (Simulación RF-A03).')">
+                  Descargar
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Editorial & Video Section -->
+        <section class="section-wrap" style="background:#fff; border-top:1px solid var(--gris-borde); border-bottom:1px solid var(--gris-borde);">
+          <div class="section-header">
+            <div class="section-eyebrow">Aprende con Método</div>
+            <h2 class="section-title">Análisis y Series Editoriales</h2>
+            <p class="section-desc">Explicaciones claras y aplicadas. Sin lenguaje de gurú ni promesas irreales.</p>
+          </div>
+          <div style="display:grid; grid-template-columns: 1.2fr 0.8fr; gap:28px;">
+            <div style="background:var(--azul-profundo); border-radius:var(--radius-lg); padding:28px; color:#fff; display:flex; flex-direction:column; justify-content:space-between;">
+              <div>
+                <span style="background:rgba(255,255,255,0.15); color:#fff; font-size:11.5px; font-weight:700; padding:4px 8px; border-radius:4px; text-transform:uppercase;">
+                  Video Destacado · YouTube
+                </span>
+                <h3 style="color:#fff; font-size:22px; margin-top:14px; margin-bottom:10px;">
+                  Opciones de crédito para PyMEs: Cómo elegir la adecuada sin asfixiar la liquidez
+                </h3>
+                <p style="color:#cbd5e1; font-size:14px; line-height:1.5;">
+                  Aprende a distinguir entre crédito revolvente, simple y factoraje, calculando el costo total y el impacto real en tus flujos semanales.
+                </p>
+              </div>
+              <div style="margin-top:20px; background:rgba(0,0,0,0.3); border-radius:8px; height:180px; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-size:14px; gap:8px;">
+                <span style="font-size:36px; color:var(--verde-productivo);">▶</span> Reproducir clase muestra (24 min)
+              </div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:16px;">
+              <div style="background:var(--gris-fondo); padding:20px; border-radius:var(--radius-md); border:1px solid var(--gris-borde);">
+                <span style="color:var(--verde-productivo); font-size:11.5px; font-weight:700; text-transform:uppercase;">Finanzas con Método</span>
+                <h4 style="font-size:16px; margin:6px 0; color:var(--azul-profundo);">5 señales de que tus costos fijos están erosionando tu margen</h4>
+                <p style="font-size:12.5px; color:var(--grafito-muted);">Por qué facturar más no siempre significa ganar más dinero en una PyME en crecimiento.</p>
+              </div>
+              <div style="background:var(--gris-fondo); padding:20px; border-radius:var(--radius-md); border:1px solid var(--gris-borde);">
+                <span style="color:#0E7490; font-size:11.5px; font-weight:700; text-transform:uppercase;">Datos con Método</span>
+                <h4 style="font-size:16px; margin:6px 0; color:var(--azul-profundo);">Cómo auditar la concentración de clientes en Excel</h4>
+                <p style="font-size:12.5px; color:var(--grafito-muted);">Plantilla paso a paso para medir el riesgo de que el 80% de tus ingresos dependa de 3 cuentas.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="portal-footer">
+          <div class="footer-grid">
+            <div>
+              <div style="font-family:'Manrope'; font-size:18px; font-weight:800; color:#fff; margin-bottom:8px;">
+                Método <span style="color:var(--verde-productivo);">Productivo</span>
+              </div>
+              <p style="font-size:13px; color:#94a3b8; line-height:1.5; margin-bottom:16px;">
+                Productividad con sentido. Plataforma digital de herramientas financieras, diagnóstico PyME y educación basada en datos.
+              </p>
+              <div style="font-size:12.5px; color:#64748b;">
+                Contacto: hola@metodoproductivo.mx
+              </div>
+            </div>
+            <div>
+              <div class="footer-title">Herramientas</div>
+              <ul class="footer-links">
+                <li><a href="#" onclick="showScreen('survey')">Check PyME v1.1</a></li>
+                <li><a href="#" onclick="showScreen('calc')">Calculadora de Equilibrio</a></li>
+                <li><a href="#">Simulador de Crédito (Fase B)</a></li>
+              </ul>
+            </div>
+            <div>
+              <div class="footer-title">Categorías</div>
+              <ul class="footer-links">
+                <li><a href="#">Finanzas con Método</a></li>
+                <li><a href="#">Negocios con Método</a></li>
+                <li><a href="#">Datos con Método</a></li>
+                <li><a href="#">Tecnología con Método</a></li>
+              </ul>
+            </div>
+            <div>
+              <div class="footer-title">Acceso sin cuentas</div>
+              <p style="font-size:12.5px; color:#94a3b8; margin-bottom:12px;">
+                No necesitas contraseña. ¿Hiciste tu Check PyME antes y perdiste el enlace?
+              </p>
+              <a href="#" class="magic-recovery-link" onclick="promptRecovery()">
+                🔑 Recuperar mi diagnóstico anterior (Magic Link)
+              </a>
+            </div>
+          </div>
+          <div class="footer-bottom">
+            <div>© 2026 Método Productivo. Todos los derechos reservados. metodoproductivo.mx</div>
+            <div style="display:flex; gap:16px;">
+              <a href="#" style="color:#64748b; text-decoration:none;">Aviso de Privacidad</a>
+              <a href="#" style="color:#64748b; text-decoration:none;">Términos de Servicio</a>
+            </div>
+          </div>
+        </footer>
+      </div>
+
+
+      <!-- ==============================================
+           VISTA 2: CHECK PYME (CUESTIONARIO INTERACTIVO)
+           ============================================== -->
+      <div id="screen-survey" class="screen-view">
+        <!-- Header minimalista del Check -->
+        <header class="portal-header" style="background:#fff;">
+          <a href="#" class="portal-logo-wrap" onclick="showScreen('home')">
+            <span style="font-family:'Manrope'; font-weight:800; font-size:18px; color:var(--azul-profundo);">
+              Método<span style="color:var(--verde-productivo)">Productivo</span>
+            </span>
+          </a>
+          <span style="font-size:13px; font-weight:600; color:var(--grafito-muted);">
+            Check PyME v1.1 · Diagnóstico Rápido
+          </span>
+          <button class="btn btn-secondary btn-sm" onclick="showScreen('home')">
+            Salir al inicio
+          </button>
+        </header>
+
+        <div class="survey-container">
+          <div class="survey-header-nav">
+            <span class="survey-progress-pill" id="survey-step-pill">Pregunta 1 de 8</span>
+            <span style="font-size:12.5px; color:var(--grafito-muted);" id="survey-pct-text">12% completado</span>
+          </div>
+
+          <div class="survey-track">
+            <div class="survey-track-fill" id="survey-track-fill" style="width: 12.5%;"></div>
+          </div>
+
+          <div class="survey-card">
+            <div class="survey-dim-name" id="q-dim-title">Dimensión 1 · Históricos de ventas</div>
+            <h2 class="survey-question" id="q-text">
+              ¿Cuenta con información histórica de ventas de al menos los últimos 12 meses?
+            </h2>
+            <p class="survey-hint" id="q-hint">
+              Permite identificar si el negocio tiene visibilidad de su ciclo comercial, estacionalidad y tendencias.
+            </p>
+
+            <!-- Dynamic Options Group -->
+            <div class="options-group" id="q-options-container">
+              <!-- Rendered via JS -->
+            </div>
+
+            <div class="survey-nav-actions">
+              <button class="btn btn-secondary" id="btn-survey-prev" onclick="surveyPrev()" style="visibility:hidden;">
+                ← Anterior
+              </button>
+              <div style="font-size:12px; color:var(--grafito-light);">
+                🔒 Sin registro ni datos personales para responder
+              </div>
+              <button class="btn btn-primary" id="btn-survey-next" onclick="surveyNext()">
+                Siguiente →
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ==============================================
+           VISTA 3: RESULTADO PRELIMINAR & MAGIC LINK
+           ============================================== -->
+      <div id="screen-result" class="screen-view">
+        <header class="portal-header">
+          <a href="#" class="portal-logo-wrap" onclick="showScreen('home')">
+            <span style="font-family:'Manrope'; font-weight:800; font-size:18px; color:var(--azul-profundo);">
+              Método<span style="color:var(--verde-productivo)">Productivo</span>
+            </span>
+          </a>
+          <span style="font-size:13px; font-weight:700; color:var(--verde-productivo); background:var(--verde-light); padding:4px 10px; border-radius:4px;">
+            ✓ Diagnóstico Completado
+          </span>
+          <button class="btn btn-secondary btn-sm" onclick="showScreen('home')">
+            Volver a Inicio
+          </button>
+        </header>
+
+        <div class="result-container">
+          <!-- Score Result Header -->
+          <div class="result-header-card">
+            <div class="result-top-banner">
+              <div class="gauge-col">
+                <div class="big-gauge" id="res-gauge-circle">
+                  <div class="big-gauge-inner">
+                    <span class="big-gauge-score tabular-nums" id="res-score-number">69</span>
+                    <span class="big-gauge-sub">/100 pts</span>
+                  </div>
+                </div>
+                <div>
+                  <span class="badge-level-pill badge-level-desarrollo" id="res-level-badge">
+                    Nivel: Gestión en desarrollo (40–69 pts)
+                  </span>
+                  <h2 style="font-size:24px; font-weight:800; color:var(--azul-profundo); margin-bottom:6px;">
+                    Tu negocio cuenta con bases operativas, pero persisten áreas de incertidumbre.
+                  </h2>
+                  <p style="font-size:13.5px; color:var(--grafito-muted); line-height:1.5;">
+                    Existen datos y prácticas útiles, pero todavía hay controles parciales o informales que dependen de personas aisladas y exponen la operación a riesgos imprevistos.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Preliminary Insights: Strengths & Gaps -->
+            <div class="insights-grid">
+              <div class="insight-box insight-strengths">
+                <div class="insight-title">✓ 2 Fortalezas Clave Detectadas</div>
+                <ul class="insight-list">
+                  <li><strong>Visibilidad de Ventas:</strong> Cuentas con histórico estructurado para observar comportamiento y estacionalidad.</li>
+                  <li><strong>Líneas de Ingreso:</strong> Tienes claridad sobre qué productos o servicios aportan el margen principal.</li>
+                </ul>
+              </div>
+
+              <div class="insight-box insight-gaps">
+                <div class="insight-title">⚠ 2 Brechas Principales a Atender</div>
+                <ul class="insight-list">
+                  <li><strong>Concentración de Clientes:</strong> Alto riesgo de dependencia en pocas cuentas clave (vulnerabilidad de ingresos).</li>
+                  <li><strong>Procesos Informales:</strong> Falta de documentación mínima para estandarizar la operación diaria y delegar.</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Disclaimer -->
+            <div class="disclaimer-box">
+              <strong>Aviso de orientación:</strong> Este resultado se calcula exclusivamente con base en las respuestas declaradas por el usuario. No constituye una auditoría contable formal, certificación crediticia ni recomendación de inversión vinculante.
+            </div>
+          </div>
+
+          <!-- The Gate / Unlock Card (RF-A05, RF-A09) -->
+          <div class="gate-unlock-card">
+            <span class="gate-badge">Liberación de Diagnóstico Completo</span>
+            <h3 class="gate-title">Desbloquea el informe detallado y tu Plan de Acción a 30 días</h3>
+            <p class="gate-desc">
+              Accede al desglose de las 8 dimensiones, recomendaciones personalizadas y descarga tu reporte en PDF ejecutivo. <strong>Sin contraseñas:</strong> te enviaremos un enlace de acceso seguro (Magic Link).
+            </p>
+
+            <form id="magic-unlock-form" onsubmit="handleUnlockSubmit(event)">
+              <div class="unlock-form-grid">
+                <div class="form-group">
+                  <label class="form-label">Nombre y Apellido *</label>
+                  <input type="text" class="form-input" placeholder="Ej. Roberto Morales" required id="lead-name" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Correo Electrónico *</label>
+                  <input type="email" class="form-input" placeholder="roberto@miempresa.com" required id="lead-email" />
+                </div>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 20px;">
+                <label class="form-label">Nombre de la Empresa (Opcional)</label>
+                <input type="text" class="form-input" placeholder="Ej. Distribuidora del Norte SA" id="lead-company" />
+              </div>
+
+              <div class="consent-checks">
+                <label class="checkbox-label">
+                  <input type="checkbox" required id="consent-service" />
+                  <span><strong>Requerido:</strong> Acepto recibir mi diagnóstico y el enlace de acceso seguro (Magic link) conforme al <a href="#" style="color:#38bdf8;">Aviso de Privacidad</a>.</span>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" id="consent-marketing" />
+                  <span><strong>Opcional:</strong> Deseo recibir análisis financieros semanales, plantillas y actualizaciones de Método Productivo (puedes cancelar cuando quieras).</span>
+                </label>
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-lg" style="width:100%;">
+                Desbloquear Diagnóstico Completo y Recibir PDF por Correo →
+              </button>
+            </form>
+
+            <div class="magic-modal-alert" id="magic-alert-box">
+              <strong>✉️ ¡Enlace enviado con éxito!</strong> Hemos generado un Magic Link seguro y lo enviamos a tu bandeja de entrada. Abre el enlace para consultar tu reporte interactivo y descargar el PDF. Vigencia de 3 días.
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ==============================================
+           VISTA 4: CALCULADORA FINANCIERA INTERACTIVA
+           ============================================== -->
+      <div id="screen-calc" class="screen-view">
+        <header class="portal-header">
+          <a href="#" class="portal-logo-wrap" onclick="showScreen('home')">
+            <span style="font-family:'Manrope'; font-weight:800; font-size:18px; color:var(--azul-profundo);">
+              Método<span style="color:var(--verde-productivo)">Productivo</span>
+            </span>
+          </a>
+          <span style="font-size:13px; font-weight:600; color:var(--grafito-muted);">
+            Herramienta Independiente · Sin Registro
+          </span>
+          <button class="btn btn-primary btn-sm" onclick="showScreen('survey')">
+            Hacer Check PyME →
+          </button>
+        </header>
+
+        <div class="calc-container">
+          <div style="margin-bottom:28px;">
+            <div style="font-size:12px; font-weight:700; color:var(--verde-productivo); text-transform:uppercase; letter-spacing:0.06em;">
+              Herramienta de Finanzas con Método
+            </div>
+            <h1 style="font-size:32px; font-weight:800; color:var(--azul-profundo); margin:4px 0 8px;">
+              Calculadora de Punto de Equilibrio
+            </h1>
+            <p style="font-size:15px; color:var(--grafito-muted);">
+              Calcula con precisión matemática cuántas unidades o qué volumen de ingresos necesita facturar tu empresa cada mes para no perder dinero.
+            </p>
+          </div>
+
+          <div class="calc-grid">
+            <!-- Inputs -->
+            <div class="calc-card-input">
+              <h3 style="font-size:17px; font-weight:700; color:var(--azul-profundo); margin-bottom:20px;">
+                Variables de tu Negocio
+              </h3>
+
+              <div class="input-row">
+                <div class="input-label-row">
+                  <span>Costos Fijos Mensuales</span>
+                  <strong class="tabular-nums" id="lbl-cf">$75,000 MXN</strong>
+                </div>
+                <input type="range" class="calc-slider" id="slider-cf" min="10000" max="300000" step="5000" value="75000" oninput="runCalculator()" />
+                <div style="font-size:11.5px; color:var(--grafito-light); margin-top:4px;">Renta, nómina base, servicios fijos, seguros, software.</div>
+              </div>
+
+              <div class="input-row">
+                <div class="input-label-row">
+                  <span>Precio de Venta Promedio (Unitario)</span>
+                  <strong class="tabular-nums" id="lbl-precio">$1,200 MXN</strong>
+                </div>
+                <input type="range" class="calc-slider" id="slider-precio" min="100" max="5000" step="50" value="1200" oninput="runCalculator()" />
+                <div style="font-size:11.5px; color:var(--grafito-light); margin-top:4px;">Precio promedio neto antes de impuestos por producto/servicio.</div>
+              </div>
+
+              <div class="input-row">
+                <div class="input-label-row">
+                  <span>Costo Variable Promedio (Unitario)</span>
+                  <strong class="tabular-nums" id="lbl-cv">$650 MXN</strong>
+                </div>
+                <input type="range" class="calc-slider" id="slider-cv" min="50" max="4500" step="50" value="650" oninput="runCalculator()" />
+                <div style="font-size:11.5px; color:var(--grafito-light); margin-top:4px;">Materia prima, comisiones de venta, empaque, envío.</div>
+              </div>
+            </div>
+
+            <!-- Outputs & Interactive Dynamic Graph -->
+            <div class="calc-card-output">
+              <h3 style="font-size:17px; font-weight:700; color:var(--azul-profundo); margin-bottom:16px;">
+                Resultados en Tiempo Real
+              </h3>
+
+              <div class="calc-kpi-grid">
+                <div class="calc-kpi-card">
+                  <div class="calc-kpi-label">Punto de Equilibrio (Unidades)</div>
+                  <div class="calc-kpi-value tabular-nums" id="kpi-unidades">137 u.</div>
+                  <div class="calc-kpi-sub">Unidades al mes</div>
+                </div>
+
+                <div class="calc-kpi-card">
+                  <div class="calc-kpi-label">Ingresos de Equilibrio ($)</div>
+                  <div class="calc-kpi-value tabular-nums" id="kpi-dinero">$164,400</div>
+                  <div class="calc-kpi-sub">Facturación mensual</div>
+                </div>
+
+                <div class="calc-kpi-card">
+                  <div class="calc-kpi-label">Margen de Contribución ($)</div>
+                  <div class="calc-kpi-value tabular-nums" id="kpi-margen-dinero">$550</div>
+                  <div class="calc-kpi-sub">Por unidad vendida</div>
+                </div>
+
+                <div class="calc-kpi-card">
+                  <div class="calc-kpi-label">Ratio de Margen (%)</div>
+                  <div class="calc-kpi-value tabular-nums" id="kpi-margen-pct">45.8%</div>
+                  <div class="calc-kpi-sub">De cada $1 vendido</div>
+                </div>
+              </div>
+
+              <!-- SVG Dynamic Chart Simulation -->
+              <div style="background:var(--gris-fondo); border:1px solid var(--gris-borde); border-radius:var(--radius-md); padding:16px; flex:1; display:flex; flex-direction:column; justify-content:center;">
+                <div style="display:flex; justify-content:space-between; font-size:11.5px; color:var(--grafito-muted); margin-bottom:6px;">
+                  <span>Visualización Gráfica de Costos vs Ingresos</span>
+                  <span><strong style="color:var(--verde-productivo)">● Ingresos</strong> &nbsp; <strong style="color:var(--azul-profundo)">● Costos Totales</strong></span>
+                </div>
+                <svg width="100%" height="110" viewBox="0 0 400 110" style="overflow:visible;">
+                  <!-- Axis -->
+                  <line x1="20" y1="95" x2="380" y2="95" stroke="#cbd5e1" stroke-width="1.5" />
+                  <line x1="20" y1="10" x2="20" y2="95" stroke="#cbd5e1" stroke-width="1.5" />
+                  <!-- Fixed Costs Line -->
+                  <line x1="20" y1="70" x2="380" y2="70" stroke="#94a3b8" stroke-dasharray="3,3" stroke-width="1" />
+                  <!-- Total Costs Line (starting at 70, ending at 20) -->
+                  <line x1="20" y1="70" x2="380" y2="25" stroke="#07345F" stroke-width="2.5" />
+                  <!-- Revenue Line (starting at 95, ending at 12) -->
+                  <line x1="20" y1="95" x2="380" y2="12" stroke="#00A987" stroke-width="2.5" />
+                  <!-- Intersection Point (Breakeven dot) -->
+                  <circle cx="215" cy="45" r="5" fill="#00A987" stroke="#fff" stroke-width="2" />
+                  <text x="225" y="44" font-size="10" font-weight="700" fill="#07345F">Punto de Equilibrio</text>
+                </svg>
+              </div>
+
+              <!-- Contextual Banner: Next Logical Action -->
+              <div style="margin-top:20px; background:var(--azul-light); border:1px solid #bfdbfe; border-radius:var(--radius-md); padding:14px 18px; display:flex; align-items:center; justify-content:space-between; gap:16px;">
+                <div style="font-size:13px; color:var(--azul-profundo);">
+                  <strong>¿Quieres evaluar la estructura completa de tu PyME?</strong><br/>
+                  El Check PyME evalúa ventas, costos, clientes y financiamiento.
+                </div>
+                <button class="btn btn-primary btn-sm" onclick="showScreen('survey')">
+                  Hacer Check PyME →
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ==============================================
+           VISTA 5: DESIGN SYSTEM & UI KIT SHOWCASE
+           ============================================== -->
+      <div id="screen-ds" class="screen-view">
+        <header class="portal-header">
+          <a href="#" class="portal-logo-wrap" onclick="showScreen('home')">
+            <span style="font-family:'Manrope'; font-weight:800; font-size:18px; color:var(--azul-profundo);">
+              Método<span style="color:var(--verde-productivo)">Productivo</span>
+            </span>
+          </a>
+          <span style="font-size:13px; font-weight:700; color:var(--azul-profundo);">
+            Guía de Estilo y Design System v0.1
+          </span>
+          <button class="btn btn-secondary btn-sm" onclick="showScreen('home')">
+            Volver a Portal
+          </button>
+        </header>
+
+        <div class="ds-container">
+          <!-- 1. Tokens de Color -->
+          <div class="ds-section">
+            <h2 class="ds-section-title">🎨 1. Paleta Cromática y Tokens Oficiales</h2>
+            <p class="ds-section-desc">
+              Basada estrictamente en la <em>Propuesta de Marca v0.1</em>. Azul profundo como ancla de autoridad y verde esmeralda para el avance, acción y resultados.
+            </p>
+            <div class="swatches-grid">
+              <div class="swatch-card">
+                <div class="swatch-color" style="background:#07345F;"></div>
+                <div class="swatch-info">
+                  <div class="swatch-name">Azul Profundo</div>
+                  <div class="swatch-hex">#07345F</div>
+                  <div class="swatch-role">Autoridad, encabezados, navegación principal</div>
+                </div>
+              </div>
+              <div class="swatch-card">
+                <div class="swatch-color" style="background:#00A987;"></div>
+                <div class="swatch-info">
+                  <div class="swatch-name">Verde Productivo</div>
+                  <div class="swatch-hex">#00A987</div>
+                  <div class="swatch-role">CTA primario, crecimiento, progreso, scores</div>
+                </div>
+              </div>
+              <div class="swatch-card">
+                <div class="swatch-color" style="background:#19B89A;"></div>
+                <div class="swatch-info">
+                  <div class="swatch-name">Verde Suave</div>
+                  <div class="swatch-hex">#19B89A</div>
+                  <div class="swatch-role">Gráficas, chips secundarios, estados positivos</div>
+                </div>
+              </div>
+              <div class="swatch-card">
+                <div class="swatch-color" style="background:#F5F7F9; border-bottom:1px solid #e2e8f0;"></div>
+                <div class="swatch-info">
+                  <div class="swatch-name">Gris Muy Claro</div>
+                  <div class="swatch-hex">#F5F7F9</div>
+                  <div class="swatch-role">Lienzo de fondo, cards, tablas y descanso</div>
+                </div>
+              </div>
+              <div class="swatch-card">
+                <div class="swatch-color" style="background:#17212B;"></div>
+                <div class="swatch-info">
+                  <div class="swatch-name">Grafito</div>
+                  <div class="swatch-hex">#17212B</div>
+                  <div class="swatch-role">Texto de lectura larga, alto contraste funcional</div>
+                </div>
+              </div>
+              <div class="swatch-card">
+                <div class="swatch-color" style="background:#DC2626;"></div>
+                <div class="swatch-info">
+                  <div class="swatch-name">Rojo Alerta</div>
+                  <div class="swatch-hex">#DC2626</div>
+                  <div class="swatch-role">Errores estrictos de validación o fallas reales</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Tipografía y Jerarquía -->
+          <div class="ds-section">
+            <h2 class="ds-section-title">🔤 2. Tipografía y Escala Modular</h2>
+            <p class="ds-section-desc">
+              <strong>Manrope</strong> para títulos con presencia y modernidad ejecutiva; <strong>Inter</strong> para alta legibilidad en párrafos, formularios y cifras tabulares.
+            </p>
+            <div style="display:flex; flex-direction:column; gap:16px;">
+              <div style="border-bottom:1px solid var(--gris-borde); padding-bottom:12px;">
+                <span style="font-size:11.5px; color:var(--grafito-light); text-transform:uppercase; font-weight:700;">H1 Display · Manrope Bold 800 · 40px / 1.15</span>
+                <h1 style="font-size:36px; margin-top:4px;">Decisiones empresariales con método y claridad</h1>
+              </div>
+              <div style="border-bottom:1px solid var(--gris-borde); padding-bottom:12px;">
+                <span style="font-size:11.5px; color:var(--grafito-light); text-transform:uppercase; font-weight:700;">H2 Section · Manrope Bold 700 · 28px</span>
+                <h2 style="font-size:26px; margin-top:4px;">Check PyME: Diagnóstico de 8 dimensiones</h2>
+              </div>
+              <div style="border-bottom:1px solid var(--gris-borde); padding-bottom:12px;">
+                <span style="font-size:11.5px; color:var(--grafito-light); text-transform:uppercase; font-weight:700;">Body Regular · Inter 400 · 15px / 1.6</span>
+                <p style="font-size:15px; color:var(--grafito-muted); margin-top:4px; max-width:700px;">
+                  Las PyMEs necesitan herramientas sin fricción que traduzcan conceptos complejos de flujo y costos en planes de acción directos, sin contraseñas ni lenguaje de gurú.
+                </p>
+              </div>
+              <div>
+                <span style="font-size:11.5px; color:var(--grafito-light); text-transform:uppercase; font-weight:700;">Datos y Métricas · Inter SemiBold 600 · Tabular Nums</span>
+                <div style="font-size:28px; font-weight:700; color:var(--azul-profundo); margin-top:4px;" class="tabular-nums">
+                  $184,250.00 MXN · 68/100 pts · +14.2%
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Componentes de UI (Botones, Formularios, Badges) -->
+          <div class="ds-section">
+            <h2 class="ds-section-title">🔘 3. Botones y Elementos Interactivos</h2>
+            <p class="ds-section-desc">
+              Regla de oro: <em>Un solo CTA principal por bloque visual</em>. Los botones secundarios dan salida alternativa sin competir.
+            </p>
+            <div style="display:flex; flex-wrap:wrap; gap:16px; align-items:center; margin-bottom:24px;">
+              <button class="btn btn-primary">Botón Primario (Verde)</button>
+              <button class="btn btn-secondary">Botón Secundario (Outline)</button>
+              <button class="btn btn-dark">Botón Institucional (Azul)</button>
+              <button class="btn btn-primary btn-sm">Botón Pequeño</button>
+              <button class="btn btn-primary btn-lg">Botón Grande / Hero</button>
+              <button class="btn btn-secondary" disabled style="opacity:0.5; cursor:not-allowed;">Deshabilitado</button>
+            </div>
+
+            <h3 style="font-size:16px; font-weight:700; margin-bottom:14px; color:var(--azul-profundo);">
+              Badges de Estado del Check PyME (Rangos Anexo A)
+            </h3>
+            <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:center;">
+              <span style="background:#FEE2E2; color:#991B1B; font-weight:700; font-size:12px; padding:5px 12px; border-radius:var(--radius-full); border:1px solid #FCA5A5;">
+                ● 0–39 pts: Baja visibilidad
+              </span>
+              <span style="background:#FEF3C7; color:#92400E; font-weight:700; font-size:12px; padding:5px 12px; border-radius:var(--radius-full); border:1px solid #FCD34D;">
+                ● 40–69 pts: Gestión en desarrollo
+              </span>
+              <span style="background:#DCFCE7; color:#166534; font-weight:700; font-size:12px; padding:5px 12px; border-radius:var(--radius-full); border:1px solid #86EFAC;">
+                ● 70–100 pts: Gestión controlada
+              </span>
+            </div>
+          </div>
+
+          <!-- 4. Principios Fundacionales de UX -->
+          <div class="ds-section" style="background:#072744; color:#fff;">
+            <h2 class="ds-section-title" style="color:#fff;">🎯 4. Principios de Experiencia de Usuario (Fase A)</h2>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:20px;">
+              <div style="background:rgba(255,255,255,0.06); padding:18px; border-radius:var(--radius-md); border:1px solid rgba(255,255,255,0.1);">
+                <div style="font-weight:700; color:var(--verde-productivo); margin-bottom:6px;">1. Primero valor, después captura</div>
+                <p style="font-size:13px; color:#cbd5e1;">La calculadora se usa sin registro y el Check PyME muestra el score global en pantalla antes de solicitar el correo para liberar el desglose y PDF.</p>
+              </div>
+              <div style="background:rgba(255,255,255,0.06); padding:18px; border-radius:var(--radius-md); border:1px solid rgba(255,255,255,0.1);">
+                <div style="font-weight:700; color:var(--verde-productivo); margin-bottom:6px;">2. Cero contraseñas (Magic Links)</div>
+                <p style="font-size:13px; color:#cbd5e1;">Ninguna pantalla pide contraseñas a visitantes. La recuperación de diagnósticos y descargas se resuelve con enlaces tokenizados y seguros por correo.</p>
+              </div>
+              <div style="background:rgba(255,255,255,0.06); padding:18px; border-radius:var(--radius-md); border:1px solid rgba(255,255,255,0.1);">
+                <div style="font-weight:700; color:var(--verde-productivo); margin-bottom:6px;">3. Móvil primero y una por pantalla</div>
+                <p style="font-size:13px; color:#cbd5e1;">En móvil, el cuestionario avanza pregunta por pregunta con botones táctiles grandes (>48px) y sin pop-ups que interrumpan la concentración.</p>
+              </div>
+              <div style="background:rgba(255,255,255,0.06); padding:18px; border-radius:var(--radius-md); border:1px solid rgba(255,255,255,0.1);">
+                <div style="font-weight:700; color:var(--verde-productivo); margin-bottom:6px;">4. Rigor sin arrogancia ni gurús</div>
+                <p style="font-size:13px; color:#cbd5e1;">Visualización limpia, con gráficas funcionales de 2–3 colores, explicaciones con límites y supuestos claros, orientadas a la acción práctica.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SCRIPT LOGIC FOR REAL-TIME INTERACTION -->
+  <script>
+    // Tab and Screen Navigation
+    function showScreen(screenId) {
+      document.querySelectorAll('.screen-view').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.suite-tab-btn').forEach(el => el.classList.remove('active'));
+
+      const target = document.getElementById('screen-' + screenId);
+      if (target) target.classList.add('active');
+
+      const btn = document.getElementById('tab-btn-' + screenId);
+      if (btn) btn.classList.add('active');
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Viewport Mode Simulator
+    function setViewport(mode) {
+      const frame = document.getElementById('previewFrame');
+      const btnDesk = document.getElementById('btn-desktop');
+      const btnMob = document.getElementById('btn-mobile');
+
+      if (mode === 'mobile') {
+        frame.classList.add('mobile-mode');
+        btnMob.classList.add('active');
+        btnDesk.classList.remove('active');
+      } else {
+        frame.classList.remove('mobile-mode');
+        btnDesk.classList.add('active');
+        btnMob.classList.remove('active');
+      }
+    }
+
+    // Check PyME v1.1 Interactive Data & Engine
+    const surveyQuestions = [
+      {
+        dim: "Dimensión 1 · Históricos de ventas",
+        text: "¿Cuenta con información histórica de ventas de al menos los últimos 12 meses?",
+        hint: "Permite identificar si el negocio tiene visibilidad de su ciclo comercial, estacionalidad y tendencias.",
+        options: [
+          { text: "Sí, registrada de forma sistemática y se analiza con regularidad", sub: "Existe, se conoce y se utiliza activamente", pts: 2 },
+          { text: "Existe parcialmente, de manera informal o con huecos en los datos", sub: "Registros dispersos o desactualizados", pts: 1 },
+          { text: "No se cuenta con información histórica organizada", sub: "No existe registro continuo", pts: 0 }
+        ]
+      },
+      {
+        dim: "Dimensión 2 · Evolución de costos",
+        text: "¿Puede identificar cómo han cambiado sus principales costos durante los últimos meses?",
+        hint: "Mide la capacidad para observar incrementos de insumos, nómina y rentas antes de que compriman el margen.",
+        options: [
+          { text: "Sí, se monitorean variaciones de costos fijos y variables periódicamente", sub: "Seguimiento activo", pts: 2 },
+          { text: "Se tiene una noción general, pero sin cálculo sistemático", sub: "Aproximaciones intuitivas", pts: 1 },
+          { text: "No se conoce con claridad cómo han evolucionado los costos", sub: "Sin monitoreo", pts: 0 }
+        ]
+      },
+      {
+        dim: "Dimensión 3 · Concentración de clientes",
+        text: "¿Conoce qué proporción de sus ventas depende de sus principales clientes?",
+        hint: "Evalúa el riesgo de dependencia comercial ante la pérdida o retraso de un cliente grande.",
+        options: [
+          { text: "Sí, se conoce la participación exacta y se monitorea la dependencia", sub: "Medición clara de riesgo", pts: 2 },
+          { text: "Se sabe quiénes son los principales, pero no el porcentaje exacto de ventas", sub: "Visibilidad parcial", pts: 1 },
+          { text: "No se tiene identificada la concentración de ingresos por cliente", sub: "Riesgo no evaluado", pts: 0 }
+        ]
+      },
+      {
+        dim: "Dimensión 4 · Concentración de proveedores",
+        text: "¿Conoce qué proporción de sus compras o insumos depende de sus principales proveedores?",
+        hint: "Identifica la vulnerabilidad operativa ante cambios de precios, plazos o desabasto de proveedores clave.",
+        options: [
+          { text: "Sí, se tiene identificada la dependencia y alternativas de suministro", sub: "Cadena de suministro mapeada", pts: 2 },
+          { text: "Se identifican los proveedores principales, pero sin medir el porcentaje", sub: "Control informal", pts: 1 },
+          { text: "No se monitorea la concentración de compras o insumos", sub: "Sin información de compras", pts: 0 }
+        ]
+      },
+      {
+        dim: "Dimensión 5 · Concentración de productos o servicios",
+        text: "¿Conoce qué productos o servicios generan la mayor parte de sus ingresos?",
+        hint: "Determina si el negocio conoce su ley de Pareto (80/20) en el catálogo comercial.",
+        options: [
+          { text: "Sí, se conoce el margen y volumen de ingresos de cada línea principal", sub: "Análisis de cartera activo", pts: 2 },
+          { text: "Se identifica el producto más vendido, pero no su aporte de margen real", sub: "Estimación sin margen", pts: 1 },
+          { text: "No se tiene claro qué líneas aportan la mayor ganancia", sub: "Desconocimiento del mix", pts: 0 }
+        ]
+      },
+      {
+        dim: "Dimensión 6 · Procesos documentados",
+        text: "¿Sus procesos principales están documentados, aunque sea mediante procedimientos sencillos?",
+        hint: "Grado de formalización operativa para permitir que el negocio opere sin depender al 100% del fundador.",
+        options: [
+          { text: "Sí, los procesos clave están descritos y el equipo los consulta", sub: "Operación estandarizada", pts: 2 },
+          { text: "Existen algunas notas o instrucciones, pero la mayoría es conocimiento verbal", sub: "Documentación aislada", pts: 1 },
+          { text: "No existe documentación; todo se resuelve sobre la marcha", sub: "Dependencia personal total", pts: 0 }
+        ]
+      },
+      {
+        dim: "Dimensión 7 · Información para decidir",
+        text: "¿Cuenta con información confiable y actualizada para tomar decisiones, aunque se gestione en Excel?",
+        hint: "Disponibilidad de números frescos para decidir precios, compras y contrataciones con certeza.",
+        options: [
+          { text: "Sí, se dispone de tableros o reportes actualizados al menos mensualmente", sub: "Información al día", pts: 2 },
+          { text: "Se consulta información ocasionalmente cuando surge una urgencia", sub: "Reportes extemporáneos", pts: 1 },
+          { text: "Las decisiones se toman principalmente por intuición o saldo en banco", sub: "Sin información de gestión", pts: 0 }
+        ]
+      },
+      {
+        dim: "Dimensión 8 · Financiamiento (v1.1)",
+        text: "¿Cuál de estas opciones describe mejor la situación de financiamiento de su negocio?",
+        hint: "No premia tener deuda; califica claridad de destino, planeación y preparación financiera.",
+        options: [
+          { text: "Tiene financiamiento formal y conoce con precisión su costo y finalidad", sub: "Uso estratégico de crédito (2 pts)", pts: 2 },
+          { text: "No tiene financiamiento, pero identifica con claridad una necesidad futura", sub: "Planeación proactiva (2 pts)", pts: 2 },
+          { text: "No tiene financiamiento, lo evaluó con números y concluyó que no lo requiere", sub: "Decisión financiera consciente (2 pts)", pts: 2 },
+          { text: "Tiene financiamiento, pero no tiene certeza sobre si las condiciones son las adecuadas", sub: "Uso sin claridad de costo (1 pto)", pts: 1 },
+          { text: "No tiene financiamiento y no ha evaluado si su modelo lo necesita", sub: "Sin evaluación financiera (0 pts)", pts: 0 }
+        ]
+      }
+    ];
+
+    let currentQ = 0;
+    let answers = [2, 1, 0, 1, 2, 0, 2, 2]; // default initialized answers
+
+    function renderQuestion() {
+      const q = surveyQuestions[currentQ];
+      document.getElementById('q-dim-title').innerText = q.dim;
+      document.getElementById('q-text').innerText = q.text;
+      document.getElementById('q-hint').innerText = q.hint;
+      document.getElementById('survey-step-pill').innerText = `Pregunta ${currentQ + 1} de 8`;
+      
+      const pct = Math.round(((currentQ + 1) / 8) * 100);
+      document.getElementById('survey-pct-text').innerText = `${pct}% completado`;
+      document.getElementById('survey-track-fill').style.width = `${pct}%`;
+
+      document.getElementById('btn-survey-prev').style.visibility = currentQ > 0 ? 'visible' : 'hidden';
+      document.getElementById('btn-survey-next').innerText = currentQ === 7 ? 'Ver Resultado Preliminar →' : 'Siguiente →';
+
+      const container = document.getElementById('q-options-container');
+      container.innerHTML = '';
+
+      q.options.forEach((opt, idx) => {
+        const isSelected = answers[currentQ] === opt.pts;
+        const card = document.createElement('div');
+        card.className = `option-radio-card ${isSelected ? 'selected' : ''}`;
+        card.onclick = () => selectOption(opt.pts);
+        card.innerHTML = `
+          <div class="option-circle">
+            <div class="option-dot"></div>
+          </div>
+          <div>
+            <div class="option-text-main">${opt.text}</div>
+            <div class="option-text-sub">${opt.sub}</div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function selectOption(pts) {
+      answers[currentQ] = pts;
+      renderQuestion();
+    }
+
+    function surveyPrev() {
+      if (currentQ > 0) {
+        currentQ--;
+        renderQuestion();
+      }
+    }
+
+    function surveyNext() {
+      if (currentQ < 7) {
+        currentQ++;
+        renderQuestion();
+      } else {
+        // Calculate Score & Show Results Screen
+        calculateAndDisplayResult();
+        showScreen('result');
+      }
+    }
+
+    function calculateAndDisplayResult() {
+      const rawPoints = answers.reduce((acc, val) => acc + val, 0); // max 16
+      const score = Math.round((rawPoints / 16) * 100);
+
+      document.getElementById('res-score-number').innerText = score;
+      document.getElementById('res-gauge-circle').style.background = 
+        `conic-gradient(var(--verde-productivo) 0% ${score}%, #e2e8f0 ${score}% 100%)`;
+
+      const badge = document.getElementById('res-level-badge');
+      if (rawPoints <= 6) {
+        badge.innerText = `Nivel: Baja visibilidad (${score}/100 pts)`;
+        badge.className = "badge-level-pill";
+        badge.style.background = "#fee2e2";
+        badge.style.color = "#991b1b";
+      } else if (rawPoints <= 11) {
+        badge.innerText = `Nivel: Gestión en desarrollo (${score}/100 pts)`;
+        badge.className = "badge-level-pill badge-level-desarrollo";
+      } else {
+        badge.innerText = `Nivel: Gestión controlada (${score}/100 pts)`;
+        badge.className = "badge-level-pill";
+        badge.style.background = "#dcfce7";
+        badge.style.color = "#166534";
+      }
+    }
+
+    // Lead Capture Simulation
+    function handleUnlockSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('lead-name').value;
+      const email = document.getElementById('lead-email').value;
+      const alertBox = document.getElementById('magic-alert-box');
+      alertBox.style.display = 'block';
+      alertBox.innerHTML = `<strong>✉️ ¡Magic Link enviado a ${email}!</strong> Estimado(a) ${name}, te hemos enviado el enlace de un solo clic para consultar tu informe completo de 12 páginas y descargar tu PDF.`;
+    }
+
+    // Interactive Breakeven Calculator
+    function runCalculator() {
+      const cf = parseFloat(document.getElementById('slider-cf').value);
+      const precio = parseFloat(document.getElementById('slider-precio').value);
+      const cv = parseFloat(document.getElementById('slider-cv').value);
+
+      document.getElementById('lbl-cf').innerText = '$' + cf.toLocaleString('es-MX') + ' MXN';
+      document.getElementById('lbl-precio').innerText = '$' + precio.toLocaleString('es-MX') + ' MXN';
+      document.getElementById('lbl-cv').innerText = '$' + cv.toLocaleString('es-MX') + ' MXN';
+
+      const margenDinero = Math.max(0, precio - cv);
+      const margenPct = precio > 0 ? ((margenDinero / precio) * 100).toFixed(1) : 0;
+      const unidadesEquilibrio = margenDinero > 0 ? Math.ceil(cf / margenDinero) : 0;
+      const ingresosEquilibrio = unidadesEquilibrio * precio;
+
+      document.getElementById('kpi-unidades').innerText = unidadesEquilibrio.toLocaleString('es-MX') + ' u.';
+      document.getElementById('kpi-dinero').innerText = '$' + ingresosEquilibrio.toLocaleString('es-MX');
+      document.getElementById('kpi-margen-dinero').innerText = '$' + margenDinero.toLocaleString('es-MX');
+      document.getElementById('kpi-margen-pct').innerText = margenPct + '%';
+    }
+
+    function promptRecovery() {
+      const email = prompt("Ingresa el correo con el que realizaste tu Check PyME:");
+      if (email) {
+        alert(`Si el correo ${email} tiene un diagnóstico registrado en los últimos 12 meses, se ha enviado un nuevo enlace de acceso (Magic link). Por seguridad no se confirma la existencia del registro en pantalla (RN-002).`);
+      }
+    }
+
+    // Initial render
+    renderQuestion();
+    runCalculator();
+  </script>
+</body>
+</html>
+"""
+
+with open("propuesta_visual_interactiva.html", "w", encoding="utf-8") as f:
+    f.write(html_content)
+
+print("propuesta_visual_interactiva.html generated successfully!")

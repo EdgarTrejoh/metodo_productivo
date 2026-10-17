@@ -1,0 +1,154 @@
+[
+  {
+    "dimension": "Históricos de ventas",
+    "question": "¿Cuenta con información histórica de ventas de al menos los últimos 12 meses?",
+    "choices": [
+      [
+        "0",
+        "No tengo información histórica de ventas"
+      ],
+      [
+        "1",
+        "La tengo, pero incompleta o de menos de 12 meses"
+      ],
+      [
+        "2",
+        "Tengo al menos 12 meses y la reviso con regularidad"
+      ]
+    ]
+  },
+  {
+    "dimension": "Evolución de costos",
+    "question": "¿Puede identificar cómo han cambiado sus principales costos durante los últimos meses?",
+    "choices": [
+      [
+        "0",
+        "No sé cómo han cambiado mis principales costos"
+      ],
+      [
+        "1",
+        "Lo sé de forma general o solo de algunos costos"
+      ],
+      [
+        "2",
+        "Lo identifico y le doy seguimiento periódico"
+      ]
+    ]
+  },
+  {
+    "dimension": "Concentración de clientes",
+    "question": "¿Conoce qué proporción de sus ventas depende de sus principales clientes?",
+    "choices": [
+      [
+        "0",
+        "No sé qué proporción de mis ventas depende de mis principales clientes"
+      ],
+      [
+        "1",
+        "Tengo una idea aproximada"
+      ],
+      [
+        "2",
+        "Lo conozco con datos y lo reviso periódicamente"
+      ]
+    ]
+  },
+  {
+    "dimension": "Concentración de proveedores",
+    "question": "¿Conoce qué proporción de sus compras o insumos depende de sus principales proveedores?",
+    "choices": [
+      [
+        "0",
+        "No sé qué proporción de mis compras depende de mis principales proveedores"
+      ],
+      [
+        "1",
+        "Tengo una idea aproximada"
+      ],
+      [
+        "2",
+        "Lo conozco con datos y lo reviso periódicamente"
+      ]
+    ]
+  },
+  {
+    "dimension": "Concentración de productos/servicios",
+    "question": "¿Conoce qué productos o servicios generan la mayor parte de sus ingresos?",
+    "choices": [
+      [
+        "0",
+        "No sé cuáles generan la mayor parte de mis ingresos"
+      ],
+      [
+        "1",
+        "Tengo una idea aproximada"
+      ],
+      [
+        "2",
+        "Lo conozco con datos y lo reviso periódicamente"
+      ]
+    ]
+  },
+  {
+    "dimension": "Procesos documentados",
+    "question": "¿Sus procesos principales están documentados, aunque sea mediante procedimientos sencillos?",
+    "choices": [
+      [
+        "0",
+        "No están documentados"
+      ],
+      [
+        "1",
+        "Algunos lo están, o de manera informal"
+      ],
+      [
+        "2",
+        "Los principales están documentados y se usan"
+      ]
+    ]
+  },
+  {
+    "dimension": "Información para decidir",
+    "question": "¿Cuenta con información confiable y actualizada para tomar decisiones, aunque se gestione en Excel?",
+    "choices": [
+      [
+        "0",
+        "No cuento con información confiable"
+      ],
+      [
+        "1",
+        "La tengo, pero es incompleta o está desactualizada"
+      ],
+      [
+        "2",
+        "Es confiable, está actualizada y la uso para decidir"
+      ]
+    ]
+  },
+  {
+    "dimension": "Financiamiento",
+    "question": "¿Cuál de estas opciones describe mejor la situación de financiamiento de su negocio? (opción única)",
+    "choices": [
+      [
+        "a",
+        "Tengo y conozco su finalidad"
+      ],
+      [
+        "b",
+        "No tengo, pero identifico una necesidad futura"
+      ],
+      [
+        "c",
+        "Tengo financiamiento, pero no tengo claridad sobre si es el adecuado"
+      ],
+      [
+        "d",
+        "No tengo financiamiento y no he evaluado si lo necesito"
+      ],
+      [
+        "e",
+        "No tengo y evalué que no lo requiero"
+      ]
+    ]
+  }
+]
