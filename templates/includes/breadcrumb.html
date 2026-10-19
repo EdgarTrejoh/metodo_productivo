@@ -1,6 +1,7 @@
 <nav class="breadcrumb" aria-label="Ruta de navegación">
   <ol>
     <li><a href="{% url 'home' %}">Inicio</a></li>
+    {% if parent_label and parent_url %}<li><span aria-hidden="true">/</span><a href="{% url parent_url %}">{{ parent_label }}</a></li>{% endif %}
     <li><span aria-hidden="true">/</span><span aria-current="page">{{ current }}</span></li>
   </ol>
 </nav>

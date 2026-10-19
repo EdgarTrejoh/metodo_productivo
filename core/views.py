@@ -1,4 +1,9 @@
-from django.shortcuts import render
+from uuid import UUID, uuid4
+
+from django.shortcuts import redirect, render
+
+from analytics.models import ProductEvent
+from .break_even import BreakEvenForm, calculate
 
 
 def home(request):
@@ -12,25 +17,12 @@ PAGES = {
         'template': 'tools.html',
         'eyebrow': 'Herramientas · Fase A',
         'title': 'Calculadoras para preguntas concretas.',
-        'intro': 'Usa modelos sencillos para explorar decisiones de tu negocio. La primera calculadora será la de punto de equilibrio mensual.',
-        'status': 'Estructura en desarrollo',
-        'note': 'La calculadora todavía no realiza cálculos. Su funcionamiento se incorporará en A-02.',
+        'intro': 'Usa modelos sencillos para explorar decisiones de tu negocio. Comienza con el punto de equilibrio mensual.',
+        'status': 'Calculadora funcional · A-02 aprobada con salvedades',
+        'note': 'El cálculo de punto de equilibrio funciona en este entorno de desarrollo; la medición transversal O-08 sigue pendiente.',
         'cards': [
             {'title': 'Punto de equilibrio', 'text': 'Una vista mensual de costos, precio y margen para un producto o servicio.', 'url': 'break_even', 'label': 'Conocer la herramienta'},
             {'title': 'Check PyME', 'text': 'Ocho preguntas para obtener una primera lectura de tus prácticas de gestión.', 'url': 'entry', 'label': 'Abrir el Check disponible'},
-        ],
-    },
-    'break_even': {
-        'eyebrow': 'Herramientas · Punto de equilibrio',
-        'title': 'Entiende cuántas unidades necesitas vender para cubrir costos.',
-        'intro': 'La calculadora de punto de equilibrio mensual utilizará costos fijos, precio unitario y costo variable unitario. El cálculo y sus resultados aún no están disponibles en esta entrega.',
-        'status': 'Calculadora pendiente · A-02',
-        'note': 'Vista de desarrollo. No captures importes aquí: todavía no existe un formulario funcional.',
-        'section_heading': 'Los datos que usará',
-        'cards': [
-            {'title': 'Costos fijos mensuales', 'text': 'Gastos relativamente constantes dentro del volumen de operación considerado.'},
-            {'title': 'Precio por unidad', 'text': 'Importe del mismo producto o servicio que se evaluará.'},
-            {'title': 'Costo variable por unidad', 'text': 'Costo asociado a cada unidad vendida.'},
         ],
     },
     'resources': {
@@ -118,3 +110,35 @@ PAGES = {
 def section(request, page):
     context = PAGES[page]
     return render(request, context.get('template', 'section.html'), {'page': context})
+
+
+def break_even(request):
+    """POST de una interacción; el token de sesión evita reenvíos accidentales."""
+    result = None
+    if request.method == 'POST':
+        submitted = request.POST.get('interaction', '')
+        try:
+            execution = UUID(submitted)
+        except (ValueError, AttributeError, TypeError):
+            execution = None
+        if execution is None or submitted != request.session.get('break_even_interaction'):
+            # El navegador puede reenviar un POST al actualizar. La interacción
+            # ya consumida vuelve a un GET vacío sin duplicar los eventos.
+            return redirect('break_even')
+        else:
+            # La siguiente operación recibe un identificador nuevo. Una recarga del
+            # POST original no crea eventos adicionales ni guarda los importes.
+            request.session['break_even_interaction'] = str(uuid4())
+            ProductEvent.objects.get_or_create(kind='TOOL_STARTED', execution=execution)
+            form = BreakEvenForm(request.POST)
+            if form.is_valid():
+                result = calculate(form.cleaned_data)
+                ProductEvent.objects.get_or_create(kind='TOOL_COMPLETED', execution=execution)
+    else:
+        form = BreakEvenForm()
+        request.session['break_even_interaction'] = str(uuid4())
+    return render(request, 'break_even.html', {
+        'form': form,
+        'interaction': request.session['break_even_interaction'],
+        'result': result,
+    })

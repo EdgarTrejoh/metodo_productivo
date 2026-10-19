@@ -27,7 +27,7 @@ site.register(Orientation,OrientationAdmin)
 urlpatterns = [
     path('', portal_views.home, name='home'),
     path('herramientas/', portal_views.section, {'page': 'tools'}, name='tools'),
-    path('herramientas/punto-de-equilibrio/', portal_views.section, {'page': 'break_even'}, name='break_even'),
+    path('herramientas/punto-de-equilibrio/', portal_views.break_even, name='break_even'),
     path('recursos/', portal_views.section, {'page': 'resources'}, name='resources'),
     path('recursos/flujo-efectivo-13-semanas/', portal_views.section, {'page': 'cash_flow_resource'}, name='cash_flow_resource'),
     path('blog/', portal_views.section, {'page': 'blog'}, name='blog'),

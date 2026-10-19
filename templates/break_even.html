@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block title %}Punto de equilibrio | Método Productivo{% endblock %}
+{% block main_class %}interior-main calculator-main{% endblock %}
+{% block content %}
+{% include 'includes/breadcrumb.html' with parent_label='Herramientas' parent_url='tools' current='Punto de equilibrio' %}
+<section class="calculator-intro" aria-labelledby="page-title">
+  <p class="eyebrow">Herramientas · Calculadora gratuita</p>
+  <h1 id="page-title">Punto de equilibrio mensual</h1>
+  <p>Estima cuántas unidades completas de un producto o servicio necesitas vender para cubrir sus costos. El cálculo se realiza en el servidor, sin cuenta ni descarga de Excel.</p>
+</section>
+
+<div class="calculator-layout">
+  <section class="calculator-panel" aria-labelledby="calculator-form-title">
+    <h2 id="calculator-form-title">Datos para el cálculo</h2>
+    <p class="calculator-hint">Usa MXN sin impuestos trasladados y el mismo criterio para precio y costos. Escribe importes sin separadores de miles, con hasta dos decimales.</p>
+    <form method="post" action="{% url 'break_even' %}" novalidate>
+      {% csrf_token %}
+      <input type="hidden" name="interaction" value="{{ interaction }}">
+      <div class="calculator-field">
+        <label for="{{ form.costs.id_for_label }}">Costos fijos mensuales <span class="field-unit">MXN por mes</span></label>
+        <p id="costs-help" class="field-help">Costos relativamente constantes, como renta, sueldos fijos y servicios contratados. Si vendes varios productos, no atribuyas necesariamente todos los costos del negocio a uno solo.</p>
+        <input id="{{ form.costs.id_for_label }}" name="costs" type="text" inputmode="decimal" autocomplete="off" required value="{{ form.costs.value|default_if_none:'' }}" aria-describedby="costs-help{% if form.costs.errors %} costs-error{% endif %}"{% if form.costs.errors %} aria-invalid="true"{% endif %}>
+        {% if form.costs.errors %}<p id="costs-error" class="field-error">{{ form.costs.errors|join:' ' }}</p>{% endif %}
+      </div>
+      <div class="calculator-field">
+        <label for="{{ form.price.id_for_label }}">Precio de venta unitario <span class="field-unit">MXN por unidad</span></label>
+        <p id="price-help" class="field-help">Precio esperado por una unidad completa del producto o servicio, después de descuentos habituales.</p>
+        <input id="{{ form.price.id_for_label }}" name="price" type="text" inputmode="decimal" autocomplete="off" required value="{{ form.price.value|default_if_none:'' }}" aria-describedby="price-help{% if form.price.errors %} price-error{% endif %}"{% if form.price.errors %} aria-invalid="true"{% endif %}>
+        {% if form.price.errors %}<p id="price-error" class="field-error">{{ form.price.errors|join:' ' }}</p>{% endif %}
+      </div>
+      <div class="calculator-field">
+        <label for="{{ form.variable_cost.id_for_label }}">Costo variable unitario <span class="field-unit">MXN por unidad</span></label>
+        <p id="variable-cost-help" class="field-help">Puede incluir compra o fabricación, empaque, comisiones, entrega y otros costos asociados a cada unidad.</p>
+        <input id="{{ form.variable_cost.id_for_label }}" name="variable_cost" type="text" inputmode="decimal" autocomplete="off" required value="{{ form.variable_cost.value|default_if_none:'' }}" aria-describedby="variable-cost-help{% if form.variable_cost.errors %} variable-cost-error{% endif %}"{% if form.variable_cost.errors %} aria-invalid="true"{% endif %}>
+        {% if form.variable_cost.errors %}<p id="variable-cost-error" class="field-error">{{ form.variable_cost.errors|join:' ' }}</p>{% endif %}
+      </div>
+      <div class="calculator-actions">
+        <button type="submit">Calcular equilibrio</button>
+        <a class="button calculator-clear" href="{% url 'break_even' %}">Limpiar</a>
+      </div>
+    </form>
+  </section>
+
+  <aside class="calculator-context" aria-labelledby="context-title">
+    <p class="eyebrow">Cómo leerlo</p>
+    <h2 id="context-title">Una vista para orientar decisiones</h2>
+    <p>El margen de contribución es el precio menos el costo variable de cada unidad. Si es positivo, contribuye a cubrir los costos fijos.</p>
+    <p>El modelo usa unidades completas e indivisibles. No contempla unidades fraccionables, como horas parciales.</p>
+  </aside>
+</div>
+
+{% if result %}
+<section class="calculator-result result-{{ result.state }}" id="resultado" aria-labelledby="result-title" tabindex="-1">
+  <p class="eyebrow">Resultado mensual</p>
+  <h2 id="result-title">Lectura de punto de equilibrio</h2>
+  <p class="result-state">{{ result.state_label }}</p>
+  <div class="result-grid">
+    <div class="result-card"><span>Unidades mínimas mensuales para cubrir costos</span><strong>{{ result.units }}</strong></div>
+    <div class="result-card"><span>Ingresos con las unidades mínimas</span><strong>{{ result.income }}</strong></div>
+    <div class="result-card"><span>Margen de contribución unitario</span><strong>{{ result.margin }}</strong></div>
+    <div class="result-card"><span>Margen de contribución porcentual</span><strong>{{ result.percentage }}</strong></div>
+  </div>
+  <p class="result-explanation">{{ result.explanation }}</p>
+  {% if result.large_result %}<p class="calculator-notice">El número de unidades es una estimación bajo supuestos de precio y costos constantes.</p>{% endif %}
+  <p class="method-note"><strong>Alcance del cálculo.</strong> Esta calculadora ofrece una estimación mensual para un producto o servicio con precio y costo variable unitarios constantes. Ingrese un precio esperado después de sus descuentos habituales y use importes sin impuestos trasladados. La herramienta no modela cambios de descuentos, impuestos, capacidad, mezcla de productos ni todos los costos posibles. Revise sus datos antes de tomar decisiones; el resultado no sustituye un análisis financiero adaptado a su negocio.</p>
+  <p class="result-next">¿Quieres revisar prácticas de gestión de tu negocio? <a href="{% url 'entry' %}">Conoce el Check PyME</a>.</p>
+</section>
+{% endif %}
+{% endblock %}

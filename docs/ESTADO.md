@@ -49,3 +49,11 @@ Implementar las reglas aprobadas en D-02 y ejecutar sus pruebas de aceptación; 
 El promotor aprobó **CON SALVEDADES** la estructura integral navegable tras las rondas AV-01–AV-29: Home, identidad oficial, navegación, pie, páginas públicas estructurales y acceso al Check B0. La evidencia técnica se resume en [VERIFICACION.md](VERIFICACION.md). Esta aceptación visual no equivale a H2 completo, publicación ni funcionalidad de calculadora, lead magnet, blog, contacto o páginas legales definitivas.
 
 **A-01 continúa EN CURSO:** faltan el favicon oficial y la instrumentación y verificación de clics principales. La prueba en dispositivo móvil físico corresponde a la actividad de verificación posterior. H2 sigue pendiente de aceptación integral; D-10 permanece aprobada. La siguiente capacidad funcional prioritaria del plan es **A-02 — calculadora de punto de equilibrio**, regida por D-04, sin inicio de Entrega 2 en este cierre.
+
+## Portal de Fase A — A-02 y Entrega 2 (19 de octubre de 2026)
+
+El promotor aprobó **CON SALVEDADES** la implementación funcional y visual de A-02, incluidos A02-AV01–AV08. La calculadora mensual de punto de equilibrio opera en Django sin JavaScript obligatorio, con tres entradas validadas, cálculo decimal en servidor y cuatro resultados según D-04. [Evidencia de verificación](VERIFICACION.md). Esta actualización no cambia el corte histórico de B0 ni las decisiones aprobadas.
+
+**A-02 y Entrega 2 continúan EN CURSO; D-04 permanece APROBADA.** `TOOL_STARTED` y `TOOL_COMPLETED` se registran por interacción sin importes, pero O-08 sigue pendiente de integración y verificación transversal. La limitación de AV-06 queda aceptada: F5 puede reenviar el POST; el servidor evita eventos duplicados y regresa a un GET vacío, sin persistir importes ni exigir JavaScript. Los estados visuales positivo, cero y negativo de AV-08 quedaron aprobados tras revisión de escritorio y móvil.
+
+El siguiente recorrido funcional de la secuencia de Entrega 2 es A-05/A-06 (blog y videos), sujeto a autorización de ejecución; A-03 conserva la dependencia del Excel definitivo externo para su entrega real. No se iniciaron esos trabajos en este cierre.
