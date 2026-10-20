@@ -48,19 +48,6 @@ PAGES = {
             {'title': 'Entrega futura', 'text': 'La solicitud y el acceso al archivo tendrán su propio recorrido cuando A-03 esté implementada.'},
         ],
     },
-    'blog': {
-        'template': 'blog.html',
-        'eyebrow': 'Contenido · Blog',
-        'title': 'Ideas para gestionar con más claridad.',
-        'intro': 'El contenido editorial se organizará alrededor de finanzas, negocios, datos y tecnología aplicados a proyectos, trabajo y negocios.',
-        'status': 'Artículos pendientes · A-05',
-        'note': 'Aún no hay artículos publicados en esta versión de desarrollo. No se muestran publicaciones de ejemplo como si fueran reales.',
-        'cards': [
-            {'title': 'Finanzas con Método', 'text': 'Lecturas para ordenar decisiones financieras.'},
-            {'title': 'Negocios con Método', 'text': 'Prácticas para mejorar la operación y los márgenes.'},
-            {'title': 'Datos y Tecnología', 'text': 'Uso práctico de indicadores y herramientas digitales.'},
-        ],
-    },
     'contact': {
         'template': 'contact.html',
         'eyebrow': 'Contacto',

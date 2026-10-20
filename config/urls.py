@@ -10,6 +10,9 @@ from core import views as portal_views
 from diagnostics.models import Diagnostic,Orientation
 from leads.models import Lead,Consent
 from analytics.models import ProductEvent
+from content.admin import ArticleAdmin, MediaAssetAdmin, VideoAdmin
+from content.models import Article, MediaAsset, Video
+from content import views as content_views
 from django.contrib import admin
 site=OTPAdminSite(name='otpadmin')
 site.register(User,UserAdmin);site.register(Group,GroupAdmin);site.register(TOTPDevice,TOTPDeviceAdmin)
@@ -24,13 +27,18 @@ class OrientationAdmin(admin.ModelAdmin):
     def has_add_permission(self,request):return False
     def has_delete_permission(self,request,obj=None):return False
 site.register(Orientation,OrientationAdmin)
+site.register(Article, ArticleAdmin)
+site.register(MediaAsset, MediaAssetAdmin)
+site.register(Video, VideoAdmin)
 urlpatterns = [
     path('', portal_views.home, name='home'),
     path('herramientas/', portal_views.section, {'page': 'tools'}, name='tools'),
     path('herramientas/punto-de-equilibrio/', portal_views.break_even, name='break_even'),
     path('recursos/', portal_views.section, {'page': 'resources'}, name='resources'),
     path('recursos/flujo-efectivo-13-semanas/', portal_views.section, {'page': 'cash_flow_resource'}, name='cash_flow_resource'),
-    path('blog/', portal_views.section, {'page': 'blog'}, name='blog'),
+    path('blog/', content_views.index, name='blog'),
+    path('blog/<slug:slug>/', content_views.detail, name='article_detail'),
+    path('editorial/media/<uuid:image_id>/', content_views.editorial_image, name='editorial_image'),
     path('contacto/', portal_views.section, {'page': 'contact'}, name='contact'),
     path('acerca/', portal_views.section, {'page': 'about'}, name='about'),
     path('privacidad/', portal_views.section, {'page': 'privacy'}, name='privacy'),

@@ -52,4 +52,10 @@ python manage.py createsuperuser
 ```
 El plugin TOTP está instalado. Para enrolar el primer dispositivo, usar shell local protegido y TOTPDevice; no guardar semillas en archivos ni logs. El runbook operativo se completará antes de habilitar administración real. No hay contraseña ni bypass predeterminados.
 
-Documentación de alcance y límites: docs/ESTADO.md. Plan y checklist de avance: docs/PLAN_TRABAJO.md. Inventario de archivos exteriores: docs/INVENTARIO_ARCHIVOS_EXTERNOS.md. Preguntas, catálogo y selección se conservan del BRD v0.6; los diseños editoriales siguen en revisión.
+## Edición de contenidos en desarrollo
+
+En `/backoffice/`, el personal autorizado con OTP puede crear imágenes editoriales y artículos. Primero agrega una imagen JPG, PNG o WebP en **Contenidos → Imágenes editoriales**, con nombre y texto alternativo; después crea un artículo en **Contenidos → Artículos**. El editor visual permite encabezados, énfasis, listas, enlaces, tablas e imágenes de la biblioteca. Guarda como borrador y usa **Vista previa del artículo guardado** antes de publicarlo. La vista previa requiere sesión administrativa verificada. La página pública solo muestra artículos publicados y vigentes; retirar un artículo oculta su URL pública. Una imagen usada por un artículo no puede eliminarse desde la biblioteca. Los videos de YouTube se administran en **Contenidos → Videos** y se reproducen cuando el visitante lo solicita.
+
+Los archivos editoriales se guardan en `local_media/` durante el desarrollo y están excluidos de Git. La ruta de entrega comprueba si la imagen pertenece a una publicación vigente o a una sesión administrativa autorizada. La persistencia definitiva para despliegues sigue pendiente en O-03; el disco local de Cloud Run no debe utilizarse como almacén permanente.
+
+Documentación de alcance y límites: docs/ESTADO.md. Plan y checklist de avance: docs/PLAN_TRABAJO.md. Inventario de archivos exteriores: docs/INVENTARIO_ARCHIVOS_EXTERNOS.md. Preguntas, catálogo y selección se conservan del BRD v0.6; A-05/A-06 tienen cierre funcional y visual local, con contenido real y almacenamiento persistente aún pendientes para publicación.

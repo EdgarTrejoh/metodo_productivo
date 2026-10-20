@@ -1,14 +1,55 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Contenidos | Método Productivo{% endblock %}
 {% block main_class %}interior-main blog-main{% endblock %}
 {% block content %}
 {% include 'includes/breadcrumb.html' with current='Contenidos' %}
-<section class="blog-intro" aria-labelledby="page-title"><p class="eyebrow">Contenidos · Fase A</p><h1 id="page-title">{{ page.title }}</h1><p class="interior-lead">{{ page.intro }}</p><p class="inline-status">Artículos en preparación · A-05</p></section>
-<section class="editorial-areas" aria-labelledby="areas-title"><h2 id="areas-title">Las líneas editoriales</h2><div class="editorial-grid">
-  <div class="editorial-area editorial-finance"><span>01</span><h3>Finanzas</h3><p>Flujos, costos y decisiones financieras.</p></div>
-  <div class="editorial-area editorial-business"><span>02</span><h3>Negocios</h3><p>Operación, margen y estrategia.</p></div>
-  <div class="editorial-area editorial-data"><span>03</span><h3>Datos</h3><p>Indicadores para decidir con evidencia.</p></div>
-  <div class="editorial-area editorial-tech"><span>04</span><h3>Tecnología</h3><p>Herramientas digitales con propósito.</p></div>
-</div></section>
-<p class="blog-footnote">Todavía no hay artículos publicados. Este índice muestra la organización editorial prevista, sin publicaciones de ejemplo.</p>
+<section class="blog-intro" aria-labelledby="page-title">
+  <p class="eyebrow">Contenidos · Fase A</p>
+  <h1 id="page-title">Ideas para gestionar con más claridad.</h1>
+  <p class="interior-lead">Finanzas, negocios, datos y tecnología aplicados a proyectos, trabajo y negocios. {% if has_live_articles or videos %}Explora las publicaciones disponibles.{% else %}Este espacio reunirá artículos y videos después de su revisión editorial.{% endif %}</p>
+</section>
+<section class="editorial-areas" aria-labelledby="areas-title">
+  <h2 id="areas-title">Las líneas editoriales</h2>
+  <div class="editorial-grid">
+    <div class="editorial-area editorial-finance"><span>01</span><h3>Finanzas</h3><p>Flujos, costos y decisiones financieras.</p></div>
+    <div class="editorial-area editorial-business"><span>02</span><h3>Negocios</h3><p>Operación, margen y estrategia.</p></div>
+    <div class="editorial-area editorial-data"><span>03</span><h3>Datos</h3><p>Indicadores para decidir con evidencia.</p></div>
+    <div class="editorial-area editorial-tech"><span>04</span><h3>Tecnología</h3><p>Herramientas digitales con propósito.</p></div>
+  </div>
+</section>
+
+<section class="published-content" aria-labelledby="articles-title">
+  <div class="content-section-head"><div><p class="eyebrow">Lecturas</p><h2 id="articles-title">Artículos</h2></div><p>{% if has_live_articles %}Explora las lecturas publicadas.{% else %}Las primeras lecturas están en preparación editorial.{% endif %}</p></div>
+  {% if has_live_articles %}<nav class="category-nav" aria-label="Filtrar artículos por categoría">
+    <a href="{% url 'blog' %}"{% if not selected_category %} aria-current="page"{% endif %}>Todas</a>
+    {% for value,label in categories %}<a href="{% url 'blog' %}?categoria={{ value }}"{% if selected_category == value %} aria-current="page"{% endif %}>{{ label }}</a>{% endfor %}
+  </nav>{% endif %}
+  {% if articles %}
+    <div class="article-grid">
+      {% for article in articles %}
+      <article class="article-card">
+        {% if article.featured_image %}<img class="article-card-image" src="{{ article.featured_image.thumbnail_url }}" alt="{{ article.featured_image.alt_text }}" loading="lazy">{% endif %}
+        <div class="article-meta"><span>{{ article.get_category_display }}</span><time datetime="{{ article.published_at|date:'Y-m-d' }}">{{ article.published_at|date:'j F Y' }}</time></div>
+        <h3><a href="{% url 'article_detail' article.slug %}">{{ article.title }}</a></h3>
+        <p>{{ article.summary }}</p>
+        <a class="text-link" href="{% url 'article_detail' article.slug %}" aria-label="Leer artículo: {{ article.title }}">Leer artículo <span aria-hidden="true">→</span></a>
+      </article>
+      {% endfor %}
+    </div>
+    {% if articles.has_other_pages %}<nav class="pagination" aria-label="Páginas de artículos">
+      {% if articles.has_previous %}<a href="?{% if selected_category %}categoria={{ selected_category }}&amp;{% endif %}pagina={{ articles.previous_page_number }}">← Anterior</a>{% endif %}
+      <span>Página {{ articles.number }} de {{ articles.paginator.num_pages }}</span>
+      {% if articles.has_next %}<a href="?{% if selected_category %}categoria={{ selected_category }}&amp;{% endif %}pagina={{ articles.next_page_number }}">Siguiente →</a>{% endif %}
+    </nav>{% endif %}
+  {% else %}<p class="content-empty">{% if selected_category %}Todavía no hay artículos publicados en esta categoría. Puedes explorar las demás líneas editoriales.{% else %}Todavía no hay artículos publicados. Esta sección mostrará lecturas cuando hayan pasado la revisión editorial.{% endif %}</p>{% endif %}
+</section>
+
+<section class="published-content video-section" aria-labelledby="videos-title">
+  <div class="content-section-head"><div><p class="eyebrow">Multimedia</p><h2 id="videos-title">Videos destacados</h2></div><p>Reproducción desde un proveedor externo, al solicitarla.</p></div>
+  {% if videos %}<div class="video-grid">
+    {% for video in videos %}{% include 'includes/video_card.html' with video=video %}{% endfor %}
+  </div>{% else %}<p class="content-empty">Todavía no hay videos publicados. Los incorporaremos después de su revisión editorial.</p>{% endif %}
+</section>
 {% endblock %}
+{% block extra_scripts %}<script src="{% static 'video_embed.js' %}" defer></script>{% endblock %}

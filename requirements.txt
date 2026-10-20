@@ -2,3 +2,5 @@ Django==5.2.18
 psycopg[binary]==3.3.6
 reportlab==4.5.1
 django-otp==1.7.5
+nh3==0.3.7
+Pillow==13.0.0

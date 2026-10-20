@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static editorial_html %}
+{% block title %}{{ article.seo_title|default:article.title }} | Método Productivo{% endblock %}
+{% block meta_description %}{{ article.seo_description|default:article.summary }}{% endblock %}
+{% block seo_meta %}
+  {% if preview %}<meta name="robots" content="noindex,nofollow">{% else %}
+  <link rel="canonical" href="{{ canonical_url }}">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="{{ article.seo_title|default:article.title }}">
+  <meta property="og:description" content="{{ article.seo_description|default:article.summary }}">
+  <meta property="og:url" content="{{ canonical_url }}">
+  {% endif %}
+{% endblock %}
+{% block main_class %}interior-main article-main{% endblock %}
+{% block content %}
+{% include 'includes/breadcrumb.html' with parent_label='Contenidos' parent_url='blog' current=article.title %}
+<article class="article-detail">
+  {% if preview %}<p class="editorial-preview-notice">Vista previa editorial · Solo para personal autorizado. Guarda los cambios antes de revisar esta vista.</p>{% endif %}
+  <header class="article-header"><p class="eyebrow">{{ article.get_category_display }} · Contenidos</p><h1>{{ article.title }}</h1><p class="article-summary">{{ article.summary }}</p>{% if article.published_at %}<time datetime="{{ article.published_at|date:'Y-m-d' }}">Publicado el {{ article.published_at|date:'j F Y' }}</time>{% endif %}</header>
+  {% if article.featured_image %}<figure class="article-featured-image"><img src="{{ article.featured_image.public_url }}" alt="{{ article.featured_image.alt_text }}"><figcaption>{{ article.featured_image.description }}</figcaption></figure>{% endif %}
+  <div class="article-body">{{ article.body|article_tables }}</div>
+  {% if video %}<section class="article-related-video" aria-labelledby="article-video-title"><h2 id="article-video-title">Video relacionado</h2>{% include 'includes/video_card.html' with video=video %}</section>{% endif %}
+  <aside class="article-cta"><p>Explora una aplicación práctica relacionada con esta lectura.</p><a class="button" href="{% url article.cta_target %}">{{ article.get_cta_target_display }} <span aria-hidden="true">→</span></a></aside>
+  <p class="article-return"><a href="{% url 'blog' %}">← Volver a Contenidos</a></p>
+</article>
+{% endblock %}
+{% block extra_scripts %}{% if video %}<script src="{% static 'video_embed.js' %}" defer></script>{% endif %}{% endblock %}

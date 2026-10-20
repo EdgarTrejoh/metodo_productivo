@@ -1,0 +1,13 @@
+.field-body .flex-container{display:block}
+.editor-workspace{display:block;width:min(100%,900px);min-width:0}
+#article-visual-editor{min-height:320px;background:#fff;font-size:1rem}
+#article-visual-editor .ql-editor{min-height:320px;line-height:1.6}
+.editor-media-controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:12px 0}
+.editor-media-controls>button{padding:8px 13px;cursor:pointer}
+.editor-media-picker{width:100%;display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;border:1px solid #cad5dd;background:#f7fafb;padding:12px;border-radius:8px;max-height:400px;overflow:auto}
+.editor-media-picker[hidden]{display:none}
+.editor-media-picker button{background:#fff;border:1px solid #c6d3db;border-radius:8px;padding:8px;text-align:left;cursor:pointer}
+.editor-media-picker button:hover,.editor-media-picker button:focus-visible{outline:2px solid #007f72}
+.editor-media-picker img{width:100%;height:100px;object-fit:contain}
+.editor-media-picker span{display:block;margin-top:6px}
+@media(max-width:620px){.ql-toolbar.ql-snow{padding:5px}.editor-media-controls{align-items:stretch;flex-direction:column}}

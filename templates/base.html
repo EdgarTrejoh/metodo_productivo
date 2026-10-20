@@ -4,7 +4,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Método Productivo: conocimiento práctico de finanzas, negocios, datos y tecnología para tomar decisiones con más claridad.">
+  <meta name="description" content="{% block meta_description %}Método Productivo: conocimiento práctico de finanzas, negocios, datos y tecnología para tomar decisiones con más claridad.{% endblock %}">
+  {% block seo_meta %}{% endblock %}
   <title>{% block title %}Método Productivo{% endblock %}</title>
   <link rel="stylesheet" href="{% static 'app.css' %}">
 </head>
@@ -19,7 +20,7 @@
       <nav class="site-nav" aria-label="Navegación principal">
         <ul>
           <li><a href="{% url 'tools' %}"{% if request.resolver_match.url_name == 'tools' or request.resolver_match.url_name == 'break_even' %} aria-current="location"{% endif %}>Herramientas</a></li>
-          <li><a href="{% url 'blog' %}"{% if request.resolver_match.url_name == 'blog' %} aria-current="location"{% endif %}>Contenidos</a></li>
+          <li><a href="{% url 'blog' %}"{% if request.resolver_match.url_name == 'blog' or request.resolver_match.url_name == 'article_detail' %} aria-current="location"{% endif %}>Contenidos</a></li>
           <li><a href="{% url 'resources' %}"{% if request.resolver_match.url_name == 'resources' or request.resolver_match.url_name == 'cash_flow_resource' %} aria-current="location"{% endif %}>Recursos</a></li>
           <li><a href="{% url 'entry' %}"{% if request.resolver_match.url_name == 'entry' or request.resolver_match.url_name == 'question' or request.resolver_match.url_name == 'capture' or request.resolver_match.url_name == 'result' %} aria-current="location"{% endif %}>Check PyME</a></li>
           <li><a href="{% url 'contact' %}"{% if request.resolver_match.url_name == 'contact' %} aria-current="location"{% endif %}>Contacto</a></li>
@@ -60,5 +61,6 @@
     </div>
     <div class="footer-bottom">© Método Productivo · Vista local de desarrollo. El Check es una lectura de prácticas declaradas, no una calificación crediticia ni un dictamen financiero.</div>
   </footer>
+{% block extra_scripts %}{% endblock %}
 </body>
 </html>

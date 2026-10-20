@@ -40,3 +40,14 @@ No afirmar conformidad integral WCAG ni cierre de RF-A17. Ver ESTADO.md.
 - Evidencia comparativa: [positivo escritorio](../qa_artifacts/a02-state-positive-1365x900.png), [cero escritorio](../qa_artifacts/a02-state-zero-1365x900.png), [negativo escritorio](../qa_artifacts/a02-state-negative-1365x900.png); [positivo móvil](../qa_artifacts/a02-state-positive-369x545.png), [cero móvil](../qa_artifacts/a02-state-zero-369x545.png), [negativo móvil](../qa_artifacts/a02-state-negative-369x545.png). [Error móvil](../qa_artifacts/a02-refined-error-369x545.png).
 
 **Salvedades aceptadas:** AV-06: F5 puede reenviar el POST; un token de interacción impide duplicar eventos y la respuesta redirige a un GET con formulario vacío. No se afirma que el navegador evite el reenvío. O-08 debe integrar y verificar los eventos de herramientas dentro de la analítica transversal antes de cerrar A-02. Las capturas móviles usan viewports, no un dispositivo físico; no se declara auditoría integral de accesibilidad ni despliegue productivo.
+
+## A-05/A-06 — blog, editor y videos (20 oct 2026)
+
+**Aceptación:** el promotor aprobó y cerró el alcance funcional y visual local de A-05, A-06 y A05-AV09/10. Confirmó manualmente editor y biblioteca, publicación y retiro de artículos, y reproducción efectiva de un video de YouTube. La aceptación no constituye autorización de producción ni cierra Entrega 2, A-09 u O-03.
+
+- `manage.py test`: **61 pruebas correctas**, con regresión de blog, videos, calculadora y Check PyME. Incluyen estados editoriales, slugs, categorías, enlaces, permisos OTP, imágenes, sanitización, tablas y espacios no separables.
+- Recorridos Chrome con base de prueba aislada: editor y biblioteca; tabla Mes/Pedidos/Variación con encabezados y alineación desde edición hasta retiro; tabla de ocho columnas en 369×545 y 390×844 con desplazamiento interno y sin desbordamiento de página. [Editor](../qa_artifacts/a05-table-editor-desktop.png), [vista previa](../qa_artifacts/a05-table-preview-desktop.png), [artículo móvil](../qa_artifacts/a05-table-public-369.png), [tabla ancha móvil](../qa_artifacts/a05-table-wide-369.png).
+- `manage.py check`: sin incidencias. `makemigrations --check --dry-run`: sin migraciones pendientes. `git diff --check`: sin errores de espacios.
+- Comprobación de la base local después de la revisión: **0 artículos y 0 videos publicados**; un artículo y un video sintéticos se conservaron como borradores, sin borrar su contenido.
+
+**Pendientes independientes:** contenido editorial real aprobado; O-03 para almacenamiento persistente de imágenes en despliegue; controles de staging y publicación de H3/H4. Las capturas móviles son de viewport, no de dispositivo físico. No se realizaron despliegues.

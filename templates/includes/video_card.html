@@ -1,0 +1,6 @@
+<article class="video-card">
+  <div class="video-frame" data-video-id="{{ video.video_id }}" data-video-title="{{ video.title }}">
+    <a class="video-activate" href="{{ video.external_url }}" rel="noopener noreferrer" target="_blank" aria-label="Reproducir video: {{ video.title }}">▶ <span>Reproducir video</span></a>
+  </div>
+  <div class="video-card-copy"><span class="video-provider">{{ video.get_provider_display }}</span><h3>{{ video.title }}</h3><p>{{ video.description }}</p><a href="{{ video.external_url }}" rel="noopener noreferrer" target="_blank">Abrir en YouTube <span aria-hidden="true">↗</span></a></div>
+</article>
