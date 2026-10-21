@@ -33,3 +33,5 @@ CHECK_CONTEXT_TTL_SECONDS=int(os.getenv('CHECK_CONTEXT_TTL_SECONDS','1800'))
 if not 60<=CHECK_CONTEXT_TTL_SECONDS<=86400:
     raise ImproperlyConfigured('TTL de desarrollo inválido')
 EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'
+DEFAULT_FROM_EMAIL='notificaciones@localhost.invalid'
+CONTACT_NOTIFICATION_EMAIL=os.getenv('CONTACT_NOTIFICATION_EMAIL', '').strip()

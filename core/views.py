@@ -1,8 +1,12 @@
 from uuid import UUID, uuid4
 
 from django.shortcuts import redirect, render
+from django.contrib import messages
+from django.views.decorators.http import require_http_methods
 
 from analytics.models import ProductEvent
+from leads.forms import ContactForm
+from leads.notifications import notify_contact
 from .break_even import BreakEvenForm, calculate
 
 
@@ -10,8 +14,7 @@ def home(request):
     return render(request, 'home.html')
 
 
-# Estas páginas muestran la estructura de Fase A durante el desarrollo. No
-# incluyen formularios ni entregas de las actividades funcionales pendientes.
+# Estas páginas muestran las secciones de Fase A todavía pendientes.
 PAGES = {
     'tools': {
         'template': 'tools.html',
@@ -46,18 +49,6 @@ PAGES = {
         'cards': [
             {'title': 'Propósito', 'text': 'Organizar una vista semanal de entradas y salidas previstas.'},
             {'title': 'Entrega futura', 'text': 'La solicitud y el acceso al archivo tendrán su propio recorrido cuando A-03 esté implementada.'},
-        ],
-    },
-    'contact': {
-        'template': 'contact.html',
-        'eyebrow': 'Contacto',
-        'title': 'Un canal para conversar.',
-        'intro': 'Aquí podrás compartir comentarios sobre el portal o enviar solicitudes cuando el formulario esté disponible.',
-        'status': 'Formulario pendiente · A-07',
-        'note': 'Vista de desarrollo. Esta página todavía no recibe ni envía mensajes. La orientación asociada al Check se solicita dentro de su resultado activo.',
-        'cards': [
-            {'title': 'Comentarios', 'text': 'Observaciones sobre los contenidos y herramientas del portal.'},
-            {'title': 'Solicitudes', 'text': 'Consultas que requieran seguimiento desde la operación del portal.'},
         ],
     },
     'about': {
@@ -97,6 +88,21 @@ PAGES = {
 def section(request, page):
     context = PAGES[page]
     return render(request, context.get('template', 'section.html'), {'page': context})
+
+
+@require_http_methods(['GET', 'POST'])
+def contact(request):
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            submission = form.save()
+            ProductEvent.objects.get_or_create(kind='FORM_SUBMITTED', execution=submission.event_id)
+            notify_contact(submission)
+            messages.success(request, 'Recibimos tu mensaje. Gracias por escribirnos.')
+            return redirect('contact')
+    else:
+        form = ContactForm()
+    return render(request, 'contact.html', {'form': form})
 
 
 def break_even(request):

@@ -332,7 +332,11 @@ class MediaEditorialTests(TestCase):
         second = self.article(slug='articulo-reutiliza-imagen', featured_image=image)
         article.status = PublicationStatus.PUBLISHED
         article.save()
-        self.assertEqual(self.client.get(image.public_url).status_code, 200)
+        image_response = self.client.get(image.public_url)
+        try:
+            self.assertEqual(image_response.status_code, 200)
+        finally:
+            image_response.close()
         self.assertContains(self.client.get(reverse('article_detail', args=[article.slug])), 'Gráfica sintética')
         article.body = '<p>Imagen retirada del cuerpo.</p>'
         article.save()
@@ -378,7 +382,11 @@ class MediaEditorialTests(TestCase):
         self.assertEqual(self.client.get(public).status_code, 404)
         self.assertContains(self.client.get(preview), 'Vista previa editorial')
         self.assertContains(self.client.get(preview), 'noindex,nofollow')
-        self.assertEqual(self.client.get(image.public_url).status_code, 200)
+        image_response = self.client.get(image.public_url)
+        try:
+            self.assertEqual(image_response.status_code, 200)
+        finally:
+            image_response.close()
         change = reverse('otpadmin:content_article_change', args=[article.pk])
         data['status'] = PublicationStatus.PUBLISHED
         self.assertEqual(self.client.post(change, data).status_code, 302)

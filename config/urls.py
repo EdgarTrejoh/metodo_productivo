@@ -8,7 +8,8 @@ from django.contrib.auth.admin import UserAdmin,GroupAdmin
 from diagnostics import views
 from core import views as portal_views
 from diagnostics.models import Diagnostic,Orientation
-from leads.models import Lead,Consent
+from leads.models import Lead,Consent,ContactSubmission
+from leads.admin import ContactSubmissionAdmin
 from analytics.models import ProductEvent
 from content.admin import ArticleAdmin, MediaAssetAdmin, VideoAdmin
 from content.models import Article, MediaAsset, Video
@@ -30,6 +31,7 @@ site.register(Orientation,OrientationAdmin)
 site.register(Article, ArticleAdmin)
 site.register(MediaAsset, MediaAssetAdmin)
 site.register(Video, VideoAdmin)
+site.register(ContactSubmission, ContactSubmissionAdmin)
 urlpatterns = [
     path('', portal_views.home, name='home'),
     path('herramientas/', portal_views.section, {'page': 'tools'}, name='tools'),
@@ -39,7 +41,7 @@ urlpatterns = [
     path('blog/', content_views.index, name='blog'),
     path('blog/<slug:slug>/', content_views.detail, name='article_detail'),
     path('editorial/media/<uuid:image_id>/', content_views.editorial_image, name='editorial_image'),
-    path('contacto/', portal_views.section, {'page': 'contact'}, name='contact'),
+    path('contacto/', portal_views.contact, name='contact'),
     path('acerca/', portal_views.section, {'page': 'about'}, name='about'),
     path('privacidad/', portal_views.section, {'page': 'privacy'}, name='privacy'),
     path('terminos/', portal_views.section, {'page': 'terms'}, name='terms'),

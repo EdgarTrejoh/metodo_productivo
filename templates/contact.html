@@ -3,5 +3,47 @@
 {% block main_class %}interior-main contact-main{% endblock %}
 {% block content %}
 {% include 'includes/breadcrumb.html' with current='Contacto' %}
-<section class="contact-intro" aria-labelledby="page-title"><p class="eyebrow">Contacto</p><h1 id="page-title">{{ page.title }}</h1><p class="interior-lead">{{ page.intro }}</p><p class="inline-status">El formulario aún no está disponible · A-07</p><a class="text-link" href="{% url 'home' %}">Volver al inicio <span aria-hidden="true">→</span></a></section>
+<section class="contact-intro" aria-labelledby="page-title">
+  <p class="eyebrow">Contacto</p>
+  <h1 id="page-title">Conversemos sobre tu mensaje.</h1>
+  <p class="interior-lead">Comparte un comentario sobre el portal o envía una solicitud para seguimiento. La orientación vinculada al Check PyME se solicita desde el resultado de ese diagnóstico.</p>
+</section>
+
+{% if messages %}{% for message in messages %}<p class="contact-confirmation" role="status">{{ message }}</p>{% endfor %}{% endif %}
+
+<section class="contact-panel" aria-labelledby="contact-form-title">
+  <h2 id="contact-form-title">Escribe tu mensaje</h2>
+  <p>Todos los campos son obligatorios. Un comentario no implica compromiso de respuesta; una solicitud pasa a seguimiento interno.</p>
+  <form method="post" action="{% url 'contact' %}" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="contact-error-summary" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+    <div class="contact-field">
+      <label for="{{ form.category.id_for_label }}">Tipo de mensaje *</label>
+      <p id="category-help" class="field-help">Elige «Comentario» para compartir una observación o «Solicitud» si esperas seguimiento.</p>
+      <select id="{{ form.category.id_for_label }}" name="category" required aria-describedby="category-help{% if form.category.errors %} category-error{% endif %}"{% if form.category.errors %} aria-invalid="true"{% endif %}>
+        <option value="">Selecciona una opción</option>
+        {% for value,label in form.fields.category.choices %}{% if value %}<option value="{{ value }}"{% if form.category.value == value %} selected{% endif %}>{{ label }}</option>{% endif %}{% endfor %}
+      </select>
+      {% if form.category.errors %}<p id="category-error" class="field-error">{{ form.category.errors|join:' ' }}</p>{% endif %}
+    </div>
+    <div class="contact-field">
+      <label for="{{ form.message.id_for_label }}">Mensaje *</label>
+      <textarea id="{{ form.message.id_for_label }}" name="message" rows="6" maxlength="3000" required aria-describedby="message-help{% if form.message.errors %} message-error{% endif %}"{% if form.message.errors %} aria-invalid="true"{% endif %}>{{ form.message.value|default_if_none:'' }}</textarea>
+      <p id="message-help" class="field-help">Describe tu comentario o solicitud en hasta 3000 caracteres. Evita incluir datos confidenciales.</p>
+      {% if form.message.errors %}<p id="message-error" class="field-error">{{ form.message.errors|join:' ' }}</p>{% endif %}
+    </div>
+    <div class="contact-field">
+      <label for="{{ form.name.id_for_label }}">Nombre *</label>
+      <input id="{{ form.name.id_for_label }}" name="name" type="text" maxlength="120" autocomplete="name" required value="{{ form.name.value|default_if_none:'' }}"{% if form.name.errors %} aria-describedby="name-error" aria-invalid="true"{% endif %}>
+      {% if form.name.errors %}<p id="name-error" class="field-error">{{ form.name.errors|join:' ' }}</p>{% endif %}
+    </div>
+    <div class="contact-field">
+      <label for="{{ form.email.id_for_label }}">Correo electrónico *</label>
+      <input id="{{ form.email.id_for_label }}" name="email" type="email" maxlength="254" autocomplete="email" required value="{{ form.email.value|default_if_none:'' }}"{% if form.email.errors %} aria-describedby="email-error" aria-invalid="true"{% endif %}>
+      {% if form.email.errors %}<p id="email-error" class="field-error">{{ form.email.errors|join:' ' }}</p>{% endif %}
+    </div>
+    <p class="contact-privacy">Usaremos los datos que proporciones únicamente para atender este mensaje. Enviar el formulario no te suscribe a comunicaciones comerciales. Consulta la <a href="{% url 'privacy' %}">página de privacidad</a>; su aviso definitivo y modalidad jurídica están pendientes de revisión antes de producción.</p>
+    <button type="submit">Enviar mensaje</button>
+  </form>
+</section>
 {% endblock %}

@@ -1,5 +1,42 @@
 # Verificación local - B0
 
+## A-07 — aceptación funcional y visual local (21 oct 2026)
+
+El promotor **aprobó y cerró A-07 en su alcance funcional y visual local**: A07-AV01, formulario, validaciones, confirmación, registro en `leads.ContactSubmission`, bandeja Django Admin con OTP, filtros, búsqueda, conteos, estados y notas. También aceptó la corrección aislada del archivo temporal en las pruebas de A-05. Las evidencias de las secciones siguientes conservan la secuencia de implementación y revisión; las capturas del Admin utilizan datos sintéticos en una base de prueba.
+
+**Verificación final:** suite Django completa de 72 pruebas correcta; `manage.py check`, `makemigrations --check --dry-run` y `git diff --check` sin incidencias. El recorrido visual cubrió escritorio y móvil con el formulario sin JavaScript y la bandeja OTP con datos sintéticos. La aceptación local no cierra Entrega 2 ni acredita producción: siguen O-02, O-04, O-07, O-08 y revisión jurídica.
+
+## A-07 — Bandeja ligera en Django Admin (21 oct 2026)
+
+**Estado:** lista para revisión, A-07 EN CURSO. El changelist OTP reutiliza `leads.ContactSubmission` y `leads_contactsubmission`: remitente, estado, tipo, fecha, filtros, búsqueda, detalle completo y nota interna. «Recibidos» cuenta todos los registros; «Pendientes» cuenta estados nuevo y en seguimiento, incluso al filtrar la lista. Los registros históricos sin nombre o correo se identifican como tales; el dato almacenado no se altera. El Admin impide agregar y eliminar desde esta vista, y exige OTP y permisos.
+
+- Suite Django completa: **72 pruebas correctas**, incluidas autorización, filtros, conteos cero y positivos, actualización de estado y nota, mensaje completo, ausencia de exposición pública y regresión de A-05/A-06, calculadora y Check. `manage.py check`, `makemigrations --check --dry-run` y `git diff --check`: correctos. El fallo de archivo temporal en Windows continúa resuelto por el cierre explícito de respuestas de imagen en las pruebas de A-05; no se modificó funcionalidad editorial.
+- Prueba visual aislada con tres registros y una cuenta OTP **sintéticos en base de pruebas**: conteos 3 recibidos / 2 pendientes; tres filas visibles, detalle completo y sin desbordamiento global a 1365×900 y 390×844. [Bandeja escritorio](../qa_artifacts/a07-inbox-1365x900.png), [bandeja móvil](../qa_artifacts/a07-inbox-390x844.png), [detalle](../qa_artifacts/a07-inbox-detail-1365x900.png), [recorrido](../qa_artifacts/a07_inbox_browser.cjs). Los números de las capturas son de prueba, no cifras de operación.
+- Stripe TEST: el producto y enlace facilitados por el promotor se consignaron únicamente como referencia futura en H6 del plan. No se añadieron al portal ni se probó checkout, pago o entrega.
+
+**Pendientes:** aceptación del promotor y, de forma independiente, O-04, O-07, O-08, validación jurídica y publicación. Sin commit, push ni despliegue.
+
+## A07-AV01 — Contacto identificado (21 oct 2026)
+
+**Estado:** ajuste implementado y listo para revisión; A-07 sigue EN CURSO. Tipo y mensaje conservan su obligatoriedad y límite de 3000 caracteres. Nombre y correo válido se exigen para Comentario y Solicitud; la casilla pública de respuesta se eliminó. El modelo conserva campos vacíos para compatibilidad histórica y no se generó otra migración. La base local mantiene el registro histórico sin nombre y correo; no fue modificado. El registro sintético creado por la prueba visual de esta ronda se retiró con su evento asociado.
+
+- Suite Django completa: **71 pruebas correctas**. Cubre ausencia de nombre/correo en ambas categorías, formato inválido, límite de mensaje, envío y confirmación de ambos tipos, persistencia, CSRF, backoffice con OTP, fallo de correo, registro histórico y regresiones del portal, Check y calculadora. `manage.py check`, `makemigrations --check --dry-run` y `git diff --check`: correctos.
+- Corrección técnica aislada A-05: las dos pruebas que abren una imagen editorial ahora cierran la respuesta `FileResponse` después de comprobarla, incluida `test_sanitizer_authorized_images_and_protected_reuse`. La suite se ejecutó con `TEMP`/`TMP` apuntando a `.venv/qa312/tmp`, directorio escribible del entorno local Windows. No se alteró código funcional del blog, videos ni biblioteca.
+- Chrome sin JavaScript: 1365×900, 369×545 y 390×844; cuatro campos visibles, sin casilla de respuesta ni desbordamiento horizontal. Se comprobó foco de teclado, validación y confirmación. [Escritorio](../qa_artifacts/a07-contact-1365x900.png), [móvil 369](../qa_artifacts/a07-contact-369x545.png), [móvil 390](../qa_artifacts/a07-contact-390x844.png), [error móvil](../qa_artifacts/a07-contact-error-369x545.png), [confirmación](../qa_artifacts/a07-contact-confirmation-1365x900.png), [recorrido](../qa_artifacts/a07_verify.cjs).
+
+**Pendientes independientes:** aceptación del promotor, O-04 (correo productivo), O-07 (límites/CAPTCHA según riesgo), O-08 (medición transversal), revisión jurídica de avisos y retención; prueba en dispositivo móvil físico. No se realizó commit, push ni despliegue.
+
+## A-07 — Contacto y solicitudes (20 oct 2026)
+
+**Estado:** implementación en desarrollo, lista para revisión funcional y visual; sin aceptación del promotor ni publicación. Comentario anónimo, solicitud con correo, respuesta opcional a comentario, errores por campo, CSRF, confirmación y registro persistente probados. Administración con OTP y permisos; cambio de estado y nota interna comprobados. La notificación local, cuando se configura `CONTACT_NOTIFICATION_EMAIL`, solo contiene tipo e ID; su fallo deja el registro intacto y visible.
+
+- `manage.py test leads core diagnostics`: 52 pruebas correctas. Suite completa: 69 pruebas ejecutadas, 68 correctas y un error en `content.tests.MediaEditorialTests.test_sanitizer_authorized_images_and_protected_reuse`: Windows impide eliminar una imagen temporal aún abierta por la respuesta de archivo de esa prueba anterior de A-05. Se reprodujo en una segunda ejecución y al ejecutar `content` solo; no se modificó A-05/A-06 en este incremento.
+- `manage.py check`: sin incidencias; `makemigrations --check --dry-run`: sin cambios pendientes; `git diff --check`: sin errores.
+- Chrome sin JavaScript: 1365×900, 369×545 y 390×844; formulario, validación de solicitud sin correo, confirmación, breadcrumb, navegación y primer foco de teclado correctos, sin desplazamiento horizontal. [Escritorio](../qa_artifacts/a07-contact-1365x900.png), [móvil 369](../qa_artifacts/a07-contact-369x545.png), [móvil 390](../qa_artifacts/a07-contact-390x844.png), [error móvil](../qa_artifacts/a07-contact-error-369x545.png), [confirmación](../qa_artifacts/a07-contact-confirmation-1365x900.png), [recorrido](../qa_artifacts/a07_verify.cjs).
+- Se retiraron de la base local las dos solicitudes sintéticas generadas para la captura del navegador. No se usaron datos reales.
+
+**Pendientes:** revisión del promotor; O-04 correo productivo y entregabilidad, O-07 límites de envíos/CAPTCHA según riesgo, O-08 medición transversal y revisión jurídica de textos, modalidad de consentimiento y retención antes de usar datos reales. El aviso de `/privacidad/` continúa provisional. La prueba móvil se hizo con viewport, no dispositivo físico.
+
 Actualización: 17 oct 2026. Entorno local Python 3.11.9; Django 5.2.18.
 
 - 28 pruebas Django: PASS (dominio, persistencia y cliente HTTP de prueba).

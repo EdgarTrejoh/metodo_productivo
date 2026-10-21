@@ -1,0 +1,15 @@
+{% extends "admin/change_list.html" %}
+{% block content %}
+<div class="contact-summary" role="group" aria-label="Resumen de comentarios y solicitudes" style="display:flex;flex-wrap:wrap;gap:12px;margin:0 0 20px">
+  <div style="padding:14px 20px;border:1px solid var(--hairline-color,#ddd);border-radius:8px;min-width:170px">
+    <strong style="display:block;font-size:1.5rem">{{ contact_summary.received }}</strong>
+    <span>Recibidos</span>
+  </div>
+  <div style="padding:14px 20px;border:1px solid var(--hairline-color,#ddd);border-radius:8px;min-width:170px">
+    <strong style="display:block;font-size:1.5rem">{{ contact_summary.pending }}</strong>
+    <span>Pendientes <small>(nuevos o en seguimiento)</small></span>
+  </div>
+</div>
+<p class="help" style="margin:0 0 18px">Conteos de toda la bandeja; los filtros cambian solo la lista.</p>
+{{ block.super }}
+{% endblock %}

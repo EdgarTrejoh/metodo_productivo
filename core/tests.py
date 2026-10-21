@@ -17,7 +17,10 @@ class PortalStructureTests(TestCase):
                 response = self.client.get(reverse(name))
                 self.assertEqual(response.status_code, 200)
                 self.assertContains(response, 'Entorno de desarrollo')
-                self.assertNotContains(response, '<form')
+                if name == 'contact':
+                    self.assertContains(response, '<form')
+                else:
+                    self.assertNotContains(response, '<form')
                 self.assertNotContains(response, 'class="section-mark"')
         self.assertContains(self.client.get(reverse('break_even')), '<form')
 

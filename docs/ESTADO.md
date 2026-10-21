@@ -62,4 +62,22 @@ El siguiente recorrido funcional de la secuencia de Entrega 2 es A-05/A-06 (blog
 
 El promotor **aprobó y cerró el alcance funcional y visual local de A-05 y A-06**, incluidos A05-AV09 y AV10. El blog ofrece artículos publicados y vigentes por categoría y slug, editor Quill, sanitización HTML, tablas, biblioteca de imágenes, vista previa protegida y administración de borradores, publicación y retiro en el backoffice con OTP. La sección Contenidos presenta videos externos publicados y los reproduce a solicitud del visitante. El promotor verificó manualmente la publicación y retiro de artículos y la reproducción efectiva de YouTube; [evidencia técnica](VERIFICACION.md).
 
-Un artículo y un video sintéticos utilizados para la revisión quedaron como **borradores locales**; no permanecen publicaciones sintéticas visibles. A-05/A-06 están cerradas en este alcance de desarrollo, sin afirmar habilitación productiva ni cierre de Entrega 2. Siguen pendientes por separado el contenido real aprobado, O-03 para persistencia de medios, los controles de publicación y las demás actividades de H2–H4. A-02 y O-08 conservan su estado anterior. No se inició A-07.
+Un artículo y un video sintéticos utilizados para la revisión quedaron como **borradores locales**; no permanecen publicaciones sintéticas visibles. A-05/A-06 están cerradas en este alcance de desarrollo, sin afirmar habilitación productiva ni cierre de Entrega 2. Siguen pendientes por separado el contenido real aprobado, O-03 para persistencia de medios, los controles de publicación y las demás actividades de H2–H4. A-02 y O-08 conservan su estado anterior. No se inició A-07 en ese cierre.
+
+## Portal de Fase A — A-07 en revisión (20 de octubre de 2026)
+
+Se implementó el formulario público de contacto para comentarios y solicitudes, con confirmación, persistencia y seguimiento en el backoffice OTP. El correo se exige cuando se solicita respuesta; un comentario sin respuesta puede enviarse sin contacto. La notificación interna usa correo local de desarrollo si se configura un destinatario y registra su resultado sin perder la solicitud. A-07 y Entrega 2 permanecen **EN CURSO** hasta revisión del promotor. O-04, O-07, O-08, revisión jurídica y publicación siguen pendientes. [Evidencia](VERIFICACION.md).
+
+## Portal de Fase A — ajuste A07-AV01 (21 de octubre de 2026)
+
+Por decisión del promotor, el formulario de contacto exige nombre y correo válido tanto para comentarios como para solicitudes; se retiró la casilla pública de respuesta. Comentario identificado no compromete respuesta y solicitud identificada pasa a seguimiento. La regla se aplica en el formulario sin alterar el modelo ni los registros históricos que pudieran carecer de esos datos. La suite completa quedó verde tras cerrar una respuesta de archivo en una prueba aislada de A-05; no cambió su funcionalidad. A-07 permanece **EN CURSO** para revisión del promotor. O-04, O-07, O-08, revisión jurídica y publicación continúan pendientes. [Evidencia](VERIFICACION.md).
+
+## Portal de Fase A — bandeja ligera A-07 (21 de octubre de 2026)
+
+El backoffice Django con OTP presenta una bandeja de comentarios y solicitudes sobre el modelo y tabla existentes. Lista remitente, estado, tipo y fecha; ofrece filtros y búsqueda, detalle del mensaje completo, notas internas y cambio de estado. Los conteos de recibidos y pendientes (nuevo o en seguimiento) se calculan desde la base, sin duplicar registros. La verificación de navegador utilizó solo datos sintéticos en una base de prueba aislada. A-07 sigue **EN CURSO** hasta revisión del promotor; no se habilitó acceso público a los mensajes. La referencia de Stripe TEST se registró solo en H6 de [PLAN_TRABAJO.md](PLAN_TRABAJO.md); no existe integración ni enlace en el portal. [Evidencia](VERIFICACION.md).
+
+## Portal de Fase A — cierre local A-07 (21 de octubre de 2026)
+
+El promotor **aprobó y cerró el alcance funcional y visual local de A-07**, incluidos A07-AV01, el formulario público, su persistencia y confirmación, la bandeja administrativa con OTP y la corrección aislada de la prueba de medios A-05 en Windows. La suite completa de 72 pruebas y las comprobaciones de Django, migraciones y diff sustentan el cierre técnico; las evidencias visuales usan datos sintéticos. [Detalle de verificación](VERIFICACION.md). Las secciones anteriores conservan el historial de implementación y revisión.
+
+**Entrega 2 y los hitos superiores siguen abiertos.** O-02, O-04, O-07, O-08 y la validación jurídica permanecen pendientes independientes; este cierre local no acredita correo productivo, base PostgreSQL verificada ni autorización de despliegue. La referencia Stripe TEST permanece únicamente documental.
