@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Solicitud recibida | Método Productivo{% endblock %}
+{% block main_class %}interior-main lead-magnet-main{% endblock %}
+{% block content %}
+{% include 'includes/breadcrumb.html' with parent_label='Recursos' parent_url='resources' current='Solicitud recibida' %}
+<section class="lead-magnet-confirmation" aria-labelledby="page-title">
+  <p class="eyebrow">Mapa de Caja PyME</p><h1 id="page-title">Solicitud recibida</h1>
+  {% if claim.email_status == 'sent' %}
+    <p role="status">El backend de correo de este entorno aceptó el mensaje de prueba. Revisa el buzón de pruebas local para abrir tu enlace privado. Esto no confirma entrega a un correo real.</p>
+  {% else %}
+    <p role="alert">No pudimos enviar el correo de prueba. Tu solicitud quedó guardada y no se ha entregado el enlace.</p>
+    {% if blocked %}<p>El archivo privado ya no está disponible. No es posible reintentar ahora.</p>
+    {% elif limited %}<p>Hubo demasiados reintentos recientes. Intenta más tarde.</p>
+    {% else %}<form method="post">{% csrf_token %}<button type="submit">Reintentar envío</button></form>{% endif %}
+  {% endif %}
+  <p>Si deseas una primera lectura de prácticas de gestión empresarial, puedes <a href="{% url 'entry' %}">conocer el Check PyME</a>.</p>
+</section>
+{% endblock %}

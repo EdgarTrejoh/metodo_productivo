@@ -10,11 +10,13 @@ from core import views as portal_views
 from diagnostics.models import Diagnostic,Orientation
 from leads.models import Lead,Consent,ContactSubmission
 from leads.admin import ContactSubmissionAdmin
+from leads import views as lead_views
 from analytics.models import ProductEvent
 from content.admin import ArticleAdmin, MediaAssetAdmin, VideoAdmin
 from content.models import Article, MediaAsset, Video
 from content import views as content_views
 from django.contrib import admin
+from django.views.generic import RedirectView
 site=OTPAdminSite(name='otpadmin')
 site.register(User,UserAdmin);site.register(Group,GroupAdmin);site.register(TOTPDevice,TOTPDeviceAdmin)
 # Solo lectura en registros del resultado; no editar silenciosamente informes.
@@ -37,7 +39,10 @@ urlpatterns = [
     path('herramientas/', portal_views.section, {'page': 'tools'}, name='tools'),
     path('herramientas/punto-de-equilibrio/', portal_views.break_even, name='break_even'),
     path('recursos/', portal_views.section, {'page': 'resources'}, name='resources'),
-    path('recursos/flujo-efectivo-13-semanas/', portal_views.section, {'page': 'cash_flow_resource'}, name='cash_flow_resource'),
+    path('recursos/mapa-de-caja-pyme/', lead_views.resource, name='lead_magnet_resource'),
+    path('recursos/mapa-de-caja-pyme/gracias/', lead_views.thanks, name='lead_magnet_thanks'),
+    path('recursos/mapa-de-caja-pyme/acceso/<str:token>/', lead_views.access, name='lead_magnet_access'),
+    path('recursos/flujo-efectivo-13-semanas/', RedirectView.as_view(pattern_name='lead_magnet_resource', permanent=False), name='cash_flow_resource'),
     path('blog/', content_views.index, name='blog'),
     path('blog/<slug:slug>/', content_views.detail, name='article_detail'),
     path('editorial/media/<uuid:image_id>/', content_views.editorial_image, name='editorial_image'),

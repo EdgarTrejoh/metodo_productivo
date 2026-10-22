@@ -81,3 +81,15 @@ El backoffice Django con OTP presenta una bandeja de comentarios y solicitudes s
 El promotor **aprobó y cerró el alcance funcional y visual local de A-07**, incluidos A07-AV01, el formulario público, su persistencia y confirmación, la bandeja administrativa con OTP y la corrección aislada de la prueba de medios A-05 en Windows. La suite completa de 72 pruebas y las comprobaciones de Django, migraciones y diff sustentan el cierre técnico; las evidencias visuales usan datos sintéticos. [Detalle de verificación](VERIFICACION.md). Las secciones anteriores conservan el historial de implementación y revisión.
 
 **Entrega 2 y los hitos superiores siguen abiertos.** O-02, O-04, O-07, O-08 y la validación jurídica permanecen pendientes independientes; este cierre local no acredita correo productivo, base PostgreSQL verificada ni autorización de despliegue. La referencia Stripe TEST permanece únicamente documental.
+
+## Portal de Fase A — A-03 en desarrollo (21 de octubre de 2026)
+
+Se implementó el recorrido J4 para solicitar el lead magnet y autorizar su entrega desde un enlace privado: nombre/correo, consentimiento comercial separado, reutilización del lead, correo de prueba local, enlace de 72 horas, tres accesos máximos, `GET` sin consumo y confirmación por `POST`. Los eventos distinguen visita, lead nuevo, fallo de correo y entrega autorizada. [Verificación](VERIFICACION.md).
+
+**El Excel definitivo `Mapa_de_Caja_PyME_v0.3.xlsx` no se encontró en el proyecto.** La página informa el bloqueo y no acepta solicitudes mientras falte el archivo privado válido. Las pruebas usan un archivo sintético aislado; no prueban entrega del producto real. A-03 y Entrega 2 siguen **EN CURSO** hasta integración del Excel y revisión del promotor. O-02, O-03, O-04, O-07, O-08 y la validación jurídica permanecen pendientes independientes. No se realizó despliegue.
+
+## Portal de Fase A — cierre funcional local A-03 (22 de octubre de 2026)
+
+El promotor **aprobó el alcance funcional local de A-03** después de completar manualmente la descarga del Excel definitivo desde el enlace privado. El archivo permanece en almacenamiento local privado excluido de Git. La corrección CSRF de la página de acceso establece `Referrer-Policy: strict-origin`; se verificó que el POST legítimo funciona y que los orígenes no confiables son rechazados. La última suite Django completa registró **83 pruebas correctas**. No se guardó una captura de la descarga para evitar revelar el enlace privado. [Detalle de verificación](VERIFICACION.md).
+
+**Entrega 2, H2 y H3 permanecen abiertos.** O-02 (PostgreSQL y concurrencia), O-03 (almacenamiento productivo), O-04 (correo real), O-07 (protección compartida), O-08 (medición transversal) y revisión jurídica siguen pendientes independientes. Este cierre local no autoriza despliegue.

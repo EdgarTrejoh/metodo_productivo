@@ -1,5 +1,25 @@
 # Verificación local - B0
 
+## A-03 — aceptación funcional local (22 oct 2026)
+
+**Aceptación:** el promotor confirmó la descarga manual satisfactoria del Excel definitivo `Mapa_de_Caja_PyME_v0.3.xlsx` mediante el recorrido J4. A-03 queda cerrada en su **alcance funcional local**. El recurso se conserva en `private_resources/`, fuera de control de versiones. No se capturó la pantalla de descarga porque expondría el enlace privado; las capturas anteriores documentan solamente páginas sin tokens.
+
+**CSRF:** se reprodujo el rechazo 403 con `Origin: null` en el POST de confirmación. La página de acceso enviaba `Referrer-Policy: no-referrer`; se ajustó únicamente esa respuesta a `strict-origin`. Con protección CSRF habilitada, un POST legítimo desde `http://127.0.0.1:8767` se aceptó y un origen ajeno o nulo continuó rechazado. La comprobación en navegador confirmó el archivo descargado con el nombre esperado. Se conservan el límite de 72 horas, los tres accesos y la autorización por POST.
+
+**Pruebas:** última suite Django completa: **83 pruebas correctas**; incluye la prueba CSRF focalizada. `manage.py check`, comprobación de migraciones y `git diff --check` correctos. El promotor verificó el recorrido real local; las pruebas automatizadas emplearon un XLSX sintético aislado. Las verificaciones de cierre documental y de repositorio constan en el commit de A-03.
+
+**Pendientes independientes:** O-02 y prueba de concurrencia en PostgreSQL, O-03 almacenamiento productivo, O-04 correo real, O-07 protección compartida, O-08 medición transversal y revisión jurídica. Entrega 2, H2 y H3 permanecen abiertos. Sin despliegue.
+
+## A-03 — Recorrido J4 en desarrollo (21 oct 2026)
+
+**Estado:** A-03 EN CURSO, pendiente de revisión del promotor y del Excel definitivo. `/recursos/mapa-de-caja-pyme/` informa la falta del archivo en el entorno local y bloquea la captura hasta contar con él. El archivo esperado es `private_resources/Mapa_de_Caja_PyME_v0.3.xlsx` (o la carpeta privada configurada en `PRIVATE_RESOURCE_ROOT`), fuera de Git, `static/` y medios públicos. Para prueba manual local, configurar `DJANGO_EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend` antes de iniciar el servidor; el enlace se imprime solo en su terminal y debe tratarse como privado. El backend predeterminado sigue siendo de memoria para pruebas automáticas. No se afirma envío a un buzón real. La migración `leads.0003` se aplicó a la SQLite local sin modificar los registros anteriores.
+
+El recorrido registra `PAGE_VIEW` al abrir el formulario, `LEAD_CREATED` solo con un lead nuevo, `EMAIL_FAILED` ante fallo local y `LEADMAGNET_DELIVERED` una vez por operación autorizada después del `POST`. Las solicitudes repetidas reutilizan el lead e invalidan el enlace anterior. Una actualización condicional del contador dentro de la transacción y una operación única evitan exceder el límite o duplicar una entrega. Las pruebas de concurrencia locales emplean SQLite; falta verificar el comportamiento en PostgreSQL como parte de O-02. El limitador de frecuencia es local y básico; O-07 sigue abierto.
+
+**Evidencia:** 10 pruebas focalizadas y suite Django completa de **82 pruebas correctas** con un XLSX sintético en carpeta temporal aislada, sin introducir un Excel ficticio en el repositorio. Validación del formulario, consentimiento, correo, fallo y reintento, `GET`/`POST`, 72 horas, tres accesos, reemisión, idempotencia, concurrencia y archivo privado. `manage.py check`, comprobación de migraciones y `git diff --check` sin incidencias. Chrome sin JavaScript en 1365×900 y 390×844: ruta y breadcrumb correctos, bloqueo honesto y sin desbordamiento horizontal. [Bloqueo escritorio](../qa_artifacts/a03-resource-desktop.png), [bloqueo móvil](../qa_artifacts/a03-resource-mobile.png), [formulario con XLSX sintético en escritorio](../qa_artifacts/a03-resource-form-desktop.png) y [móvil](../qa_artifacts/a03-resource-form-mobile.png). El archivo sintético temporal se retiró tras las capturas. El archivo real y su contenido aún no se han verificado; no se declara aceptación visual.
+
+**Pendientes independientes:** O-02, O-03, O-04, O-07, O-08 y revisión jurídica. No hay Stripe, GCS, envío real ni despliegue.
+
 ## A-07 — aceptación funcional y visual local (21 oct 2026)
 
 El promotor **aprobó y cerró A-07 en su alcance funcional y visual local**: A07-AV01, formulario, validaciones, confirmación, registro en `leads.ContactSubmission`, bandeja Django Admin con OTP, filtros, búsqueda, conteos, estados y notas. También aceptó la corrección aislada del archivo temporal en las pruebas de A-05. Las evidencias de las secciones siguientes conservan la secuencia de implementación y revisión; las capturas del Admin utilizan datos sintéticos en una base de prueba.

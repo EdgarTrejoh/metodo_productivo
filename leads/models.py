@@ -50,3 +50,31 @@ class ContactSubmission(models.Model):
 
     def __str__(self):
         return f'{self.get_category_display()} #{self.pk}'
+
+
+class LeadMagnetRequest(models.Model):
+    class EmailStatus(models.TextChoices):
+        PENDING = 'pending', 'Pendiente'
+        SENT = 'sent', 'Enviado en backend local'
+        FAILED = 'failed', 'Fallido'
+
+    execution = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    lead = models.ForeignKey(Lead, on_delete=models.PROTECT)
+    resource_key = models.CharField(max_length=60)
+    name = models.CharField(max_length=120)
+    token_hash = models.CharField(max_length=64, unique=True)
+    issued_at = models.DateTimeField()
+    expires_at = models.DateTimeField()
+    access_count = models.PositiveSmallIntegerField(default=0)
+    active = models.BooleanField(default=True)
+    email_status = models.CharField(max_length=12, choices=EmailStatus.choices, default=EmailStatus.PENDING)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+
+class LeadMagnetAccess(models.Model):
+    operation = models.UUIDField(unique=True)
+    request = models.ForeignKey(LeadMagnetRequest, on_delete=models.PROTECT)
+    authorized_at = models.DateTimeField(auto_now_add=True)

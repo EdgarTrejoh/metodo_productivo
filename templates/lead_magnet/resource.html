@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Mapa de Caja PyME | Método Productivo{% endblock %}
+{% block main_class %}interior-main lead-magnet-main{% endblock %}
+{% block content %}
+{% include 'includes/breadcrumb.html' with parent_label='Recursos' parent_url='resources' current='Mapa de Caja PyME' %}
+<section class="lead-magnet-intro" aria-labelledby="page-title">
+  <p class="eyebrow">Recurso gratuito · Excel</p>
+  <h1 id="page-title">Mapa de Caja PyME</h1>
+  <p class="interior-lead">Una plantilla de flujo de efectivo para ordenar entradas y salidas previstas durante 13 semanas. Ayuda a identificar con anticipación semanas que requieren atención y a revisar tus supuestos de cobro y pago.</p>
+</section>
+<div class="lead-magnet-layout">
+  <section class="contact-panel" aria-labelledby="lead-form-title">
+    <h2 id="lead-form-title">Recibe la plantilla gratuita</h2>
+    {% if not available %}
+      <p class="calculator-notice" role="status">El archivo Excel definitivo aún no está disponible en este entorno. La solicitud por correo está temporalmente deshabilitada; no se enviará un enlace ficticio.</p>
+    {% else %}
+      <p>Proporciona tu nombre y correo para recibir un enlace privado. Dura tres días y permite hasta tres accesos autorizados.</p>
+      {% if form.non_field_errors %}<div class="contact-error-summary" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="contact-field"><label for="id_name">Nombre *</label><input id="id_name" name="name" type="text" maxlength="120" autocomplete="name" required value="{{ form.name.value|default_if_none:'' }}"{% if form.name.errors %} aria-invalid="true" aria-describedby="name-error"{% endif %}>{% if form.name.errors %}<p id="name-error" class="field-error">{{ form.name.errors|join:' ' }}</p>{% endif %}</div>
+        <div class="contact-field"><label for="id_email">Correo electrónico *</label><input id="id_email" name="email" type="email" maxlength="254" autocomplete="email" required value="{{ form.email.value|default_if_none:'' }}"{% if form.email.errors %} aria-invalid="true" aria-describedby="email-error"{% endif %}>{% if form.email.errors %}<p id="email-error" class="field-error">{{ form.email.errors|join:' ' }}</p>{% endif %}</div>
+        <p class="contact-privacy">Usaremos tu nombre y correo para enviarte el acceso a la plantilla gratuita solicitada. Consulta la <a href="{% url 'privacy' %}">página de privacidad</a>. El aviso y la modalidad jurídica definitivos siguen pendientes de revisión antes de producción.</p>
+        <div class="lead-magnet-consent"><input id="id_commercial" name="commercial" type="checkbox"{% if form.commercial.value %} checked{% endif %}><label for="id_commercial">Quiero recibir comunicaciones comerciales de Método Productivo por correo. Puedo darme de baja después.</label></div>
+        <button type="submit">Recibir mi plantilla gratis</button>
+      </form>
+    {% endif %}
+  </section>
+  <aside class="calculator-context" aria-label="Sobre el recurso">
+    <p class="eyebrow">13 semanas</p><h2>Una vista semanal del efectivo</h2>
+    <p>Organiza lo que esperas cobrar y pagar. Revisa la secuencia de semanas y detecta posibles faltantes para conversar y decidir con mejor información.</p>
+    <p>El archivo es una plantilla Excel, no una proyección automática ni una promesa de resultado financiero.</p>
+  </aside>
+</div>
+{% endblock %}

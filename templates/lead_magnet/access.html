@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Acceso a la plantilla | Método Productivo{% endblock %}
+{% block main_class %}interior-main lead-magnet-main{% endblock %}
+{% block content %}
+<section class="lead-magnet-confirmation" aria-labelledby="page-title">
+  <p class="eyebrow">Recurso gratuito · Acceso privado</p><h1 id="page-title">Mapa de Caja PyME</h1>
+  {% if error %}<p role="alert">{{ error }}</p>{% endif %}
+  {% if valid and available %}
+    <p>Este enlace permite {{ remaining }} acceso{{ remaining|pluralize }} más. Confirmar autoriza una entrega del archivo Excel y consume un acceso; abrir esta página no lo consume.</p>
+    <form method="post">{% csrf_token %}<input type="hidden" name="operation" value="{{ operation }}"><button type="submit">Confirmar descarga</button></form>
+  {% elif not available and valid %}
+    <p role="status">El archivo privado no está disponible ahora. No se consumió un acceso.</p>
+  {% else %}
+    <p>Este enlace venció o agotó sus accesos. Puedes solicitar otro desde la <a href="{% url 'lead_magnet_resource' %}">página del recurso</a>.</p>
+  {% endif %}
+</section>
+{% endblock %}

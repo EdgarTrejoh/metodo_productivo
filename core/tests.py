@@ -9,7 +9,7 @@ from unittest.mock import patch
 class PortalStructureTests(TestCase):
     def test_public_structure_is_navigable_without_fake_forms(self):
         structural_pages = (
-            'tools', 'resources', 'cash_flow_resource',
+            'tools', 'resources',
             'blog', 'contact', 'about', 'privacy', 'terms',
         )
         for name in structural_pages:
@@ -23,6 +23,7 @@ class PortalStructureTests(TestCase):
                     self.assertNotContains(response, '<form')
                 self.assertNotContains(response, 'class="section-mark"')
         self.assertContains(self.client.get(reverse('break_even')), '<form')
+        self.assertRedirects(self.client.get(reverse('cash_flow_resource')), reverse('lead_magnet_resource'))
 
     def test_home_links_to_portal_and_existing_check(self):
         response = self.client.get(reverse('home'))

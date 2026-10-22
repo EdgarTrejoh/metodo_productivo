@@ -10,6 +10,7 @@ __pycache__/
 !.env.example
 staticfiles/
 local_media/
+private_resources/
 .coverage
 .coverage.*
 htmlcov/
