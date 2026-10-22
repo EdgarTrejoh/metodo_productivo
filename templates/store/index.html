@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Tienda digital | Método Productivo{% endblock %}
+{% block main_class %}interior-main store-main{% endblock %}
+{% block content %}
+{% include 'includes/breadcrumb.html' with current='Tienda' %}
+<section class="store-intro" aria-labelledby="page-title">
+  <p class="eyebrow">Herramientas digitales</p>
+  <h1 id="page-title">Tienda digital</h1>
+  <p class="interior-lead">Productos digitales de Método Productivo disponibles para explorar. La compra en línea todavía no está habilitada.</p>
+</section>
+<section class="published-content" aria-labelledby="products-title">
+  <h2 id="products-title">Productos publicados</h2>
+  {% if products %}
+  <div class="article-grid store-grid">
+    {% for product in products %}
+    <article class="article-card store-card">
+      {% if product.image %}<img class="article-card-image" src="{{ product.image.thumbnail_url }}" alt="{{ product.image.alt_text }}" loading="lazy">{% endif %}
+      <p class="eyebrow">Versión {{ product.version }}</p>
+      <h3><a href="{% url 'store_detail' product.slug %}">{{ product.name }}</a></h3>
+      <p>{{ product.summary }}</p>
+      <p class="store-price">{{ product.price|floatformat:2 }} {{ product.currency }}</p>
+      <a class="text-link" href="{% url 'store_detail' product.slug %}">Ver ficha <span aria-hidden="true">→</span></a>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}<p class="content-empty">Todavía no hay productos digitales publicados. Aquí aparecerán cuando su información haya sido revisada.</p>{% endif %}
+</section>
+{% endblock %}

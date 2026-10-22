@@ -1,5 +1,29 @@
 # Verificación local - B0
 
+## B-01 — aceptación funcional y visual local (22 oct 2026)
+
+**Aceptación del promotor:** catálogo `/tienda/`, fichas dinámicas, administración OTP, publicación/retiro, imágenes reutilizables y piloto de Payment Link TEST aprobados en alcance local. El promotor revisó la tienda y la ficha del producto publicado y completó un **pago simulado** desde el Checkout TEST del Simulador de Crédito. Una lectura de la base local confirmó una ficha publicada con `prod_VU03aSWkY1qGQK`, `price_1UT23CDEvKci1tgSdgGv8n96`, $499.00 MXN y el enlace TEST correspondiente; no hay asignación de ese enlace al DEMO de $299. La prueba automatizada creó un segundo producto sintético desde Admin sin nuevas rutas ni código.
+
+**Retorno y alcance:** el promotor confirmó que Stripe tiene configurada la redirección posterior al pago a `http://127.0.0.1:8766/tienda/`. **No se declara comprobada manualmente la navegación final de retorno en el navegador.** La página de éxito o retorno no concede archivos. No hay webhook, orden, derecho de descarga ni envío comercial. La última suite Django completa reportada tuvo **90 pruebas correctas**; las capturas previas corresponden a contenido sintético y no exponen datos de pago.
+
+**Pendientes independientes:** H5, H6, B-02–B-08, Checkout Sessions definitivo, confirmación por webhook, correo comercial, almacenamiento privado definitivo y condiciones fiscales, jurídicas y operativas. Cierre local sin autorización de ventas LIVE ni despliegue.
+
+## B-01 — piloto técnico de Checkout TEST (22 oct 2026)
+
+**Comportamiento:** `stripe_test_payment_url` es opcional en el Admin OTP y rechaza HTTP, dominios ajenos, enlaces de producción, rutas o parámetros adicionales. Requiere entorno Stripe TEST. El botón «Probar compra en Stripe» aparece únicamente en la ficha pública de un producto publicado cuando el enlace pasa la validación, `DEBUG=1` y `STORE_TEST_CHECKOUT_ENABLED=1`; debajo muestra «Pago de prueba. No se realizan cargos reales ni se entregan archivos». Sin enlace, en borrador o con configuración de producción se conserva la ficha sin botón. Ningún producto existente recibió el enlace de $499 de forma automática.
+
+**Evidencia:** suite Django completa de **90 pruebas correctas**, incluidos escenarios de URL inválida, entorno LIVE, flag apagado, `DEBUG=0`, borrador, producto DEMO de $299 sin enlace y destino TEST correcto. Chrome a 1365×900 y 390×844: botón legible, sin desbordamiento; el clic se interceptó localmente y llegó a la URL sintética configurada, **sin solicitar Stripe**. [Ficha escritorio](../qa_artifacts/b01-detail-desktop.png) y [ficha móvil](../qa_artifacts/b01-detail-mobile.png). `manage.py check`, migraciones y `git diff --check` sin incidencias.
+
+**Límite:** este enlace solo permite iniciar una simulación externa cuando el promotor lo configure sobre el producto correcto. No se verificó una transacción real en Stripe ni existe webhook, orden, derecho de entrega o descarga comercial. H5, H6 y B-02–B-08 permanecen abiertos; B-01 sigue en revisión, sin commit, push ni despliegue.
+
+## B-01 — catálogo administrable en desarrollo (22 oct 2026)
+
+**Alcance:** el Admin OTP permite crear, editar, previsualizar, publicar y retirar productos digitales. Las rutas fijas `/tienda/` y `/tienda/<slug>/` muestran solo productos publicados y vigentes; un segundo producto sintético se creó desde el Admin en prueba, sin cambios de código, rutas o plantillas. El estado vacío no inventa ofertas. Las imágenes de productos publicados se sirven públicamente; las de borradores requieren acceso editorial autorizado y la relación impide eliminarlas mientras estén referenciadas. No hay botón de compra, Checkout ni entrega comercial.
+
+**Pruebas:** suite Django completa de **88 pruebas correctas**, incluidos cinco casos nuevos de B-01; `manage.py check`, comprobación de migraciones y `git diff --check` sin incidencias. Recorrido Chrome en base aislada con contenido sintético: catálogo, ficha y Admin OTP a 1365×900 y 390×844, sin desbordamiento horizontal. [Catálogo escritorio](../qa_artifacts/b01-catalog-desktop.png), [catálogo móvil](../qa_artifacts/b01-catalog-mobile.png), [ficha escritorio](../qa_artifacts/b01-detail-desktop.png), [ficha móvil](../qa_artifacts/b01-detail-mobile.png), [Admin](../qa_artifacts/b01-admin-desktop.png). Ningún dato sintético queda publicado en la base local por esta prueba.
+
+**Pendientes:** revisión del promotor, primera ficha/archivo/condiciones reales y verificación operativa futura del identificador privado. Stripe Product y Price son referencias opcionales etiquetadas TEST/LIVE, sin comprobación contra Stripe en este incremento. H5, H6 y B-02–B-08 siguen pendientes; sin ventas, commit, push ni despliegue.
+
 ## A-03 — aceptación funcional local (22 oct 2026)
 
 **Aceptación:** el promotor confirmó la descarga manual satisfactoria del Excel definitivo `Mapa_de_Caja_PyME_v0.3.xlsx` mediante el recorrido J4. A-03 queda cerrada en su **alcance funcional local**. El recurso se conserva en `private_resources/`, fuera de control de versiones. No se capturó la pantalla de descarga porque expondría el enlace privado; las capturas anteriores documentan solamente páginas sin tokens.

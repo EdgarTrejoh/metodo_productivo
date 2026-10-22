@@ -15,6 +15,9 @@ from analytics.models import ProductEvent
 from content.admin import ArticleAdmin, MediaAssetAdmin, VideoAdmin
 from content.models import Article, MediaAsset, Video
 from content import views as content_views
+from store.admin import DigitalProductAdmin
+from store.models import DigitalProduct
+from store import views as store_views
 from django.contrib import admin
 from django.views.generic import RedirectView
 site=OTPAdminSite(name='otpadmin')
@@ -33,6 +36,7 @@ site.register(Orientation,OrientationAdmin)
 site.register(Article, ArticleAdmin)
 site.register(MediaAsset, MediaAssetAdmin)
 site.register(Video, VideoAdmin)
+site.register(DigitalProduct, DigitalProductAdmin)
 site.register(ContactSubmission, ContactSubmissionAdmin)
 urlpatterns = [
     path('', portal_views.home, name='home'),
@@ -45,6 +49,8 @@ urlpatterns = [
     path('recursos/flujo-efectivo-13-semanas/', RedirectView.as_view(pattern_name='lead_magnet_resource', permanent=False), name='cash_flow_resource'),
     path('blog/', content_views.index, name='blog'),
     path('blog/<slug:slug>/', content_views.detail, name='article_detail'),
+    path('tienda/', store_views.index, name='store'),
+    path('tienda/<slug:slug>/', store_views.detail, name='store_detail'),
     path('editorial/media/<uuid:image_id>/', content_views.editorial_image, name='editorial_image'),
     path('contacto/', portal_views.contact, name='contact'),
     path('acerca/', portal_views.section, {'page': 'about'}, name='about'),

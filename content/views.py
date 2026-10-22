@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from .models import Article, MediaAsset, PublicationStatus, Video
+from store.models import DigitalProduct
 
 
 def index(request):
@@ -48,7 +49,7 @@ def editorial_image(request, image_id):
     )
     publicly_used = Article.live().filter(
         Q(featured_image=image) | Q(inline_image_usages__image=image)
-    ).exists()
+    ).exists() or DigitalProduct.live().filter(image=image).exists()
     if not authorized_editor and not publicly_used:
         raise Http404('Imagen no disponible.')
     thumbnail = request.GET.get('thumb') == '1'

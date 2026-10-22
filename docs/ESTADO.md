@@ -93,3 +93,21 @@ Se implementó el recorrido J4 para solicitar el lead magnet y autorizar su entr
 El promotor **aprobó el alcance funcional local de A-03** después de completar manualmente la descarga del Excel definitivo desde el enlace privado. El archivo permanece en almacenamiento local privado excluido de Git. La corrección CSRF de la página de acceso establece `Referrer-Policy: strict-origin`; se verificó que el POST legítimo funciona y que los orígenes no confiables son rechazados. La última suite Django completa registró **83 pruebas correctas**. No se guardó una captura de la descarga para evitar revelar el enlace privado. [Detalle de verificación](VERIFICACION.md).
 
 **Entrega 2, H2 y H3 permanecen abiertos.** O-02 (PostgreSQL y concurrencia), O-03 (almacenamiento productivo), O-04 (correo real), O-07 (protección compartida), O-08 (medición transversal) y revisión jurídica siguen pendientes independientes. Este cierre local no autoriza despliegue.
+
+## Tienda digital — B-01 en desarrollo (22 de octubre de 2026)
+
+Se implementó el primer incremento del catálogo administrable: modelo de producto digital, edición y vista previa en el backoffice OTP, publicación y retiro, páginas dinámicas `/tienda/` y `/tienda/<slug>/`, navegación y reutilización de imágenes editoriales. Los productos sintéticos de verificación solo existieron en una base de pruebas aislada; la tienda local permanece sin productos comerciales aprobados. La suite Django registró **88 pruebas correctas** y la inspección en Chrome cubrió escritorio y móvil sin desbordamiento. [Evidencia](VERIFICACION.md).
+
+**B-01 sigue EN CURSO** para revisión del promotor y definición del primer producto real, precio, archivo y condiciones comerciales. No se implementaron compra, pago, orden, derecho de descarga ni almacenamiento cloud. H5 y H6 permanecen abiertos; no hay autorización de venta ni despliegue.
+
+## Tienda digital — piloto técnico de Checkout TEST en B-01 (22 de octubre de 2026)
+
+El producto digital admite un Payment Link TEST opcional, editable en el backoffice OTP y validado para HTTPS y la ruta `buy.stripe.com/test_`. Solo una ficha publicada, etiquetada TEST, en desarrollo y con `STORE_TEST_CHECKOUT_ENABLED=1` presenta «Probar compra en Stripe» bajo el precio, junto a la advertencia de pago de prueba sin cargos reales ni entrega. La referencia de $499 proporcionada por el promotor **no se asignó automáticamente** a ningún producto ni al DEMO de $299. La suite Django completa registró **90 pruebas correctas** y la revisión de navegador usó un enlace sintético interceptado, sin contactar Stripe. [Evidencia](VERIFICACION.md).
+
+Es un **piloto técnico de B-01**, no una integración de pagos ni activación comercial. B-01, H5 y H6 siguen abiertos; no hay webhook, orden, derecho de descarga, magic link comercial ni despliegue.
+
+## Tienda digital — cierre funcional y visual local B-01 (22 de octubre de 2026)
+
+El promotor **aprobó el alcance funcional y visual local** del catálogo autoadministrable y del piloto de Checkout TEST. Revisó la tienda y la ficha publicada, y completó un pago simulado del Simulador de Crédito. Una consulta de solo lectura a la base local confirmó una ficha publicada con el producto y precio Stripe TEST indicados y $499.00 MXN; el DEMO de $299 no tiene el mismo enlace. Stripe tiene configurada una redirección a `/tienda/` local después del pago, pero **no se ha confirmado manualmente en navegador la navegación final de retorno**. La última suite Django reportada registró **90 pruebas correctas**. [Evidencia](VERIFICACION.md).
+
+**H5 y H6 siguen abiertos**, junto con B-02–B-08, Checkout Sessions definitivo, webhooks, órdenes, derechos de descarga, correo comercial, almacenamiento privado definitivo y condiciones fiscales, jurídicas y operativas. El cierre local no autoriza ventas LIVE ni despliegue productivo.

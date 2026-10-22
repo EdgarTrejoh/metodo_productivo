@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}{{ product.name }} | Tienda | Método Productivo{% endblock %}
+{% block meta_description %}{{ product.summary }}{% endblock %}
+{% block seo_meta %}{% if preview %}<meta name="robots" content="noindex,nofollow">{% endif %}{% endblock %}
+{% block main_class %}interior-main store-main{% endblock %}
+{% block content %}
+{% include 'includes/breadcrumb.html' with parent_label='Tienda' parent_url='store' current=product.name %}
+<article class="store-detail">
+  {% if preview %}<p class="editorial-preview-notice">Vista previa privada del producto guardado. Los campos vacíos aún no aparecerán en la ficha pública.</p>{% endif %}
+  <header class="store-intro">
+    <p class="eyebrow">Producto digital{% if product.version %} · Versión {{ product.version }}{% endif %}</p>
+    <h1>{{ product.name }}</h1>
+    {% if product.summary %}<p class="interior-lead">{{ product.summary }}</p>{% endif %}
+  </header>
+  {% if product.image %}<figure class="store-image"><img src="{{ product.image.public_url }}" alt="{{ product.image.alt_text }}"><figcaption>{{ product.image.description }}</figcaption></figure>{% endif %}
+  <div class="store-detail-grid">
+    <div class="store-copy">
+      {% if product.description %}<section><h2>Descripción</h2><p>{{ product.description|linebreaksbr }}</p></section>{% endif %}
+      {% if product.benefits %}<section><h2>Beneficios</h2><p>{{ product.benefits|linebreaksbr }}</p></section>{% endif %}
+      {% if product.contents %}<section><h2>Contenido</h2><p>{{ product.contents|linebreaksbr }}</p></section>{% endif %}
+    </div>
+    <aside class="store-facts" aria-label="Detalles del producto">
+      {% if product.price %}<p><strong>Precio</strong><span>{{ product.price|floatformat:2 }} {{ product.currency }}</span></p>{% endif %}
+      {% if show_test_checkout %}<a class="button store-test-checkout" href="{{ product.stripe_test_payment_url }}" rel="noreferrer">Probar compra en Stripe</a><p class="store-test-note">Pago de prueba. No se realizan cargos reales ni se entregan archivos.</p>{% endif %}
+      {% if product.version %}<p><strong>Versión</strong><span>{{ product.version }}</span></p>{% endif %}
+      {% if product.software_requirements %}<p><strong>Requisitos de software</strong><span>{{ product.software_requirements|linebreaksbr }}</span></p>{% endif %}
+      {% if product.delivery_terms %}<p><strong>Condiciones de entrega</strong><span>{{ product.delivery_terms|linebreaksbr }}</span></p>{% endif %}
+      {% if not show_test_checkout %}<p class="store-unavailable">La compra en línea todavía no está disponible.</p>{% endif %}
+    </aside>
+  </div>
+  <p class="article-return"><a href="{% url 'store' %}">← Volver a la tienda</a></p>
+</article>
+{% endblock %}

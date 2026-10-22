@@ -3,12 +3,13 @@ from pathlib import Path
 from django.core.exceptions import ImproperlyConfigured
 BASE_DIR=Path(__file__).resolve().parent.parent
 DEBUG=os.getenv('DJANGO_DEBUG','1')=='1'
+STORE_TEST_CHECKOUT_ENABLED=os.getenv('STORE_TEST_CHECKOUT_ENABLED','0')=='1'
 # Esta entrega es exclusivamente de desarrollo. Evita una publicación accidental.
 if not DEBUG:
     raise ImproperlyConfigured('Bloque inicial no habilitado para producción. Revisar docs/ESTADO.md.')
 SECRET_KEY=os.getenv('DJANGO_SECRET_KEY') or secrets.token_urlsafe(48)
 ALLOWED_HOSTS=os.getenv('DJANGO_ALLOWED_HOSTS','localhost,127.0.0.1,testserver').split(',')
-INSTALLED_APPS=['django.contrib.admin','django.contrib.auth','django.contrib.contenttypes','django.contrib.sessions','django.contrib.messages','django.contrib.staticfiles','django_otp','django_otp.plugins.otp_totp','leads','diagnostics','analytics','content']
+INSTALLED_APPS=['django.contrib.admin','django.contrib.auth','django.contrib.contenttypes','django.contrib.sessions','django.contrib.messages','django.contrib.staticfiles','django_otp','django_otp.plugins.otp_totp','leads','diagnostics','analytics','content','store']
 MIDDLEWARE=['django.middleware.security.SecurityMiddleware','django.contrib.sessions.middleware.SessionMiddleware','django.middleware.common.CommonMiddleware','django.middleware.csrf.CsrfViewMiddleware','django.contrib.auth.middleware.AuthenticationMiddleware','django_otp.middleware.OTPMiddleware','django.contrib.messages.middleware.MessageMiddleware','django.middleware.clickjacking.XFrameOptionsMiddleware','core.middleware.CheckContextMiddleware']
 ROOT_URLCONF='config.urls'
 TEMPLATES=[{'BACKEND':'django.template.backends.django.DjangoTemplates','DIRS':[BASE_DIR/'templates'],'APP_DIRS':True,'OPTIONS':{'context_processors':['django.template.context_processors.request','django.contrib.auth.context_processors.auth','django.contrib.messages.context_processors.messages']}}]
