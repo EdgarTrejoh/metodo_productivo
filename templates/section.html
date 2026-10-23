@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}{{ page.title }} | Método Productivo{% endblock %}
 {% block main_class %}section-main{% endblock %}
 {% block content %}
@@ -23,5 +24,20 @@
 </section>
 {% endif %}
 
-<div class="section-bottom-links"><a href="{% url 'home' %}">← Volver al inicio</a></div>
+{% if request.resolver_match.url_name == 'privacy' %}
+  {% if request.GET.desde == 'check' %}
+    <div class="section-bottom-links privacy-return" data-privacy-return="check">
+      <button type="button" class="privacy-return-action" aria-describedby="privacy-close-help">Cerrar esta pestaña y continuar con mi Check</button>
+      <p id="privacy-close-help">Si el navegador no permite cerrarla automáticamente, cierra esta pestaña y continúa en la anterior.</p>
+    </div>
+  {% else %}
+    <div class="section-bottom-links privacy-return" data-privacy-return="other">
+      <button type="button" class="privacy-back" hidden>← Volver a la página anterior</button>
+      <a href="{% url 'home' %}">Ir al inicio</a>
+    </div>
+  {% endif %}
+{% else %}
+  <div class="section-bottom-links"><a href="{% url 'home' %}">← Volver al inicio</a></div>
+{% endif %}
 {% endblock %}
+{% block extra_scripts %}{% if request.resolver_match.url_name == 'privacy' %}<script src="{% static 'privacy_return.js' %}" defer></script>{% endif %}{% endblock %}

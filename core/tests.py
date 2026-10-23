@@ -7,6 +7,19 @@ from unittest.mock import patch
 
 
 class PortalStructureTests(TestCase):
+    def test_privacy_return_uses_only_controlled_origin(self):
+        from_check = self.client.get('/privacidad/?desde=check')
+        self.assertContains(from_check, 'Cerrar esta pestaña y continuar con mi Check')
+        self.assertContains(from_check, 'Si el navegador no permite cerrarla automáticamente')
+        self.assertNotContains(from_check, '← Volver al inicio')
+        self.assertNotContains(from_check, '← Volver a la página anterior')
+
+        for url in ('/privacidad/', '/privacidad/?desde=https://example.com'):
+            response = self.client.get(url)
+            self.assertContains(response, '← Volver a la página anterior')
+            self.assertContains(response, 'href="/">Ir al inicio</a>')
+            self.assertNotContains(response, 'Cerrar esta pestaña y continuar con mi Check')
+
     def test_public_structure_is_navigable_without_fake_forms(self):
         structural_pages = (
             'tools', 'resources',

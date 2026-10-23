@@ -1,1 +1,49 @@
-{% extends 'base.html' %}{% block content %}<h1>Tu informe está listo</h1><p>Ingresa tu correo y completa tus datos para ver y descargar tu informe.</p><form method="post">{% csrf_token %}{{ form.as_p }}<p>Guarda el PDF antes de salir. No hay recuperación posterior de este diagnóstico.</p><button>Ver y descargar mi informe</button></form><p>Los textos de privacidad y servicio definitivos siguen pendientes. Usa datos sintéticos.</p>{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Datos de contacto del Check PyME | Método Productivo{% endblock %}
+{% block content %}
+<div class="check-capture">
+  <h1>Último paso para ver tu informe</h1>
+  <p class="check-capture-intro">Completa tus datos de contacto para generar y consultar tu diagnóstico de gestión empresarial.</p>
+
+  <form method="post" class="check-capture-form">
+    {% csrf_token %}
+    <input type="hidden" name="execution" value="{{ execution }}">
+    {{ form.non_field_errors }}
+
+    <div class="check-capture-fields">
+      {% for field in form %}
+        {% if field.name != 'service' and field.name != 'commercial' %}
+          <div class="check-capture-field">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {{ field.errors }}
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <aside class="check-capture-privacy" aria-labelledby="check-privacy-title">
+      <h2 id="check-privacy-title">Protección de tus datos</h2>
+      <p>Utilizamos la información que proporcionas para generar tu diagnóstico y atender las solicitudes relacionadas con este servicio. Consulta cómo tratamos tus datos en nuestro aviso de privacidad.</p>
+      <a href="{% url 'privacy' %}?desde=check" target="_blank" rel="noopener noreferrer">Consultar aviso de privacidad integral <span aria-hidden="true">↗</span><span class="sr-only"> (se abre en una pestaña nueva)</span></a>
+      <p class="check-capture-legal-note">Aviso y textos de consentimiento provisionales para pruebas locales; pendientes de revisión jurídica antes de su publicación.</p>
+    </aside>
+
+    <div class="check-capture-consents">
+      <div class="check-capture-consent">
+        <strong>Consentimiento para el servicio — obligatorio</strong>
+        <label for="{{ form.service.id_for_label }}">{{ form.service }}<span>{{ form.service.label }}</span></label>
+        {{ form.service.errors }}
+      </div>
+      <div class="check-capture-consent">
+        <strong>Consentimiento comercial — opcional</strong>
+        <label for="{{ form.commercial.id_for_label }}">{{ form.commercial }}<span>{{ form.commercial.label }}</span></label>
+        {{ form.commercial.errors }}
+      </div>
+    </div>
+
+    <p class="check-capture-reminder">Guarda el PDF antes de salir. No hay recuperación posterior de este diagnóstico.</p>
+    <button type="submit">Ver mi informe</button>
+  </form>
+</div>
+{% endblock %}

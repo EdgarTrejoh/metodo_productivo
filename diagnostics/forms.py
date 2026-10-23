@@ -12,8 +12,8 @@ class CaptureForm(forms.Form):
     email=forms.EmailField(label='Correo electrónico',max_length=254)
     company=forms.CharField(label='Nombre de la empresa',max_length=180)
     whatsapp=forms.CharField(label='WhatsApp (opcional)',required=False,max_length=20)
-    service=forms.BooleanField(label='Acepto el uso de datos sintéticos para esta prueba local. Texto de servicio definitivo pendiente.')
-    commercial=forms.BooleanField(label='Quiero recibir contenidos y novedades (opcional; registro de prueba).',required=False)
+    service=forms.BooleanField(label='He leído el aviso de privacidad y acepto el tratamiento de mis datos para generar mi diagnóstico y prestar el servicio solicitado.')
+    commercial=forms.BooleanField(label='Deseo recibir contenidos, novedades y comunicaciones comerciales de Método Productivo.',required=False)
     def clean_email(self):return self.cleaned_data['email'].strip().lower()
     def clean_whatsapp(self):
         v=self.cleaned_data['whatsapp'].strip()
