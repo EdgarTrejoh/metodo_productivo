@@ -261,6 +261,12 @@ class EditorialTests(TestCase):
 
 
 class MediaEditorialTests(TestCase):
+    @staticmethod
+    def close_stream_file(response):
+        # Response.close() emits request_finished, which closes TestCase's PostgreSQL transaction.
+        while response._resource_closers:
+            response._resource_closers.pop()()
+
     def setUp(self):
         self.folder = TemporaryDirectory()
         self.addCleanup(self.folder.cleanup)
@@ -336,7 +342,7 @@ class MediaEditorialTests(TestCase):
         try:
             self.assertEqual(image_response.status_code, 200)
         finally:
-            image_response.close()
+            self.close_stream_file(image_response)
         self.assertContains(self.client.get(reverse('article_detail', args=[article.slug])), 'Gráfica sintética')
         article.body = '<p>Imagen retirada del cuerpo.</p>'
         article.save()
@@ -386,7 +392,7 @@ class MediaEditorialTests(TestCase):
         try:
             self.assertEqual(image_response.status_code, 200)
         finally:
-            image_response.close()
+            self.close_stream_file(image_response)
         change = reverse('otpadmin:content_article_change', args=[article.pk])
         data['status'] = PublicationStatus.PUBLISHED
         self.assertEqual(self.client.post(change, data).status_code, 302)
