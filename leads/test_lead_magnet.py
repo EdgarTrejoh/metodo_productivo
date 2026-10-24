@@ -9,6 +9,7 @@ from unittest.mock import patch
 
 from django.core import mail
 from django.core.cache import cache
+from django.db import connections
 from django.test import Client, TestCase, TransactionTestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
@@ -185,13 +186,16 @@ class ConcurrentAccessTests(ResourceFixture, TransactionTestCase):
         cookie = self.client.cookies['sessionid'].value
 
         def submit(_):
-            client = Client()
-            client.cookies['sessionid'] = cookie
-            response = client.post(url, {'operation': operation})
-            if response.streaming:
-                b''.join(response.streaming_content)
-                response.close()
-            return response.status_code
+            try:
+                client = Client()
+                client.cookies['sessionid'] = cookie
+                response = client.post(url, {'operation': operation})
+                if response.streaming:
+                    b''.join(response.streaming_content)
+                    response.close()
+                return response.status_code
+            finally:
+                connections.close_all()
 
         with ThreadPoolExecutor(max_workers=2) as pool:
             statuses = list(pool.map(submit, range(2)))
@@ -213,11 +217,14 @@ class ConcurrentAccessTests(ResourceFixture, TransactionTestCase):
         operations = [client.get(url).context['operation'] for client in clients]
 
         def submit(index):
-            response = clients[index].post(url, {'operation': operations[index]})
-            if response.streaming:
-                b''.join(response.streaming_content)
-                response.close()
-            return response.status_code
+            try:
+                response = clients[index].post(url, {'operation': operations[index]})
+                if response.streaming:
+                    b''.join(response.streaming_content)
+                    response.close()
+                return response.status_code
+            finally:
+                connections.close_all()
 
         with ThreadPoolExecutor(max_workers=2) as pool:
             list(pool.map(submit, range(2)))
