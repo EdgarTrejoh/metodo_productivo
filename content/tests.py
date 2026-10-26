@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models import ProtectedError
-from django.test import TestCase, override_settings
+from django.test import TestCase, TransactionTestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django_otp import DEVICE_ID_SESSION_KEY
@@ -260,13 +260,7 @@ class EditorialTests(TestCase):
         self.assertIn(self.client.get(reverse('otpadmin:content_video_add')).status_code, (302, 403))
 
 
-class MediaEditorialTests(TestCase):
-    @staticmethod
-    def close_stream_file(response):
-        # Response.close() emits request_finished, which closes TestCase's PostgreSQL transaction.
-        while response._resource_closers:
-            response._resource_closers.pop()()
-
+class MediaEditorialTests(TransactionTestCase):
     def setUp(self):
         self.folder = TemporaryDirectory()
         self.addCleanup(self.folder.cleanup)
@@ -342,7 +336,7 @@ class MediaEditorialTests(TestCase):
         try:
             self.assertEqual(image_response.status_code, 200)
         finally:
-            self.close_stream_file(image_response)
+            image_response.close()
         self.assertContains(self.client.get(reverse('article_detail', args=[article.slug])), 'Gráfica sintética')
         article.body = '<p>Imagen retirada del cuerpo.</p>'
         article.save()
@@ -392,7 +386,7 @@ class MediaEditorialTests(TestCase):
         try:
             self.assertEqual(image_response.status_code, 200)
         finally:
-            self.close_stream_file(image_response)
+            image_response.close()
         change = reverse('otpadmin:content_article_change', args=[article.pk])
         data['status'] = PublicationStatus.PUBLISHED
         self.assertEqual(self.client.post(change, data).status_code, 302)

@@ -10,7 +10,7 @@ from unittest.mock import patch
 from django.core import mail
 from django.core.cache import cache
 from django.db import connections
-from django.test import Client, TestCase, TransactionTestCase, override_settings
+from django.test import Client, TransactionTestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 
@@ -41,7 +41,7 @@ class ResourceFixture:
         return re.search(r'/acceso/([A-Za-z0-9_-]{43})/', mail.outbox[-1].body).group(1)
 
 
-class LeadMagnetTests(ResourceFixture, TestCase):
+class LeadMagnetTests(ResourceFixture, TransactionTestCase):
     def test_csrf_accepts_local_origin_and_rejects_null_or_foreign_origin(self):
         token = self.request_resource()
         url = reverse('lead_magnet_access', args=[token])
