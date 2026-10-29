@@ -1,5 +1,42 @@
 # Verificación local - B0
 
+## O-01 — configuración segura de staging (29 oct 2026; aceptada y cerrada en su alcance)
+
+**Cierre administrativo:** el promotor aceptó y cerró O-01 el 29 de octubre de 2026 con base en la evidencia técnica ya registrada. El alcance es preparación local equivalente a staging; no acredita GCP, TLS o proxy reales, almacenamiento y medios externos, correo real, pagos LIVE ni publicación pública. `security.W005` y `security.W021` permanecen abiertas.
+
+**Separación y arranque:** `DJANGO_ENV=local` conserva Windows/SQLite y Docker local/PostgreSQL. `DJANGO_ENV=staging` exige `DJANGO_DEBUG=0`, clave estable de al menos 50 caracteres, PostgreSQL, hosts y orígenes CSRF HTTPS explícitos, y backend de correo explícito. Falta de clave, hosts u orígenes, `DEBUG=1` y cambio a SQLite provocaron `ImproperlyConfigured` antes de arrancar. El archivo `.env.staging-smoke`, con valores sintéticos distintos de `.env.docker`, está excluido de Git. El proyecto Compose `mp_o01_smoke` creó red y volumen PostgreSQL propios; no comparte la base ni los secretos de desarrollo.
+
+**Ejecución y seguridad:** la imagen Python 3.12 incorporó Gunicorn WSGI y WhiteNoise; `collectstatic` copió 143 archivos al construirla. Gunicorn arrancó con `DEBUG=0` en 127.0.0.1:8877 y PostgreSQL 16 saludable. Sesión y CSRF usaron cookies seguras; Django Admin redirigió sin OTP y permitió entrar con un dispositivo sintético confirmado dentro de la base aislada. Sin `X-Forwarded-Proto: https`, HTTP respondió 301; con la cabecera de proxy, Home respondió 200. El endpoint `/health/` identifica el modo `staging`.
+
+**`manage.py check --deploy`:** sin errores; advierte `security.W005` (HSTS de subdominios) y `security.W021` (preload). No se activan hasta definir el dominio y confirmar que todos sus subdominios son exclusivamente HTTPS; no se silencian. O-02 debe garantizar que un proxy de confianza reemplaza `X-Forwarded-Proto` y que no existe acceso directo que permita falsificarlo. El smoke local no incluye terminación TLS: la cabecera se envió solo para simular ese proxy en un puerto ligado a loopback.
+
+**Compatibilidad:** Docker local se reconstruyó sin perder volúmenes ni montaje privado (`RW=False`); Django confirmó PostgreSQL y `storage.available(RESOURCE_KEY)=True`. La suite completa pasó **103/103** en Docker/PostgreSQL y **103/103** en Windows/SQLite. `manage.py check` y `makemigrations --check --dry-run` fueron correctos en ambos modos y en staging aislado. No hubo migración de SQLite ni cambios de modelo.
+
+| Módulo | Entrada | Comprobación con O-01 | Dependencia que sigue abierta |
+| --- | --- | --- | --- |
+| Home y navegación | `/` | 200 en Gunicorn | Contenido definitivo y gates H2/H4 |
+| Herramientas y calculadora | `/herramientas/`, `/herramientas/punto-de-equilibrio/` | 200; regresión Django completa | O-08 y cierre A-02 |
+| Check, resultado y PDF | `/check-pyme/`, rutas protegidas | Entrada 200; regresión Django completa y evidencia C-02 | C-01 concurrente, C-02 aceptación y demás H1 |
+| Recursos y Excel | `/recursos/`, `/recursos/mapa-de-caja-pyme/` | 200; Excel disponible en Docker local | O-03 para archivo privado persistente en nube; O-04 para correo real |
+| Contenidos, artículos y videos | `/blog/`, detalle dinámico | 200; regresión Django completa | Contenido aprobado y medios persistentes O-03 |
+| Tienda y productos | `/tienda/`, ficha dinámica | 200; regresión Django completa | H5/H6; pagos LIVE y entrega comercial no habilitados |
+| Contacto y seguimiento | `/contacto/` | 200; regresión Django completa | O-04, O-07 y revisión jurídica |
+| Páginas institucionales | `/acerca/`, `/privacidad/`, `/terminos/` | 200 | D-06, A-08 y R-05 antes de publicación |
+| Backoffice OTP | `/backoffice/` | 302 a login; prueba de acceso con TOTP sintético confirmado | O-06 operativo antes de uso público |
+| Estáticos y salud | `/static/app.css`, `/static/admin/css/base.css`, `/health/` | 200; `health` indica staging | O-02 debe comprobar proxy/TLS y operación en nube |
+
+**Límite:** el smoke aislado no monta el Excel ni envía correo real. Sus medios editoriales usan un volumen Docker propio para esta prueba, pero eso no resuelve el almacenamiento persistente de Cloud Run previsto en O-03. Se conservan los módulos y sus dependencias sin presentarlas como integradas. No existe despliegue GCP, dominio, certificado ni prueba de navegador HTTPS completa. O-02, O-03, O-04 y las condiciones jurídicas/publicación permanecen abiertos.
+
+## C-02 — Protección del resultado y PDF (29 oct 2026; verificada localmente, lista para aceptación formal)
+
+**Estado inicial:** `diagnostics/views.py` ya exigía sesión, ejecución vigente y diagnóstico asociado antes de servir resultado y PDF; `current()` vencía a los 30 minutos de inactividad, `exit_check()` revocaba el contexto y `core/middleware.py` aplicaba `Cache-Control: no-store, private` a las rutas del Check. El PDF podía reintentarse durante la vigencia sin crear otro diagnóstico. Faltaban afirmaciones directas en pruebas para denegación antes de capturar contacto, cabeceras del PDF y respuestas 410, y sustitución de una ejecución completada.
+
+**Brecha corregida:** solo se agregaron tres pruebas a `diagnostics/tests.py`; no se cambió lógica de negocio, middleware, plantillas ni configuración. Resultado y PDF devolvieron 410 antes de completar la captura y tras salida, vencimiento o reemplazo; ambos devolvieron 200 durante la ejecución autorizada. Las respuestas 200 y 410 verificadas incluyeron `no-store`. La sesión de otro navegador no obtuvo acceso. Dos descargas del mismo PDF conservaron un solo diagnóstico.
+
+**Pruebas automatizadas en Docker/PostgreSQL:** `diagnostics.tests.FlowTests` **29/29**, regresión `diagnostics.tests` **40/40**, suite Django completa **103/103**; `manage.py check` sin incidencias y `makemigrations --check --dry-run` sin cambios. La expiración exacta, renovación por actividad legítima, privacidad sin renovación y formularios obsoletos ya están cubiertos en la regresión C-01. La concurrencia simultánea propia de C-01 continúa pendiente por separado.
+
+**Navegador real:** Chrome automatizado con datos sintéticos verificó resultado y PDF protegidos, descarga dos veces, acceso de otra pestaña en la misma sesión, rechazo en otro navegador, salida que revoca ambas pestañas, Atrás sin restaurar el resultado y vencimiento al simular 30 minutos de inactividad en la sesión del servidor. [Guion](../qa_artifacts/c02_browser.cjs), [resultado sintético](../qa_artifacts/c02-result.png) y [pantalla tras Atrás](../qa_artifacts/c02-expired.png). Esta comprobación corresponde a Chrome en este entorno; `no-store` es el control HTTP comprobado, no una garantía universal sobre todos los mecanismos de restauración de todos los navegadores. **C-02 está verificada funcionalmente en local y lista para aceptación formal; su casilla permanece abierta porque el promotor aún no la ha aprobado expresamente.**
+
 ## Docker local con PostgreSQL — aprobado (29 oct 2026)
 
 **Decisión de cierre:** el promotor aprobó el incremento **INF-LOCAL-01** el 29 de octubre de 2026. Docker AV-01 y AV-02 quedaron cerradas para desarrollo local. Las pruebas automatizadas, las comprobaciones técnicas y las verificaciones manuales se distinguen abajo. Este cierre no acredita un despliegue productivo ni completa O-02.
