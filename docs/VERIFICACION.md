@@ -1,5 +1,29 @@
 # Verificación local - B0
 
+## Docker local con PostgreSQL — aprobado (29 oct 2026)
+
+**Decisión de cierre:** el promotor aprobó el incremento **INF-LOCAL-01** el 29 de octubre de 2026. Docker AV-01 y AV-02 quedaron cerradas para desarrollo local. Las pruebas automatizadas, las comprobaciones técnicas y las verificaciones manuales se distinguen abajo. Este cierre no acredita un despliegue productivo ni completa O-02.
+
+**Infraestructura:** Docker Desktop 29.1.3 y Compose v5.0.0 disponibles. La imagen Django con Python 3.12 se construyó con `requirements.txt`; PostgreSQL 16 arrancó saludable, sin publicar 5432 en el anfitrión. Django confirmó `connection.vendor=postgresql` y se aplicaron **30 migraciones** en la base nueva. `manage.py check` no reportó incidencias y `makemigrations --check --dry-run` no detectó cambios. El servicio web quedó publicado solo en `127.0.0.1:8767`.
+
+**Aplicación y pruebas:** mediante HTTP local respondieron 200 Home `/`, entrada `/check-pyme/`, Contacto `/contacto/`, Privacidad `/privacidad/`, Contenidos `/blog/` y Tienda `/tienda/`; `/backoffice/` respondió 302 hacia el login, que respondió 200. En el contenedor pasaron **2/2** pruebas concurrentes de A-03 y la suite Django completa de **100/100** con PostgreSQL. El recorrido protegido de captura del Check se cubre por la suite; esta comprobación de rutas no incluyó una nueva inspección visual en navegador.
+
+**Aislamiento y persistencia:** la imagen no contiene `dev.sqlite3`, `local_media/` ni el Excel privado. El servicio normal no ve el Excel. El montaje opcional de `private_resources/` permitió confirmar su presencia con `RW=False`, sin leerlo; después se restauró el servicio sin ese montaje. Al reiniciar PostgreSQL y Django persistieron las 30 migraciones y un archivo sintético de prueba en el volumen de medios; ese archivo se retiró tras la comprobación. No se modificaron ni migraron datos de SQLite ni se copiaron recursos privados a la imagen.
+
+**Estado:** entorno local aprobado por el promotor el 29 de octubre de 2026. No hay despliegue ni cierre de O-02, C-01 integral, C-02 o H1. El archivo `.env.docker` local contiene valores de desarrollo y está excluido de Git; Checkout TEST permanece deshabilitado por defecto. Los volúmenes persisten al reiniciar, pero no se probaron alta disponibilidad, tolerancia a fallos ni restauración.
+
+### Docker AV-01 — recurso privado habilitado para revisión
+
+La observación del promotor se reprodujo con el servicio base: sin montaje privado, `storage.available(RESOURCE_KEY)` era falso y el formulario se ocultaba. El archivo definitivo existía en el anfitrión y `.env.docker`, excluido de Git, ya apuntaba a su carpeta. Se recreó `web` con `compose.private.yaml`; Docker confirmó el montaje `/app/private_resources` como `RW=False`. Dentro del contenedor, Django pudo abrir el XLSX y `storage.available(RESOURCE_KEY)` devolvió `True`. La página HTTP 200 volvió a mostrar el formulario y dejó de mostrar el aviso de bloqueo.
+
+Una prueba sintética con CSRF activo completó la solicitud, produjo un correo transaccional únicamente en memoria y autorizó tres entregas del archivo real. La vigencia fue exactamente de 72 horas; cada GET dejó el contador intacto, los tres reenvíos de la misma operación devolvieron 409 sin consumir otro acceso y el cuarto acceso devolvió 410. Se confirmaron tres registros de acceso y tres eventos `LEADMAGNET_DELIVERED`; el enlace privado no se incorporó a la documentación. El servicio de revisión permanece activo en `127.0.0.1:8767` con el montaje privado; no se alteraron A-03, SQLite ni la imagen. El [README](../README.md) conserva el comando de inicio con recurso y la opción independiente sin montaje. **Docker AV-01 cerrada por aprobación del promotor; O-02 continúa abierto.**
+
+### Docker AV-02 — administración y persistencia local
+
+**Comprobación manual del promotor:** accedió al backoffice Docker con usuario, contraseña y TOTP; observó los módulos administrativos; creó un producto digital sintético en borrador y confirmó que no aparece en el catálogo público. Tras reiniciar contenedores, el registro continuó en PostgreSQL y fue visible en la administración. No se eliminó el producto ni otros datos locales. **Docker AV-02 cerrada por aprobación del promotor.** Esta comprobación no sustituye las pruebas de seguridad, respaldo y recuperación de H3/H4.
+
+**Revalidación previa al versionamiento — 29 oct 2026:** `docker compose ... config --quiet` y la reconstrucción de `web` terminaron correctamente; `db` siguió saludable y `web` disponible en 127.0.0.1:8767. Dentro del contenedor: `manage.py check` sin incidencias, `makemigrations --check --dry-run` sin cambios, concurrencia A-03 **2/2** y suite Django **100/100** correctas. La construcción Docker se verificó localmente; el workflow de GitHub Actions se documentará por separado, pues ejecuta pruebas Django con PostgreSQL y no construye la imagen Docker.
+
 ## C-01 — vigencia renovable y ejecución activa (23 oct 2026)
 
 **Decisión y aceptación:** D02-AV01–AV03 aprobadas por el promotor el 23 de octubre de 2026. Se retiró el máximo absoluto original de dos horas; el límite de 30 minutos se mide desde la última petición válida y autorizada. `/privacidad/` no revoca ni renueva. Las operaciones de formularios obsoletos se rechazan sin modificar una ejecución nueva. El promotor otorgó **aceptación funcional local a C-01**, junto con los ajustes de captura y retorno de Privacidad. La casilla de cierre integral permanece abierta por la concurrencia PostgreSQL pendiente.

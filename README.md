@@ -1,6 +1,6 @@
 # Método Productivo — portal Fase A en desarrollo
 
-Aplicación Django con el Check PyME B0 y la primera estructura navegable del portal. La Entrega 1 fue aprobada con salvedades el 17 de octubre de 2026; A-01 sigue en curso. Las páginas de herramientas, recursos, contenidos, contacto y textos legales muestran contenido provisional; sus funciones aún no están disponibles.
+Aplicación Django con Check PyME, calculadora, lead magnet, contenidos, contacto y catálogo de tienda en desarrollo local. La Entrega 1 fue aprobada con salvedades el 17 de octubre de 2026; A-01 sigue en curso. Hay contenidos y textos legales provisionales, y las funciones comerciales productivas permanecen pendientes.
 No está publicada. La aplicación bloquea DJANGO_DEBUG=0 hasta resolver docs/ESTADO.md.
 
 ## Estructura del proyecto
@@ -33,9 +33,59 @@ python manage.py runserver
 ```
 Abrir http://127.0.0.1:8000. No se envían correos ni se usan claves externas.
 Si el puerto 8000 está ocupado, ejecutar `python manage.py runserver 127.0.0.1:8765` y abrir http://127.0.0.1:8765.
-Desde la Home se puede recorrer la estructura pública y entrar al Check existente. Usar únicamente datos ficticios. Las páginas provisionales no contienen formularios funcionales; los avisos legales definitivos permanecen pendientes de revisión.
-SQLite es solo para la prueba local. Ver .env.example para PostgreSQL.
+Desde la Home se puede recorrer la estructura pública y entrar al Check existente. Usar únicamente datos ficticios; los avisos legales definitivos permanecen pendientes de revisión.
+Sin `DB_ENGINE=postgresql`, el método Windows usa SQLite local. La opción Docker con PostgreSQL se describe abajo.
 No crear usuarios públicos; solo personal interno en el backoffice.
+
+## Desarrollo local con Docker
+
+Requiere Docker Desktop con motor Linux y Docker Compose. Esta opción usa Python 3.12, PostgreSQL 16 y el puerto `127.0.0.1:8767`; no utiliza ni migra `dev.sqlite3`. Si otro servidor ocupa 8767, detén ese servidor antes de iniciar Compose. Ejecuta los comandos desde la carpeta que contiene `manage.py`.
+
+En PowerShell, crea tu configuración local y sustituye `DJANGO_SECRET_KEY` y `PGPASSWORD` por valores aleatorios propios. Conserva `.env.docker` fuera de Git y no reutilices credenciales de otros entornos:
+
+```powershell
+Copy-Item .env.docker.example .env.docker
+notepad .env.docker
+```
+
+El ejemplo usa `DJANGO_DEBUG=1`, `DB_ENGINE=postgresql`, `PGHOST=db`, correo de desarrollo en memoria y `STORE_TEST_CHECKOUT_ENABLED=0`. Para observar correos transaccionales de una prueba local, cambia `DJANGO_EMAIL_BACKEND` a `django.core.mail.backends.console.EmailBackend` y consulta los logs de `web`; esos logs contendrán enlaces privados y no deben compartirse. No habilites Checkout TEST salvo para una prueba local explícita.
+
+Construye, arranca PostgreSQL, aplica las migraciones en esa base nueva y después inicia Django:
+
+```powershell
+docker compose --env-file .env.docker build web
+docker compose --env-file .env.docker up -d db
+docker compose --env-file .env.docker run --rm web python manage.py migrate
+docker compose --env-file .env.docker up -d web
+docker compose --env-file .env.docker ps
+docker compose --env-file .env.docker logs --tail 50 web
+```
+
+Abre [Home](http://127.0.0.1:8767/), [Check PyME](http://127.0.0.1:8767/check-pyme/), [Privacidad](http://127.0.0.1:8767/privacidad/), [Contenidos](http://127.0.0.1:8767/blog/), [Tienda](http://127.0.0.1:8767/tienda/) y [Backoffice](http://127.0.0.1:8767/backoffice/). El código y las plantillas se montan desde la carpeta del proyecto y el servidor de desarrollo refleja sus cambios. `local_media/` del contenedor se guarda en el volumen Docker `editorial_media`, independiente de `local_media/` de Windows. PostgreSQL utiliza `postgres_data`; los registros de SQLite no aparecen en esta base nueva.
+
+Para crear un administrador local de prueba, ejecuta `docker compose --env-file .env.docker exec web python manage.py createsuperuser`. El ingreso a `/backoffice/` sigue requiriendo enrolamiento TOTP con los mecanismos seguros del proyecto; crear el superusuario no desactiva OTP.
+
+El Excel privado **no se copia a la imagen ni se monta por defecto**. Para revisar A-03, configura una sola vez `PRIVATE_RESOURCE_HOST_PATH` en `.env.docker` con la carpeta local que contiene `Mapa_de_Caja_PyME_v0.3.xlsx`; el ejemplo usa `./private_resources`. En cada sesión de revisión inicia con ambos archivos Compose. El montaje es de solo lectura y no requiere volver a editar las variables:
+
+```powershell
+docker compose --env-file .env.docker -f compose.yaml -f compose.private.yaml up -d
+```
+
+Si es la primera ejecución, construye la imagen y aplica migraciones con los comandos anteriores antes de revisar el recurso. Trata los enlaces enviados por correo local como privados. Si vuelves al modo normal sin montaje, ejecuta `docker compose --env-file .env.docker up -d --force-recreate web`. Este modo sin recurso sigue disponible para pruebas independientes de A-03.
+
+Comprobaciones y operación:
+
+```powershell
+docker compose --env-file .env.docker exec web python manage.py check
+docker compose --env-file .env.docker exec web python manage.py makemigrations --check --dry-run
+docker compose --env-file .env.docker exec web python manage.py test leads.test_lead_magnet.ConcurrentAccessTests
+docker compose --env-file .env.docker exec web python manage.py test
+docker compose --env-file .env.docker logs --tail 100 -f web
+docker compose --env-file .env.docker stop
+docker compose --env-file .env.docker up -d
+```
+
+`stop` detiene los contenedores y conserva ambos volúmenes. `up -d` los reinicia con sus datos. No uses `down --volumes` si deseas conservar la base PostgreSQL y los medios. Para regresar al método Windows anterior, detén Compose con `docker compose --env-file .env.docker stop` y ejecuta `python manage.py runserver 127.0.0.1:8767` en tu entorno virtual habitual; Django volverá a SQLite cuando `DB_ENGINE` no esté definido en esa terminal.
 
 ## Verificación
 ```bash

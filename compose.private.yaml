@@ -1,0 +1,9 @@
+services:
+  web:
+    volumes:
+      - type: bind
+        source: ${PRIVATE_RESOURCE_HOST_PATH:?Define PRIVATE_RESOURCE_HOST_PATH en .env.docker}
+        target: /app/private_resources
+        read_only: true
+        bind:
+          create_host_path: false

@@ -1,0 +1,44 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ${PGDATABASE:?Define PGDATABASE en .env.docker}
+      POSTGRES_USER: ${PGUSER:?Define PGUSER en .env.docker}
+      POSTGRES_PASSWORD: ${PGPASSWORD:?Define PGPASSWORD en .env.docker}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  web:
+    build: .
+    env_file: .env.docker
+    environment:
+      DB_ENGINE: postgresql
+      PGHOST: db
+      PGPORT: "5432"
+      PRIVATE_RESOURCE_ROOT: /app/private_resources
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8767:8000"
+    volumes:
+      - ./manage.py:/app/manage.py:ro
+      - ./config:/app/config:ro
+      - ./core:/app/core:ro
+      - ./diagnostics:/app/diagnostics:ro
+      - ./leads:/app/leads:ro
+      - ./analytics:/app/analytics:ro
+      - ./content:/app/content:ro
+      - ./store:/app/store:ro
+      - ./templates:/app/templates:ro
+      - ./static:/app/static:ro
+      - editorial_media:/app/local_media
+
+volumes:
+  postgres_data:
+  editorial_media:

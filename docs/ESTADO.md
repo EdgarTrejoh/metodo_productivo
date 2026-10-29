@@ -129,3 +129,11 @@ La regresión pertinente de **76 pruebas Django**, la suite completa de **100 pr
 ## CI PostgreSQL — 26 de octubre de 2026
 
 El workflow de GitHub Actions ejecutó PostgreSQL 16 y terminó correctamente con las dos pruebas concurrentes de A-03 y la suite completa de **100 pruebas**. Se corrigió únicamente el aislamiento de las pruebas que cierran respuestas streaming; se preservó el cierre real de archivos y no cambió la lógica del portal. [Evidencia](VERIFICACION.md). Esta comprobación no equivale a la verificación de concurrencia propia de C-01. Su cierre integral, C-02, C-06/D-06, H1 y O-02 permanecen abiertos.
+
+## Infraestructura Docker local — aprobada y cerrada (29 de octubre de 2026)
+
+El promotor aprobó **INF-LOCAL-01** y cerró **Docker AV-01 y AV-02** para desarrollo local. Django/Python 3.12 y PostgreSQL 16 funcionan en servicios Compose independientes, con datos y medios en volúmenes persistentes. El Excel de A-03 está disponible mediante montaje privado opcional de solo lectura, fuera de Git y de la imagen; el arranque sin ese montaje sigue disponible. El entorno Windows con SQLite permanece separado e intacto. [Comandos](../README.md) y [evidencia](VERIFICACION.md).
+
+El promotor comprobó manualmente el acceso al backoffice mediante contraseña y TOTP, la creación de un producto sintético como borrador, su ausencia en el catálogo público y su persistencia al reiniciar contenedores. Las verificaciones automatizadas de Docker alcanzaron **2/2** pruebas concurrentes A-03 y **100/100** pruebas Django, además de `manage.py check` y ausencia de migraciones pendientes. La persistencia comprobada no acredita alta disponibilidad ni recuperación ante desastres.
+
+Este cierre no habilita producción ni completa O-02. Permanecen abiertos la concurrencia propia de C-01 en PostgreSQL, C-02, C-06/D-06 y textos legales definitivos, O-02 y demás pendientes operativos, H1 y los gates superiores. No hubo migración de SQLite ni despliegue.
