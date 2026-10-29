@@ -9,6 +9,7 @@ __pycache__/
 .env.*
 !.env.example
 !.env.docker.example
+!.env.staging.example
 staticfiles/
 local_media/
 private_resources/

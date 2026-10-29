@@ -1,5 +1,6 @@
 from django.urls import path
 from django.http import JsonResponse
+from django.conf import settings
 from django_otp.admin import OTPAdminSite
 from django_otp.plugins.otp_totp.models import TOTPDevice
 from django_otp.plugins.otp_totp.admin import TOTPDeviceAdmin
@@ -56,7 +57,7 @@ urlpatterns = [
     path('acerca/', portal_views.section, {'page': 'about'}, name='about'),
     path('privacidad/', portal_views.section, {'page': 'privacy'}, name='privacy'),
     path('terminos/', portal_views.section, {'page': 'terms'}, name='terms'),
-    path('health/', lambda r: JsonResponse({'status': 'ok', 'mode': 'development'})),
+    path('health/', lambda r: JsonResponse({'status': 'ok', 'mode': settings.DJANGO_ENV})),
     path('backoffice/', site.urls),
     path('check-pyme/', views.entry, name='entry'),
     path('check-pyme/iniciar/', views.start, name='start'),

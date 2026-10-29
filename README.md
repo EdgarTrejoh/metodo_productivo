@@ -87,6 +87,24 @@ docker compose --env-file .env.docker up -d
 
 `stop` detiene los contenedores y conserva ambos volúmenes. `up -d` los reinicia con sus datos. No uses `down --volumes` si deseas conservar la base PostgreSQL y los medios. Para regresar al método Windows anterior, detén Compose con `docker compose --env-file .env.docker stop` y ejecuta `python manage.py runserver 127.0.0.1:8767` en tu entorno virtual habitual; Django volverá a SQLite cuando `DB_ENGINE` no esté definido en esa terminal.
 
+### Prueba local aislada de configuración staging
+
+`DJANGO_ENV=staging` exige `DJANGO_DEBUG=0`, clave estable, PostgreSQL, hosts y orígenes CSRF HTTPS explícitos. Rechaza configuraciones incompletas. Gunicorn ejecuta WSGI y WhiteNoise sirve archivos estáticos reunidos por `collectstatic` durante la construcción. Este modo mantiene todas las rutas y módulos; el correo de prueba y los archivos privados/medios requieren sus integraciones posteriores para operar fuera del equipo. No es un despliegue ni autoriza datos personales reales.
+
+Crea `.env.staging-smoke` a partir de `.env.staging.example` y sustituye sus dos marcadores de secreto por valores aleatorios **distintos de `.env.docker`**. El archivo queda fuera de Git. Estos comandos crean un proyecto Compose y una base PostgreSQL separados, publicados solo en `127.0.0.1:8877`:
+
+```powershell
+Copy-Item .env.staging.example .env.staging-smoke
+notepad .env.staging-smoke
+docker compose -p mp_o01_smoke --env-file .env.staging-smoke -f compose.yaml -f compose.staging-smoke.yaml build web
+docker compose -p mp_o01_smoke --env-file .env.staging-smoke -f compose.yaml -f compose.staging-smoke.yaml up -d db
+docker compose -p mp_o01_smoke --env-file .env.staging-smoke -f compose.yaml -f compose.staging-smoke.yaml run --rm web python manage.py migrate --noinput
+docker compose -p mp_o01_smoke --env-file .env.staging-smoke -f compose.yaml -f compose.staging-smoke.yaml up -d web
+docker compose -p mp_o01_smoke --env-file .env.staging-smoke -f compose.yaml -f compose.staging-smoke.yaml exec web python manage.py check --deploy
+```
+
+El smoke local no incluye un terminador TLS. Para comprobar una respuesta detrás de un proxy que garantiza HTTPS, usa `curl.exe -H "X-Forwarded-Proto: https" http://127.0.0.1:8877/`; sin esa cabecera la aplicación redirige a HTTPS. **No uses la cabecera como sustituto de TLS en un entorno accesible por terceros.** O-02 deberá garantizar que el proxy reemplaza la cabecera y bloquea el acceso directo, además de configurar dominio y certificado reales. Para detener solo esta prueba, ejecuta `docker compose -p mp_o01_smoke --env-file .env.staging-smoke -f compose.yaml -f compose.staging-smoke.yaml stop`. No uses `down --volumes` si deseas conservar los datos sintéticos de esta base.
+
 ## Verificación
 ```bash
 python manage.py check

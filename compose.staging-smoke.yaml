@@ -1,0 +1,10 @@
+# Solo para una prueba local aislada de configuración equivalente a staging.
+# Un proyecto Compose distinto mantiene PostgreSQL y medios separados del desarrollo.
+services:
+  web:
+    env_file: !override .env.staging-smoke
+    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 2 --access-logfile - --error-logfile -
+    ports: !override
+      - "127.0.0.1:8877:8000"
+    volumes: !override
+      - editorial_media:/app/local_media
