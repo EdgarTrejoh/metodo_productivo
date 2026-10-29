@@ -121,6 +121,40 @@ class FlowTests(TestCase):
     def test_result_nostore(self):
         self.complete();r=self.client.get('/check-pyme/resultado/')
         self.assertContains(r,'100 / 100');self.assertIn('no-store',r['Cache-Control'])
+    def test_result_and_pdf_denied_before_capture_with_nostore(self):
+        for url in ('/check-pyme/resultado/','/check-pyme/informe.pdf'):
+            response=self.client.get(url)
+            self.assertEqual(response.status_code,410)
+            self.assertIn('no-store',response['Cache-Control'])
+        self.questions()
+        self.assertEqual(Diagnostic.objects.count(),0)
+        for url in ('/check-pyme/resultado/','/check-pyme/informe.pdf'):
+            response=self.client.get(url)
+            self.assertEqual(response.status_code,410)
+            self.assertIn('no-store',response['Cache-Control'])
+    def test_authorized_result_pdf_and_revocation_headers(self):
+        self.complete()
+        for url in ('/check-pyme/resultado/','/check-pyme/informe.pdf'):
+            response=self.client.get(url)
+            self.assertEqual(response.status_code,200)
+            self.assertIn('no-store',response['Cache-Control'])
+            if url.endswith('.pdf'):
+                self.assertTrue(response.content.startswith(b'%PDF'))
+        self.post_check('/check-pyme/salir/')
+        for url in ('/check-pyme/resultado/','/check-pyme/informe.pdf'):
+            response=self.client.get(url)
+            self.assertEqual(response.status_code,410)
+            self.assertIn('no-store',response['Cache-Control'])
+    def test_replaced_execution_does_not_grant_previous_result(self):
+        self.complete()
+        previous=Diagnostic.objects.get().pk
+        self.client.post('/check-pyme/iniciar/')
+        for url in ('/check-pyme/resultado/','/check-pyme/informe.pdf'):
+            response=self.client.get(url)
+            self.assertEqual(response.status_code,410)
+            self.assertIn('no-store',response['Cache-Control'])
+        self.assertEqual(Diagnostic.objects.count(),1)
+        self.assertEqual(Diagnostic.objects.get().pk,previous)
     def test_pdf_retries(self):
         self.complete()
         for _ in range(2):
