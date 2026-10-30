@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Aviso de privacidad — borrador | Método Productivo{% endblock %}
+{% block seo_meta %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+{% block main_class %}section-main{% endblock %}
+{% block content %}
+{% include 'includes/breadcrumb.html' with current='Privacidad' %}
+
+<header class="section-hero privacy-hero">
+  <p class="eyebrow">Privacidad · revisión local</p>
+  <h1>Aviso de privacidad</h1>
+  <p class="section-lead">Borrador integral de Método Productivo para revisión administrativa, editorial y jurídica.</p>
+</header>
+
+<aside class="legal-warning privacy-draft-warning" role="note" aria-label="Estado del aviso">
+  <strong>BORRADOR — NO AUTORIZADO PARA PUBLICACIÓN</strong>
+  <p>Este texto aún requiere datos administrativos y revisión jurídica. En este entorno no están habilitados los envíos comerciales, su baja ni la eliminación automática. No utilices datos personales reales para probarlo.</p>
+  {% if site_admin_config_ready %}
+    <p>Los campos administrativos del archivo local están completos; aún faltan revisión jurídica, validación editorial y autorización de publicación.</p>
+  {% elif site_admin_config %}
+    <p>La configuración administrativa local está incompleta. Los datos faltantes se señalan como pendientes.</p>
+  {% else %}
+    <p>No se ha cargado la configuración administrativa local. Los datos faltantes se señalan como pendientes.</p>
+  {% endif %}
+</aside>
+
+<article class="privacy-document" aria-label="Borrador del aviso integral">
+  <p class="privacy-version"><strong>Aviso de privacidad integral de {{ site_admin_config.responsable.nombre_comercial|default:'Método Productivo' }}</strong> — versión {{ site_admin_config.privacidad.version_aviso|default:'pendiente' }} · fecha {{ site_admin_config.privacidad.fecha_actualizacion|default:'pendiente' }}</p>
+
+  <section aria-labelledby="privacy-responsable">
+    <h2 id="privacy-responsable">1. Quién es el responsable</h2>
+    <p>{{ site_admin_config.responsable.nombre_legal|default:'Nombre legal pendiente' }}, con domicilio en {{ site_admin_config.responsable.domicilio|default:'domicilio pendiente' }}, es responsable del tratamiento de tus datos personales en el portal {{ site_admin_config.responsable.nombre_comercial|default:'Método Productivo' }}.</p>
+    <p>Para cualquier asunto de privacidad o para ejercer tus derechos, escribe a {% if site_admin_config.privacidad.correo_arco %}<a href="mailto:{{ site_admin_config.privacidad.correo_arco }}">{{ site_admin_config.privacidad.correo_arco }}</a>{% else %}correo ARCO pendiente{% endif %}.{% if site_admin_config.privacidad.responsable_atencion %} Responsable de atención: {{ site_admin_config.privacidad.responsable_atencion }}.{% endif %}{% if site_admin_config.privacidad.canal_alternativo %} Canal alternativo: {{ site_admin_config.privacidad.canal_alternativo }}.{% endif %}</p>
+  </section>
+
+  <section aria-labelledby="privacy-datos">
+    <h2 id="privacy-datos">2. Qué datos recabamos</h2>
+    <p><strong>Check PyME:</strong> nombre, correo, empresa, WhatsApp (solo si decides darlo), tus ocho respuestas sobre prácticas de gestión, la puntuación y el diagnóstico resultantes, y datos técnicos necesarios para que el servicio funcione.</p>
+    <p><strong>Descarga del Excel:</strong> nombre, correo y registros de emisión y acceso al enlace.</p>
+    <p><strong>Contacto:</strong> nombre, correo, tipo y contenido de tu mensaje, y las notas y estado de seguimiento que llevamos de tu solicitud.</p>
+    <p><strong>Comunicaciones comerciales:</strong> tu elección, la versión del texto que aceptaste y la fecha.</p>
+    <p><strong>Datos técnicos:</strong> cookies técnicas de sesión y de protección de formularios, y registros de funcionamiento y errores que usamos para mantener la seguridad del portal, detectar fallas y prevenir usos indebidos. También guardamos registros básicos de uso del portal: el tipo de evento, la fecha y un identificador interno que puede asociarse a tu diagnóstico o a tu solicitud.</p>
+    <p>El Check PyME no pide datos financieros, patrimoniales ni datos personales sensibles. En los campos de texto libre, como Contacto, te pedimos no escribir información sensible, confidencial o innecesaria para atender tu solicitud.</p>
+  </section>
+
+  <section aria-labelledby="privacy-finalidades">
+    <h2 id="privacy-finalidades">3. Para qué usamos tus datos</h2>
+    <p>Usamos tus datos para darte el servicio que solicitaste: generar y mostrar tu diagnóstico del Check PyME, permitirte descargarlo mientras tu sesión está vigente, entregarte los recursos digitales que pidas, responder tus mensajes y dar seguimiento a tus solicitudes de orientación. También realizamos las operaciones técnicas necesarias para el funcionamiento y la seguridad del portal.</p>
+    <p>Estas finalidades no dependen de que aceptes recibir publicidad. Además, usamos los registros básicos de uso para entender qué partes del portal se utilizan y mejorarlo.</p>
+    <p><strong>Resultado automatizado.</strong> La puntuación y el diagnóstico del Check PyME se generan automáticamente a partir de tus ocho respuestas sobre prácticas de gestión empresarial. Los resultados tienen carácter exclusivamente informativo y orientativo. No producen efectos jurídicos ni determinan el acceso a créditos, trámites o servicios. Si deseas conocer o solicitar la rectificación de los datos personales utilizados para generar tu diagnóstico, puedes hacerlo mediante el correo de derechos ARCO indicado en este aviso.</p>
+    <p><strong>Uso de tu WhatsApp.</strong> Proporcionarlo es opcional. Si lo das, lo usamos únicamente para dar seguimiento a tu solicitud, no para fines comerciales.</p>
+  </section>
+
+  <section aria-labelledby="privacy-comercial">
+    <h2 id="privacy-comercial">4. Finalidad opcional: comunicaciones comerciales</h2>
+    <p>Si lo autorizas, te enviaremos por correo electrónico contenidos de educación financiera, productividad y gestión empresarial, novedades sobre nuestras herramientas y recursos digitales, y promociones de nuestros productos y servicios.</p>
+    <p>La casilla para autorizarlo es independiente y aparece desmarcada. Si no la marcas, puedes usar el Check PyME, descargar recursos gratuitos y solicitar orientación sin ninguna limitación. Puedes retirar tu autorización en cualquier momento desde el enlace de baja incluido en cada correo o escribiendo a {% if site_admin_config.privacidad.correo_arco %}<a href="mailto:{{ site_admin_config.privacidad.correo_arco }}">{{ site_admin_config.privacidad.correo_arco }}</a>{% else %}el correo ARCO pendiente de configuración{% endif %}.</p>
+  </section>
+
+  <section aria-labelledby="privacy-destinatarios">
+    <h2 id="privacy-destinatarios">5. Con quién compartimos tus datos</h2>
+    <p>Para la arquitectura prevista se contemplan proveedores que tratarían datos por nuestra cuenta, únicamente para operar el portal:</p>
+    <ul>
+      <li>Alojamiento en la nube: {{ site_admin_config.privacidad.proveedores.alojamiento.nombre|default:'proveedor pendiente' }}, con ubicación prevista en {{ site_admin_config.privacidad.proveedores.alojamiento.ubicacion|default:'ubicación pendiente' }}.</li>
+      <li>Envío de correo electrónico: {{ site_admin_config.privacidad.proveedores.correo.nombre|default:'proveedor pendiente' }}, con ubicación declarada en {{ site_admin_config.privacidad.proveedores.correo.ubicacion|default:'ubicación pendiente' }}.</li>
+    </ul>
+    <p>La operación efectiva de estos proveedores y la existencia de transferencias a terceros requieren verificación antes de autorizar la publicación de este aviso.</p>
+    <p><strong>Videos de YouTube.</strong> Los videos se cargan solo cuando tú das clic para reproducirlos. Al hacerlo, YouTube puede tratar datos según sus propias políticas de privacidad; el portal no carga el reproductor al abrir la página.</p>
+  </section>
+
+  <section aria-labelledby="privacy-conservacion">
+    <h2 id="privacy-conservacion">6. Cuánto tiempo conservamos tus datos</h2>
+    <p class="privacy-table-hint">Desliza la tabla para consultar los plazos.</p>
+    <div class="privacy-table-scroll" role="region" aria-label="Plazos de conservación" tabindex="0">
+      <table>
+        <thead><tr><th scope="col">Información</th><th scope="col">Plazo</th></tr></thead>
+        <tbody>
+          <tr><td>Diagnóstico del Check PyME y sus datos asociados, incluidos los registros básicos de uso</td><td>12 meses desde que lo finalizas</td></tr>
+          <tr><td>Otros contactos y solicitudes de recursos</td><td>24 meses desde tu última interacción</td></tr>
+          <tr><td>Comentarios y solicitudes</td><td>12 meses después de cerrarse</td></tr>
+          <tr><td>Consentimiento comercial</td><td>Hasta que lo retires, o 24 meses sin actividad</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>El enlace de descarga del Excel funciona durante 72 horas y permite hasta tres entregas autorizadas; ese límite no es el plazo de conservación de tu solicitud. Al terminar cada plazo, está previsto borrar tus datos de forma definitiva; ese mecanismo aún no está implementado. Si te das de baja de las comunicaciones comerciales, está previsto conservar solo lo indispensable (por ejemplo, tu correo en una lista de exclusión) para respetar tu decisión, por 24 meses. Salir del Check PyME o vencer tu sesión impide recuperar el diagnóstico desde el portal, pero no limita tus derechos.</p>
+  </section>
+
+  <section aria-labelledby="privacy-derechos">
+    <h2 id="privacy-derechos">7. Tus derechos</h2>
+    <p>Tienes derecho a acceder a tus datos, rectificarlos, cancelarlos o suprimirlos, y oponerte a su tratamiento (derechos ARCO); también a limitar su uso o divulgación y a revocar tu consentimiento.</p>
+    <p>Para ejercerlos, escribe a {% if site_admin_config.privacidad.correo_arco %}<a href="mailto:{{ site_admin_config.privacidad.correo_arco }}">{{ site_admin_config.privacidad.correo_arco }}</a>{% else %}el correo ARCO pendiente de configuración{% endif %} indicando tu nombre, el medio para responderte, una descripción clara de lo que solicitas y un documento que acredite tu identidad (o la de tu representante). Revisaremos tu solicitud y te responderemos en los plazos que marca la ley, por correo electrónico. El ejercicio de tus derechos de acceso, rectificación, cancelación y oposición es gratuito. Las solicitudes se reciben y atienden mediante el correo electrónico de privacidad indicado en este aviso. No cobramos por su recepción, tramitación ni respuesta electrónica.</p>
+    <p>Si consideras que tus derechos no fueron atendidos o que tus datos se trataron indebidamente, puedes acudir ante la Secretaría Anticorrupción y Buen Gobierno, autoridad en materia de protección de datos personales en posesión de particulares.</p>
+  </section>
+
+  <section aria-labelledby="privacy-cambios">
+    <h2 id="privacy-cambios">8. Cambios a este aviso</h2>
+    <p>Cualquier modificación se publicará en <a href="{{ site_admin_config.privacidad.url_aviso_integral|default:'/privacidad/' }}">{{ site_admin_config.privacidad.url_aviso_integral|default:'/privacidad/' }}</a> con su número de versión y fecha. Si un cambio requiere tu nuevo consentimiento, te lo pediremos antes de aplicarlo.</p>
+  </section>
+</article>
+
+<div class="section-bottom-links privacy-return" data-privacy-return="{% if request.GET.desde == 'check' %}check{% else %}other{% endif %}">
+  {% if request.GET.desde == 'check' %}
+    <button type="button" class="privacy-return-action" aria-describedby="privacy-close-help">Cerrar esta pestaña y continuar con mi Check</button>
+    <p id="privacy-close-help">Si el navegador no permite cerrarla automáticamente, cierra esta pestaña y continúa en la anterior.</p>
+  {% else %}
+    <button type="button" class="privacy-back" hidden>← Volver a la página anterior</button>
+    <a href="{% url 'home' %}">Ir al inicio</a>
+  {% endif %}
+</div>
+{% endblock %}
+{% block extra_scripts %}<script src="{% static 'privacy_return.js' %}" defer></script>{% endblock %}

@@ -1,0 +1,20 @@
+responsable:
+  tipo: persona_fisica
+  nombre_legal: ""
+  nombre_comercial: "Método Productivo"
+  domicilio: ""
+
+privacidad:
+  correo_arco: ""
+  responsable_atencion: ""
+  canal_alternativo: ""
+  version_aviso: ""
+  fecha_actualizacion: ""
+  url_aviso_integral: "/privacidad/"
+  proveedores:
+    alojamiento:
+      nombre: "Google Cloud"
+      ubicacion: "Querétaro, México"
+    correo:
+      nombre: "Brevo"
+      ubicacion: "Unión Europea (Francia y Bélgica)"

@@ -1,6 +1,7 @@
 from uuid import UUID, uuid4
 
 from django.shortcuts import redirect, render
+from django.conf import settings
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 
@@ -87,6 +88,8 @@ PAGES = {
 
 def section(request, page):
     context = PAGES[page]
+    if page == 'privacy' and settings.DJANGO_ENV == 'local':
+        return render(request, 'privacy.html', {'page': context})
     return render(request, context.get('template', 'section.html'), {'page': context})
 
 

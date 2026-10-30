@@ -6,6 +6,7 @@ from urllib.parse import urlsplit
 from django.core.exceptions import ImproperlyConfigured
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+SITE_CONFIG_PATH = Path(os.getenv('SITE_CONFIG_PATH', BASE_DIR / 'config.yaml')).resolve()
 DJANGO_ENV = os.getenv('DJANGO_ENV', 'local')
 if DJANGO_ENV not in ('local', 'staging'):
     raise ImproperlyConfigured('DJANGO_ENV debe ser local o staging.')
@@ -52,7 +53,7 @@ MIDDLEWARE = ['django.middleware.security.SecurityMiddleware', 'django.contrib.s
 if DJANGO_ENV == 'staging':
     MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 ROOT_URLCONF = 'config.urls'
-TEMPLATES = [{'BACKEND': 'django.template.backends.django.DjangoTemplates', 'DIRS': [BASE_DIR / 'templates'], 'APP_DIRS': True, 'OPTIONS': {'context_processors': ['django.template.context_processors.request', 'django.contrib.auth.context_processors.auth', 'django.contrib.messages.context_processors.messages']}}]
+TEMPLATES = [{'BACKEND': 'django.template.backends.django.DjangoTemplates', 'DIRS': [BASE_DIR / 'templates'], 'APP_DIRS': True, 'OPTIONS': {'context_processors': ['django.template.context_processors.request', 'django.contrib.auth.context_processors.auth', 'django.contrib.messages.context_processors.messages', 'core.context_processors.privacy_administration']}}]
 WSGI_APPLICATION = 'config.wsgi.application'
 if os.getenv('DB_ENGINE') == 'postgresql':
     DATABASES = {'default': {'ENGINE': 'django.db.backends.postgresql', 'NAME': os.environ['PGDATABASE'], 'USER': os.environ['PGUSER'], 'PASSWORD': os.environ['PGPASSWORD'], 'HOST': os.getenv('PGHOST', 'localhost'), 'PORT': os.getenv('PGPORT', '5432')}}

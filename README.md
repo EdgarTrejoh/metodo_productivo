@@ -37,6 +37,17 @@ Desde la Home se puede recorrer la estructura pública y entrar al Check existen
 Sin `DB_ENGINE=postgresql`, el método Windows usa SQLite local. La opción Docker con PostgreSQL se describe abajo.
 No crear usuarios públicos; solo personal interno en el backoffice.
 
+### Configuración administrativa local
+
+`config.example.yaml` muestra la estructura versionable. Copia ese archivo a `config.yaml` y completa los datos únicamente en tu equipo; `config.yaml` está excluido de Git y de la imagen Docker. No incluyas contraseñas ni claves API. Si el archivo está en otra ubicación, define `SITE_CONFIG_PATH` con su ruta absoluta antes de iniciar Django. En PowerShell:
+
+```powershell
+if (-not (Test-Path .\config.yaml)) { Copy-Item config.example.yaml config.yaml }
+$env:SITE_CONFIG_PATH = (Resolve-Path .\config.yaml).Path
+```
+
+El archivo puede permanecer incompleto durante el desarrollo: `/privacidad/` mostrará los datos disponibles dentro de un aviso marcado **BORRADOR — NO AUTORIZADO PARA PUBLICACIÓN**. Completar el YAML no habilita un aviso definitivo; C-06/A-08 conservan la validación jurídica y la autorización de publicación pendientes. En Docker, `config.yaml` local no se monta ni se copia automáticamente; debe suministrarse externamente mediante un montaje privado de solo lectura y `SITE_CONFIG_PATH` cuando se necesite revisar esos datos.
+
 ## Desarrollo local con Docker
 
 Requiere Docker Desktop con motor Linux y Docker Compose. Esta opción usa Python 3.12, PostgreSQL 16 y el puerto `127.0.0.1:8767`; no utiliza ni migra `dev.sqlite3`. Si otro servidor ocupa 8767, detén ese servidor antes de iniciar Compose. Ejecuta los comandos desde la carpeta que contiene `manage.py`.

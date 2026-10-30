@@ -1,4 +1,5 @@
 Django==5.2.18
+PyYAML==6.0.3
 psycopg[binary]==3.3.6
 reportlab==4.5.1
 django-otp==1.7.5

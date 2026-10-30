@@ -6,6 +6,8 @@ __pycache__/
 *.sqlite3-wal
 *.sqlite3-shm
 .env
+/config.yaml
+/qa_artifacts/d06-*.png
 .env.*
 !.env.example
 !.env.docker.example

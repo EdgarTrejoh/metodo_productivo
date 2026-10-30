@@ -194,5 +194,25 @@ th,td{text-align:left;border-bottom:1px solid #d8e1e8;padding:12px}
 .privacy-return .privacy-back{background:none;color:var(--navy);padding:0;border-radius:0;font:inherit;text-decoration:underline;text-underline-offset:3px}
 .privacy-return .privacy-back:hover{background:none;transform:none}
 .privacy-return [hidden]{display:none}
+.privacy-hero{padding-bottom:30px}
+.privacy-draft-warning{max-width:900px;margin:18px 0 22px}
+.privacy-document{max-width:900px;background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:32px 42px;overflow-wrap:break-word}
+.privacy-version{color:var(--navy);font-size:.91rem;border-bottom:1px solid var(--border);padding-bottom:18px;margin-bottom:4px}
+.privacy-document section{padding:20px 0;border-bottom:1px solid var(--border)}
+.privacy-document section:last-child{border-bottom:0;padding-bottom:0}
+.privacy-document h2{font-size:clamp(1.35rem,2.2vw,1.75rem);margin:0 0 12px}
+.privacy-document p{color:var(--ink);line-height:1.75;margin:0}
+.privacy-document p+p{margin-top:12px}
+.privacy-document ul{margin:12px 0;padding-left:22px;line-height:1.7}
+.privacy-document li+li{margin-top:8px}
+.privacy-table-hint{display:none}
+.privacy-table-scroll{max-width:100%;overflow-x:auto;margin:18px 0;border:1px solid var(--border);border-radius:10px}
+.privacy-table-scroll table{width:100%;min-width:520px;border-collapse:collapse;text-align:left}
+.privacy-table-scroll th,.privacy-table-scroll td{padding:12px 15px;vertical-align:top;border-bottom:1px solid var(--border);line-height:1.5}
+.privacy-table-scroll th{background:#edf5f3;color:var(--navy)}
+.privacy-table-scroll tr:last-child td{border-bottom:0}
+.privacy-table-scroll th:first-child,.privacy-table-scroll td:first-child{width:62%}
+.privacy-document a{overflow-wrap:anywhere}
+@media(max-width:620px){.privacy-hero{padding:26px 23px}.privacy-document{padding:22px 23px}.privacy-document section{padding:18px 0}.privacy-document p{font-size:.94rem}.privacy-draft-warning{font-size:.86rem}.privacy-table-hint{display:block;color:var(--muted);font-size:.85rem}}
 .store-test-checkout{display:flex;width:100%;text-align:center;margin:-2px 0 12px}.store-facts .store-test-note{display:block;border:0;margin:0 0 18px;padding:0;color:#315961;font-size:.88rem;line-height:1.5}
 .article-table-scroll{max-width:100%;overflow-x:auto;margin:25px 0;border:1px solid #d8e1e8;border-radius:8px}.article-table-scroll table{width:max-content;min-width:100%;margin:0;white-space:nowrap}.article-body th,.article-body td{min-width:105px;border-right:1px solid #d8e1e8}.article-body th{background:#edf5f3;color:var(--navy);font-weight:800}.article-body td p,.article-body th p{margin:0}.article-body .ql-align-right{text-align:right}.article-body .ql-align-center{text-align:center}

@@ -4,6 +4,7 @@
 **/__pycache__
 **/*.pyc
 .env
+/config.yaml
 .env.*
 *.sqlite3
 *.sqlite3-*
