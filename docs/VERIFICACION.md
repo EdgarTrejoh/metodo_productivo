@@ -1,5 +1,7 @@
 # Verificación local - B0
 
+**Continuidad D06-DOC-01 (3 nov 2026; documentación, sin nueva prueba):** el [expediente D-06, sección 11](privacidad/D06_EXPEDIENTE_PREPUBLICACION.md#11-contrato-técnico-del-yaml-y-continuidad-del-aviso) registra la cadena `SITE_CONFIG_PATH` → `load_site_config()`/`yaml.safe_load()` → context processor → `privacy.html`, la exclusión de `config.yaml` de Git/imagen, el montaje privado requerido y la diferencia `local`/`staging`. La evidencia de D06-AVISO-05 inmediatamente abajo confirma que los valores pendientes se debieron al montaje ausente en QA y que 11/11 valores sintéticos se mostraron con montaje de solo lectura; el cierre fue **técnico**, no jurídico, editorial ni de publicación. No se repitieron pruebas funcionales en esta actualización documental.
+
 ## D06-AVISO-05 — verificación técnica final del YAML (30 oct 2026; CERRADA)
 
 Las capturas anteriores mostraban valores pendientes porque el contenedor de QA no tenía `config.yaml`: `SITE_CONFIG_PATH` resolvía a `/app/config.yaml` y `load_site_config()` devolvía ausencia. El archivo privado se excluye deliberadamente de la imagen y no estaba montado. No se detectó un defecto del lector ni del procesador de contexto.
