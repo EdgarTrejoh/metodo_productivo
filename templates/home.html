@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Método Productivo | Productividad con sentido{% endblock %}
 {% block main_class %}home-main{% endblock %}
 {% block content %}
@@ -8,7 +9,7 @@
     <h1 id="hero-title">Conocimiento práctico para <span>decidir mejor.</span></h1>
     <p class="hero-lead">Finanzas, negocios, datos y tecnología explicados con claridad. Ideas y herramientas que puedes aplicar a proyectos, trabajo y negocios.</p>
     <div class="hero-actions">
-      <a class="button" href="#explorar">Explorar el portal <span aria-hidden="true">↓</span></a>
+      <a class="button" href="#explorar" data-home-cta="explore">Explorar el portal <span aria-hidden="true">↓</span></a>
     </div>
   </div>
   <div class="hero-visual">
@@ -36,23 +37,24 @@
     <article class="feature-card">
       <div class="feature-top"><span class="feature-symbol" aria-hidden="true">◈</span><span class="status-pill status-live">Disponible en desarrollo</span></div>
       <h3>Calculadoras</h3><p>Prueba el punto de equilibrio mensual para un producto o servicio.</p>
-      <a href="{% url 'tools' %}">Ver calculadoras <span aria-hidden="true">→</span></a>
+      <a href="{% url 'tools' %}" data-home-cta="tools">Ver calculadoras <span aria-hidden="true">→</span></a>
     </article>
     <article class="feature-card">
       <div class="feature-top"><span class="feature-symbol" aria-hidden="true">✳</span><span class="status-pill">Artículos pendientes</span></div>
       <h3>Contenidos</h3><p>Lecturas prácticas de finanzas, negocios, datos y tecnología.</p>
-      <a href="{% url 'blog' %}">Explorar contenidos <span aria-hidden="true">→</span></a>
+      <a href="{% url 'blog' %}" data-home-cta="content">Explorar contenidos <span aria-hidden="true">→</span></a>
     </article>
     <article class="feature-card feature-check">
       <div class="feature-top"><span class="feature-symbol" aria-hidden="true">↗</span><span class="status-pill status-live">Disponible en desarrollo</span></div>
       <h3>Diagnóstico inicial</h3><p>El Check PyME ofrece una primera lectura de tus prácticas de gestión en ocho preguntas.</p>
-      <a href="{% url 'entry' %}">Conocer el Check PyME <span aria-hidden="true">→</span></a>
+      <a href="{% url 'entry' %}" data-home-cta="check">Conocer el Check PyME <span aria-hidden="true">→</span></a>
     </article>
     <article class="feature-card">
       <div class="feature-top"><span class="feature-symbol" aria-hidden="true">▤</span><span class="status-pill">Entrega pendiente</span></div>
       <h3>Recursos</h3><p>Conoce la plantilla gratuita de flujo de efectivo de 13 semanas prevista para Fase A.</p>
-      <a href="{% url 'resources' %}">Ver recursos <span aria-hidden="true">→</span></a>
+      <a href="{% url 'resources' %}" data-home-cta="resources">Ver recursos <span aria-hidden="true">→</span></a>
     </article>
   </div>
 </section>
 {% endblock %}
+{% block extra_scripts %}<script src="{% static 'home_analytics.js' %}" data-analytics-url="{% url 'home_cta' %}" defer></script>{% endblock %}

@@ -49,7 +49,7 @@ No utilizar el correo como identificador de sesión pública. La deduplicación 
 
 La medición válida comienza **con la liberación pública de Fase A**, después de verificar la instrumentación. Se excluyen pruebas internas y pilotos anteriores, que se reportan por separado. La muestra se mide de forma **acumulada** y la primera evaluación formal ocurre al alcanzar **500 sesiones calificadas**. Cada reporte indica fechas, población, fuentes y exclusiones aplicadas.
 
-Para el corte de evaluación, una ejecución del Check iniciada antes de alcanzarlo puede concluirse y contabilizarse en su cohorte de inicio, incluso si su finalización o liberación ocurre después del corte, siempre dentro del contexto autorizado de D-02: **30 minutos de inactividad renovables mediante peticiones válidas y límite absoluto de 2 horas desde el inicio**. Las ejecuciones nuevas después del corte pertenecen al siguiente periodo. No se extiende la vigencia del Check para completar métricas.
+Para el corte de evaluación, una ejecución del Check iniciada antes de alcanzarlo puede concluirse y contabilizarse en su cohorte de inicio, incluso si su finalización o liberación ocurre después del corte, siempre dentro del contexto autorizado de D-02: **30 minutos de inactividad renovables mediante peticiones válidas y autorizadas, sin límite absoluto**. Las ejecuciones nuevas después del corte pertenecen al siguiente periodo. No se extiende la vigencia del Check para completar métricas. La referencia original de D-08 a dos horas absolutas quedó sustituida por D02-AV01, aprobada expresamente por el promotor el 23 de octubre de 2026; se conserva aquí su trazabilidad histórica.
 
 | Tasa | Fórmula aprobada | Límite de interpretación |
 | --- | --- | --- |
@@ -81,4 +81,4 @@ La conversión resultado → PDF definida en D-03 puede informarse aparte, usand
 - Arquitectura v0.5, analítica: sesiones desde eventos, entidades de negocio desde PostgreSQL y eventos críticos auditables internamente.
 - [D-03](D-03_MEDICION_DESCARGA_PDF.md), [D-04](D-04_CALCULADORA_PUNTO_EQUILIBRIO.md), [D-05](D-05_PRIMER_LEAD_MAGNET.md) y [D-07](D-07_OPERACION_ORIENTACION.md): semántica de eventos y deduplicación ya aprobadas para cada recorrido.
 
-**Estado de implementación:** D-08 quedó aprobada el 17 de octubre de 2026. O-08 y O-09 permanecen pendientes de implementación y verificación; H5 aún no se ha evaluado. La decisión aprobada no acredita instrumentación operativa ni autoriza avanzar automáticamente a Fase B.
+**Estado de implementación:** D-08 quedó aprobada el 17 de octubre de 2026. O08-01 instrumenta parcialmente navegación pública, CTA de Home y calculadora en desarrollo local; O-08 conserva pendientes la integración y verificación transversal y O-09 sigue pendiente. H5 aún no se ha evaluado. La decisión aprobada y las pruebas locales no acreditan medición pública ni autorizan avanzar automáticamente a Fase B.

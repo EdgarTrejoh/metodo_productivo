@@ -4,6 +4,10 @@ from django.shortcuts import redirect, render
 from django.conf import settings
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.db import DatabaseError
+import logging
+from analytics.tracking import record_tool
 
 from analytics.models import ProductEvent
 from leads.forms import ContactForm
@@ -11,6 +15,10 @@ from leads.notifications import notify_contact
 from .break_even import BreakEvenForm, calculate
 
 
+logger = logging.getLogger(__name__)
+
+
+@ensure_csrf_cookie
 def home(request):
     return render(request, 'home.html')
 
@@ -125,11 +133,18 @@ def break_even(request):
             # La siguiente operación recibe un identificador nuevo. Una recarga del
             # POST original no crea eventos adicionales ni guarda los importes.
             request.session['break_even_interaction'] = str(uuid4())
-            ProductEvent.objects.get_or_create(kind='TOOL_STARTED', execution=execution)
+            try:
+                ProductEvent.objects.get_or_create(kind='TOOL_STARTED', execution=execution)
+            except DatabaseError:
+                logger.warning('No se pudo registrar el inicio de la calculadora.')
+            record_tool(request, execution)
             form = BreakEvenForm(request.POST)
             if form.is_valid():
                 result = calculate(form.cleaned_data)
-                ProductEvent.objects.get_or_create(kind='TOOL_COMPLETED', execution=execution)
+                try:
+                    ProductEvent.objects.get_or_create(kind='TOOL_COMPLETED', execution=execution)
+                except DatabaseError:
+                    logger.warning('No se pudo registrar el resultado de la calculadora.')
     else:
         form = BreakEvenForm()
         request.session['break_even_interaction'] = str(uuid4())

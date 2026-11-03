@@ -13,6 +13,7 @@ from leads.models import Lead,Consent,ContactSubmission
 from leads.admin import ContactSubmissionAdmin
 from leads import views as lead_views
 from analytics.models import ProductEvent
+from analytics.views import home_cta
 from content.admin import ArticleAdmin, MediaAssetAdmin, VideoAdmin
 from content.models import Article, MediaAsset, Video
 from content import views as content_views
@@ -41,6 +42,7 @@ site.register(DigitalProduct, DigitalProductAdmin)
 site.register(ContactSubmission, ContactSubmissionAdmin)
 urlpatterns = [
     path('', portal_views.home, name='home'),
+    path('analitica/cta/', home_cta, name='home_cta'),
     path('herramientas/', portal_views.section, {'page': 'tools'}, name='tools'),
     path('herramientas/punto-de-equilibrio/', portal_views.break_even, name='break_even'),
     path('recursos/', portal_views.section, {'page': 'resources'}, name='resources'),
