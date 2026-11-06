@@ -1,6 +1,6 @@
 # Plan de trabajo y seguimiento — Método Productivo
 
-**Actualizado:** 17 de octubre de 2026  
+**Actualizado:** 6 de noviembre de 2026 (registro de MP-EXT-01; los cortes de octubre se conservan)  
 **Punto de partida:** bloque local B0 del Check PyME v1.3 y estructura pública del portal pendiente.
 
 **Alcance de este plan:** construir y publicar la plataforma integral de Fase A —contenidos, educación financiera, herramientas, captación y orientación—, completar el Check como componente diferenciador y preparar las Fases B y C únicamente al superar sus decisiones y gates.
@@ -138,6 +138,7 @@ Las siguientes **entregas son cortes incrementales del plan vigente**, no fases 
 - [ ] **A-08** Publicar páginas Acerca de, Privacidad y Términos con textos aprobados y enlaces desde formularios y pie.
 - [ ] **A-09** Ampliar backoffice para artículos, recursos, testimoniales, leads, solicitudes y métricas; registrar acciones administrativas sensibles.
 - [ ] **A-10** Crear sitemap, robots, canonical, OpenGraph y páginas 404/500 útiles; revisar indexación prevista en el sitemap.
+- [ ] **MP-EXT-01 — PENDIENTE; integración externa de Inflación Copilot MX.** **Aprobada para incorporar a Fase A / Entrega 2** el 6-nov-2026, con **prioridad P2** como tarea breve que puede ejecutarse en paralelo; **objetivo temporal: antes del 31-dic-2026**, sin fecha exacta ni autorización de despliegue. En `/herramientas/`, agregar ficha con descripción y enlace externo a `https://fluted-oath-477301-c1.web.app`; en Contenidos, agregar referencia contextual educativa (inflación, INPC y poder adquisitivo), sin exigir un artículo nuevo. **Aceptar únicamente con**: verificación de enlace y apertura externa segura/comunicada, navegación por teclado y en escritorio/móvil, prueba de humo del recorrido mínimo del Copilot publicado (rango de datos, consulta válida, respuesta y rechazo controlado) y evidencia de revisión; revisar antes de promocionar tráfico los controles/costos de la API pública sin rate limiting. **Fuera de alcance:** `iframe`, migración de código, intercambio de datos entre las aplicaciones, cambios a FastAPI/React y retiro de Streamlit. **Dependencias:** funcionamiento verificado de la URL externa y controles de publicación de Método Productivo; **no depende del desmontaje de Streamlit**, aplazado a revisión el 29-ene-2027. [Decisión y seguimiento canónico en Notion](https://app.notion.com/p/3fcdcc8a437a81cc8bced59a00e86a57).
 
 ## H3 — Infraestructura, seguridad y operación de Fase A
 
