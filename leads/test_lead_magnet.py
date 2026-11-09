@@ -5,11 +5,12 @@ import zipfile
 from concurrent.futures import ThreadPoolExecutor
 from datetime import timedelta
 from pathlib import Path
+from unittest import skipUnless
 from unittest.mock import patch
 
 from django.core import mail
 from django.core.cache import cache
-from django.db import connections
+from django.db import connection, connections
 from django.test import Client, TransactionTestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
@@ -175,6 +176,7 @@ class LeadMagnetTests(ResourceFixture, TransactionTestCase):
         self.assertEqual(LeadMagnetRequest.objects.count(), 5)
 
 
+@skipUnless(connection.vendor == 'postgresql', 'La concurrencia de descargas requiere PostgreSQL; SQLite bloquea tablas en pruebas con hilos.')
 class ConcurrentAccessTests(ResourceFixture, TransactionTestCase):
     def test_same_operation_cannot_consume_twice(self):
         self.client.post(reverse('lead_magnet_resource'), {
