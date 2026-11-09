@@ -7,6 +7,30 @@ from unittest.mock import patch
 
 
 class PortalStructureTests(TestCase):
+    def test_tools_links_to_external_copilot_without_displacing_calculator(self):
+        response = self.client.get(reverse('tools'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '<h2 id="tool-title">Punto de equilibrio</h2>')
+        self.assertContains(response, f'href="{reverse("break_even")}"')
+        self.assertContains(response, 'class="tool-action tool-action-primary"')
+        self.assertContains(response, 'Herramienta externa')
+        self.assertContains(response, 'Inflación Copilot MX')
+        self.assertContains(response, 'poder adquisitivo del dinero')
+        self.assertContains(response, 'inflación e INPC')
+        self.assertContains(response, 'Se abrirá otra aplicación en una pestaña nueva. Saldrás de Método Productivo.')
+        self.assertContains(response, 'class="tool-action tool-action-primary" href="https://fluted-oath-477301-c1.web.app"')
+        self.assertContains(response,
+            'href="https://fluted-oath-477301-c1.web.app" target="_blank" rel="noopener noreferrer" '
+            'aria-label="Abrir Inflación Copilot MX en una aplicación externa, en otra pestaña"', count=1)
+        self.assertContains(response, '<h2 id="diagnostic-title">Check PyME</h2>')
+        self.assertContains(response, f'href="{reverse("entry")}"')
+        self.assertContains(response, 'src="/static/copilot/inflacion-copilot-preview.webp"', count=1)
+        self.assertContains(response, 'width="496" height="470" loading="lazy"')
+        html = response.content.decode()
+        self.assertLess(html.index('id="tool-title"'), html.index('id="copilot-tool-title"'))
+        self.assertLess(html.index('id="copilot-tool-title"'), html.index('id="diagnostic-title"'))
+        self.assertNotContains(response, '<iframe')
+
     def test_privacy_return_uses_only_controlled_origin(self):
         from_check = self.client.get('/privacidad/?desde=check')
         self.assertContains(from_check, 'Cerrar esta pestaña y continuar con mi Check')

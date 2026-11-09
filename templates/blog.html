@@ -7,20 +7,10 @@
 <section class="blog-intro" aria-labelledby="page-title">
   <p class="eyebrow">Contenidos</p>
   <h1 id="page-title">Ideas para gestionar con más claridad.</h1>
-  <p class="interior-lead">Finanzas, negocios, datos y tecnología aplicados a proyectos, trabajo y negocios. {% if has_live_articles or videos %}Explora las publicaciones disponibles.{% else %}Aquí encontrarás artículos y videos cuando estén publicados.{% endif %}</p>
+  <p class="interior-lead">Finanzas, negocios, datos y tecnología aplicados a proyectos, trabajo y negocios.{% if has_live_articles or videos %} Explora las publicaciones disponibles.{% endif %}</p>
 </section>
-<section class="editorial-areas" aria-labelledby="areas-title">
-  <h2 id="areas-title">Las líneas editoriales</h2>
-  <div class="editorial-grid">
-    <div class="editorial-area editorial-finance"><span>01</span><h3>Finanzas</h3><p>Flujos, costos y decisiones financieras.</p></div>
-    <div class="editorial-area editorial-business"><span>02</span><h3>Negocios</h3><p>Operación, margen y estrategia.</p></div>
-    <div class="editorial-area editorial-data"><span>03</span><h3>Datos</h3><p>Indicadores para decidir con evidencia.</p></div>
-    <div class="editorial-area editorial-tech"><span>04</span><h3>Tecnología</h3><p>Herramientas digitales con propósito.</p></div>
-  </div>
-</section>
-
 <section class="published-content" aria-labelledby="articles-title">
-  <div class="content-section-head"><div><p class="eyebrow">Lecturas</p><h2 id="articles-title">Artículos</h2></div><p>{% if has_live_articles %}Explora las lecturas publicadas.{% else %}Todavía no hay artículos publicados.{% endif %}</p></div>
+  <div class="content-section-head"><div><p class="eyebrow">Lecturas</p><h2 id="articles-title">Artículos</h2></div>{% if articles %}<p>Explora las lecturas publicadas.</p>{% endif %}</div>
   {% if has_live_articles %}<nav class="category-nav" aria-label="Filtrar artículos por categoría">
     <a href="{% url 'blog' %}"{% if not selected_category %} aria-current="page"{% endif %}>Todas</a>
     {% for value,label in categories %}<a href="{% url 'blog' %}?categoria={{ value }}"{% if selected_category == value %} aria-current="page"{% endif %}>{{ label }}</a>{% endfor %}
@@ -42,14 +32,16 @@
       <span>Página {{ articles.number }} de {{ articles.paginator.num_pages }}</span>
       {% if articles.has_next %}<a href="?{% if selected_category %}categoria={{ selected_category }}&amp;{% endif %}pagina={{ articles.next_page_number }}">Siguiente →</a>{% endif %}
     </nav>{% endif %}
-  {% else %}<p class="content-empty">{% if selected_category %}Todavía no hay artículos publicados en esta categoría. Puedes explorar las demás líneas editoriales.{% else %}Todavía no hay artículos publicados.{% endif %}</p>{% endif %}
+  {% else %}<p class="blog-empty">{% if selected_category %}No hay artículos publicados en esta categoría.{% else %}Próximamente encontrarás artículos sobre finanzas, negocios, datos y tecnología{% endif %}</p>{% endif %}
 </section>
 
+{% include 'includes/inflation_copilot.html' with variant='editorial' %}
+
 <section class="published-content video-section" aria-labelledby="videos-title">
-  <div class="content-section-head"><div><p class="eyebrow">Multimedia</p><h2 id="videos-title">Videos destacados</h2></div><p>Reproducción desde un proveedor externo, al solicitarla.</p></div>
+  <div class="content-section-head"><div><p class="eyebrow">Multimedia</p><h2 id="videos-title">Videos destacados</h2></div>{% if videos %}<p>Reproducción desde un proveedor externo, al solicitarla.</p>{% endif %}</div>
   {% if videos %}<div class="video-grid">
     {% for video in videos %}{% include 'includes/video_card.html' with video=video %}{% endfor %}
-  </div>{% else %}<p class="content-empty">Todavía no hay videos publicados.</p>{% endif %}
+  </div>{% else %}<p class="blog-empty">Próximamente, contenido audiovisual para complementar nuestras publicaciones</p>{% endif %}
 </section>
 {% endblock %}
 {% block extra_scripts %}<script src="{% static 'video_embed.js' %}" defer></script>{% endblock %}
