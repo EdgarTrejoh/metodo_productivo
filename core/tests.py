@@ -65,7 +65,9 @@ class PortalStructureTests(TestCase):
         response = self.client.get(reverse('home'))
         self.assertContains(response, 'Contenidos</a>', count=2)
         self.assertNotContains(response, '>Blog</a>')
-        self.assertContains(response, 'proyectos, trabajo y negocios')
+        self.assertContains(response, 'personas y negocios')
+        self.assertNotContains(response, 'Cuatro miradas para un mismo negocio.')
+        self.assertContains(response, 'class="feature-card', count=4)
         self.assertContains(self.client.get(reverse('entry')), 'check-entry-card')
 
 
@@ -220,3 +222,57 @@ class BreakEvenTests(TestCase):
         self.assertContains(response, '<span aria-current="page">Punto de equilibrio</span>')
         self.assertContains(response, 'aria-label="Ruta de navegación"')
         self.assertContains(response, '>Limpiar</a>')
+
+class EditorialStateTests(TestCase):
+    def test_resources_reflects_file_without_promising_email(self):
+        for available in (False, True):
+            with self.subTest(available=available), patch('core.views.storage.available', return_value=available) as check:
+                for name in ('resources',):
+                    response = self.client.get(reverse(name))
+                    self.assertContains(response, 'Archivo disponible para pruebas' if available else 'Archivo temporalmente no disponible')
+                    self.assertNotContains(response, 'Entrega pendiente')
+                    self.assertNotContains(response, 'A-03')
+                self.assertEqual(check.call_count, 1)
+
+    def test_home_preserves_ctas_and_links_to_store(self):
+        response = self.client.get(reverse('home'))
+        for cta in ('tools', 'resources', 'store', 'content'):
+            self.assertContains(response, f'data-home-cta="{cta}"', count=1)
+        self.assertContains(response, 'data-home-cta="check"', count=2)
+        self.assertContains(response, 'Plantilla gratuita')
+        self.assertContains(response, f'href="{reverse("blog")}" data-home-cta="content">Explorar contenidos')
+        self.assertContains(response, f'href="{reverse("entry")}" data-home-cta="check">¿Tienes una PyME? Haz el Check PyME')
+        self.assertContains(response, f'href="{reverse("store")}" data-home-cta="store">Ver la tienda')
+        for name in ('tools', 'resources', 'blog', 'entry', 'store'):
+            self.assertContains(response, reverse(name))
+
+    def test_commercial_pages_do_not_expose_obsolete_project_labels(self):
+        for name in ('home', 'tools', 'resources', 'blog', 'store', 'contact'):
+            with self.subTest(page=name):
+                response = self.client.get(reverse(name))
+                for label in ('Fase A', 'A-03', 'O-08', 'aprobado con salvedades', 'Disponible en desarrollo', 'Portal en desarrollo'):
+                    self.assertNotContains(response, label)
+                self.assertContains(response, 'Entorno de desarrollo')
+        response = self.client.get(reverse('tools'))
+        self.assertContains(response, 'Calcula el punto de equilibrio de tu negocio.')
+        self.assertContains(response, 'Descubre cuántas unidades de un producto o servicio necesitas vender al mes para cubrir sus costos.')
+
+class AboutPageTests(TestCase):
+    def test_about_content_and_routes(self):
+        home = self.client.get(reverse('home'))
+        self.assertContains(home, f'href="{reverse("about")}">Acerca de</a>')
+        response = self.client.get(reverse('about'))
+        self.assertContains(response, 'Para decidir mejor, entiende tus números.')
+        self.assertContains(response, 'Para quien quiere entender su dinero.')
+        self.assertContains(response, 'Primero explico, luego te doy la herramienta.')
+        self.assertContains(response, 'Quién está detrás')
+        self.assertContains(response, 'Lo que aprendí dentro del sistema financiero.')
+        self.assertContains(response, 'Cómo trabajo')
+        content = response.content.decode()
+        self.assertLess(content.index('about-founder'), content.index('about-audience'))
+        self.assertLess(content.index('about-audience'), content.index('about-method'))
+        self.assertContains(response, 'Soy Edgar Trejo. Durante más de 25 años trabajé en banca, crédito hipotecario y análisis financiero')
+        self.assertContains(response, f'href="{reverse("contact")}">Escríbenos')
+        self.assertNotContains(response, 'Empieza por lo que necesitas hoy.')
+        self.assertContains(response, '<span aria-current="page">Acerca de</span>')
+        self.assertNotContains(response, 'Contenido editorial provisional')

@@ -34,7 +34,14 @@ jobs:
       - run: python -m pip install -r requirements.txt
       - run: python manage.py check
       - run: python manage.py makemigrations --check --dry-run
-      - run: python manage.py test leads.test_lead_magnet.ConcurrentAccessTests
+      - name: Concurrencia de descargas obligatoria en PostgreSQL
+        run: |
+          set -euo pipefail
+          python manage.py shell -c "from django.db import connection; assert connection.vendor == 'postgresql', 'Las pruebas concurrentes requieren PostgreSQL'"
+          output=$(python manage.py test leads.test_lead_magnet.ConcurrentAccessTests 2>&1)
+          printf '%s\n' "$output"
+          grep -Fq 'Ran 2 tests' <<< "$output"
+          grep -Fxq 'OK' <<< "$output"
       - run: python manage.py test leads.test_lead_magnet
       - run: python manage.py test store.tests
       - run: python manage.py test content.tests

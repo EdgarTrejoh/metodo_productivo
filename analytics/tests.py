@@ -134,6 +134,19 @@ class InitialTrafficTests(TestCase):
         self.assertEqual(client.post('/analitica/cta/', {'cta': 'unknown', 'operation': operation},
                                      HTTP_X_CSRFTOKEN=client.cookies['csrftoken'].value).status_code, 400)
 
+    def test_store_cta_is_recorded_without_qualifying_session(self):
+        client = Client(enforce_csrf_checks=True)
+        home = client.get('/')
+        self.assertContains(home, 'href="/tienda/" data-home-cta="store"')
+        operation = str(uuid.uuid4())
+        data = {'cta': 'store', 'operation': operation}
+        for _ in range(2):
+            self.assertEqual(client.post('/analitica/cta/', data,
+                                         HTTP_X_CSRFTOKEN=client.cookies['csrftoken'].value).status_code, 204)
+        self.assertEqual(TrafficEvent.objects.filter(kind='CTA_CLICK', cta='store', operation=operation).count(), 1)
+        self.assertIsNone(TrafficSession.objects.get().qualified_at)
+        self.assertContains(client.get('/tienda/'), 'Todavía no hay productos digitales publicados')
+
     def test_analytics_failure_does_not_block_public_page_or_calculation(self):
         with patch('analytics.tracking.TrafficEvent.objects.create', side_effect=DatabaseError('synthetic')):
             self.assertEqual(self.client.get('/').status_code, 200)

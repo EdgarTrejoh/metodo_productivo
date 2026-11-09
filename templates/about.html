@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Acerca de Método Productivo{% endblock %}
+{% block meta_description %}Conoce Método Productivo: aprendizaje y herramientas prácticas para comprender finanzas, negocios, datos y tecnología.{% endblock %}
+{% block main_class %}interior-main about-main{% endblock %}
+{% block content %}
+{% include 'includes/breadcrumb.html' with current='Acerca de' %}
+<section class="about-intro" aria-labelledby="about-title">
+  <div class="about-intro-content">
+    <p class="eyebrow">Acerca de Método Productivo</p>
+    <h1 id="about-title">Para decidir mejor, entiende tus números.</h1>
+    <div class="about-intro-copy">
+      <p>Artículos, herramientas y guías de finanzas, negocios, datos y tecnología.</p>
+    </div>
+  </div>
+  <svg class="about-illustration" viewBox="0 0 340 280" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="170" cy="135" r="116" fill="none" stroke="#9cebdd" stroke-opacity=".22"/>
+    <path d="M65 155C83 92 124 66 173 78s85 44 102 94" fill="none" stroke="#68dec7" stroke-opacity=".65" stroke-width="2"/>
+    <path d="M52 100c23-7 40-5 58 8v68c-18-13-35-15-58-8zm116 0c-23-7-40-5-58 8v68c18-13 35-15 58-8z" fill="#124a6d" stroke="#9cebdd" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M68 119c11-2 19 0 27 4m-27 11c11-2 19 0 27 4m57-19c-11-2-19 0-27 4m27 11c-11-2-19 0-27 4" fill="none" stroke="#d7f4ed" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="195" cy="119" r="33" fill="#07345f" stroke="#d7f4ed" stroke-width="3"/><path d="m219 143 27 27" stroke="#d7f4ed" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="260" cy="184" r="29" fill="#00a987"/><path d="m247 184 9 9 17-19" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="65" cy="70" r="4" fill="#68dec7"/><circle cx="281" cy="78" r="5" fill="#68dec7" opacity=".7"/>
+  </svg>
+</section>
+<section class="about-section about-founder" aria-labelledby="founder-title">
+  <div class="about-section-heading">
+    <p class="eyebrow">Quién está detrás</p>
+    <h2 id="founder-title">Lo que aprendí dentro del sistema financiero.</h2>
+    {% if founder.photo_url %}<img src="{{ founder.photo_url }}" alt="{{ founder.photo_alt }}" loading="lazy">{% endif %}
+  </div>
+  <div class="about-founder-copy">
+    <p>Soy Edgar Trejo. Durante más de 25 años trabajé en banca, crédito hipotecario y análisis financiero: diseñé productos de crédito, analicé mercados y convertí datos en propuestas concretas.</p>
+    <p>Con Método Productivo quiero llevar esa experiencia a un lenguaje más cercano: explicar conceptos financieros, mostrar ejemplos con números y desarrollar herramientas que puedas usar en tus finanzas personales o en tu negocio.</p>
+  </div>
+</section>
+<section class="about-section about-audience" aria-labelledby="audience-title">
+  <div class="about-section-heading"><p class="eyebrow">Para quién es</p><h2 id="audience-title">Para quien quiere entender su dinero.</h2></div>
+  <div class="about-audience-list">
+    <div><h3>Personas</h3><p>Quieres ordenar tus finanzas, entender un crédito o saber qué hacer con tu dinero.</p></div>
+    <div><h3>Emprendedores</h3><p>Estás arrancando y necesitas saber cuánto cuesta de verdad tu producto y cuánto debes vender.</p></div>
+    <div><h3>PyMEs</h3><p>Tu negocio vende, pero el efectivo no alcanza y quieres entender por qué.</p></div>
+  </div>
+</section>
+<section class="about-section about-method" aria-labelledby="method-title">
+  <div class="about-section-heading"><p class="eyebrow">Cómo trabajo</p><h2 id="method-title">Primero explico, luego te doy la herramienta.</h2></div>
+  <dl class="about-principles">
+    <div><dt>Explicar</dt><dd>Cada tema empieza por lo básico, sin jerga y sin perder rigor.</dd></div>
+    <div><dt>Aplicar</dt><dd>Acompaño las explicaciones con ejemplos, calculadoras y plantillas cuando ayudan a comprender mejor el tema.</dd></div>
+    <div><dt>Decidir</dt><dd>La decisión es tuya. El contenido es educativo, no constituye una recomendación personalizada de inversión ni garantiza resultados.</dd></div>
+  </dl>
+</section>
+<section class="about-explore" aria-label="Contacto">
+  <p>¿Tienes una pregunta o comentario?</p>
+  <a href="{% url 'contact' %}">Escríbenos <span aria-hidden="true">→</span></a>
+</section>
+{% endblock %}

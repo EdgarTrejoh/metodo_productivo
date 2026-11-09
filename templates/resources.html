@@ -4,12 +4,12 @@
 {% block content %}
 {% include 'includes/breadcrumb.html' with current='Recursos' %}
 <section class="resource-intro" aria-labelledby="page-title">
-  <div><p class="eyebrow">Recursos · Fase A</p><h1 id="page-title">{{ page.title }}</h1><p class="interior-lead">{{ page.intro }}</p></div>
-  <span class="resource-tag">Plantilla Excel gratuita<br><strong>01 recurso en integración</strong></span>
+  <div><p class="eyebrow">Recursos</p><h1 id="page-title">{{ page.title }}</h1><p class="interior-lead">{{ page.intro }}</p></div>
+  <span class="resource-tag">Plantilla Excel gratuita<br><strong>Mapa de Caja PyME</strong></span>
 </section>
 <section class="resource-feature" aria-labelledby="resource-title">
   <div class="resource-number" aria-hidden="true">13<span>semanas</span></div>
-  <div class="resource-detail"><span class="small-status">Archivo definitivo pendiente · A-03</span><h2 id="resource-title">Mapa de Caja PyME</h2><p>Una plantilla para organizar entradas y salidas previstas por semana y observar necesidades de efectivo con anticipación.</p><a class="text-link" href="{% url 'lead_magnet_resource' %}">Conocer el recurso <span aria-hidden="true">→</span></a></div>
+  <div class="resource-detail"><span class="small-status">{% if resource_available %}Archivo disponible para pruebas{% else %}Archivo temporalmente no disponible{% endif %}</span><h2 id="resource-title">Mapa de Caja PyME</h2><p>Una plantilla para organizar entradas y salidas previstas por semana y observar necesidades de efectivo con anticipación.</p><a class="text-link" href="{% url 'lead_magnet_resource' %}">Conocer el recurso <span aria-hidden="true">→</span></a></div>
 </section>
-<p class="resource-footnote">El archivo definitivo será proporcionado externamente. La página del recurso indica si la solicitud está disponible en este entorno local.</p>
+<p class="resource-footnote">Consulta la página del Mapa de Caja PyME para conocer la disponibilidad de la plantilla y las condiciones de solicitud.</p>
 {% endblock %}
