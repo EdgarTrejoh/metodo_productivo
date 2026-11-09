@@ -1,9 +1,11 @@
 # Plan de trabajo y seguimiento — Método Productivo
 
-**Actualizado:** 6 de noviembre de 2026 (registro de MP-EXT-01; los cortes de octubre se conservan)  
+**Actualizado:** 9 de noviembre de 2026 (objetivo comercial de lanzamiento; se conservan los cortes y decisiones anteriores)
 **Punto de partida:** bloque local B0 del Check PyME v1.3 y estructura pública del portal pendiente.
 
-**Alcance de este plan:** construir y publicar la plataforma integral de Fase A —contenidos, educación financiera, herramientas, captación y orientación—, completar el Check como componente diferenciador y preparar las Fases B y C únicamente al superar sus decisiones y gates.
+**Alcance de este plan:** construir y publicar la plataforma integral de Fase A —contenidos, educación financiera, herramientas, captación y orientación—, completar el Check como componente diferenciador y preparar la tienda de productos digitales propios para el lanzamiento gradual del 18 de enero de 2027, con pagos operativos sujetos a sus decisiones y gates. La Fase C conserva sus dependencias propias.
+
+**Nota de vigencia comercial (9-nov-2026):** el objetivo vigente incluye B-02–B-08 y una tienda con cobro y entrega controlada para el lanzamiento gradual del 18-ene-2027. La secuencia histórica que situaba H6 después de la medición H5 se conserva como antecedente, pero H5 no impide preparar y probar B-02–B-08 en paralelo. La activación LIVE exige aceptación integral de pagos, entrega, privacidad, soporte, operación fiscal e infraestructura, además de autorización expresa. B-01 y su piloto TEST no acreditan esos requisitos. MP-EXT-01 permanece en Fase A; O-02 continúa pendiente de decisiones y despliegue.
 
 ## Cómo usar este documento
 
@@ -146,7 +148,7 @@ Las siguientes **entregas son cortes incrementales del plan vigente**, no fases 
 
 - [x] **INF-LOCAL-01 — Docker local (29-oct-2026).** Infraestructura de desarrollo con Django/Python 3.12 y PostgreSQL 16 **APROBADA Y CERRADA** por el promotor, incluidas Docker AV-01 y AV-02. Compose mantiene servicios y volúmenes independientes de SQLite; el recurso Excel se monta opcionalmente en solo lectura. Aceptación local respaldada por 100/100 pruebas Django, 2/2 concurrentes A-03, comprobaciones técnicas y pruebas manuales del promotor. Este ID identifica el incremento local y no sustituye ni cierra O-01 u O-02: staging, Cloud Run, Cloud SQL y despliegue siguen pendientes. [Evidencia](VERIFICACION.md) y [operación](../README.md).
 - [x] **O-01 — CERRADA / ACEPTADA (29-oct-2026).** El promotor aceptó la preparación técnica de la aplicación completa en un entorno local aislado equivalente a staging: configuración segura con `DEBUG=0`, PostgreSQL, Gunicorn, estáticos, sesiones/CSRF y backoffice OTP, sin regresión de Docker local. Evidencia: [VERIFICACION.md](VERIFICACION.md). Este cierre no acredita despliegue ni infraestructura GCP; `security.W005` y `security.W021` siguen abiertas hasta definir dominio y política HSTS.
-- [ ] **O-02** Desplegar monolito Django en Cloud Run y PostgreSQL en Cloud SQL; verificar migraciones, transacciones, concurrencia y conexión.
+- [ ] **O-02** Desplegar monolito Django en Cloud Run y PostgreSQL en Cloud SQL; verificar migraciones, transacciones, concurrencia y conexión. [Preparación operativa sin cargos externos](O-02_PREPARACION_STAGING.md) documentada el 29-oct-2026; despliegue e integración cloud pendientes.
 
 **Gate de entrada a O-02:** permanece pendiente. Su apertura requiere decisiones explícitas del promotor sobre región GCP, dominio o estrategia de dominio, Cloud Run, Cloud SQL, Secret Manager, almacenamiento persistente y privado, medios, correo transaccional y presupuesto/costo autorizado. Estas decisiones no se resuelven por el cierre de O-01.
 - [ ] **O-03** Configurar almacenamiento privado de archivos/PDF y metadatos necesarios; impedir rutas permanentes públicas.
@@ -185,7 +187,9 @@ Las siguientes **entregas son cortes incrementales del plan vigente**, no fases 
 - [ ] **M-05** Revisar errores, entregabilidad, privacidad y seguridad; confirmar ausencia de incidentes graves.
 - [ ] **M-06** Documentar la decisión de producto y actualizar backlog y estimación de B.
 
-## H6 — Fase B: monetización digital (condicionada a H5)
+## H6 — Fase B: monetización digital para el lanzamiento gradual
+
+**Antecedente de secuencia:** H6 se planteó originalmente condicionado a la decisión de H5. La nota de vigencia comercial anterior permite preparar y validar B-02–B-08 antes de completar la medición H5; no modifica los criterios de aceptación ni autoriza ventas LIVE por sí sola.
 
 **Antes de construir:** aprobar catálogo/precios, operación fiscal, políticas de reembolso y soporte. La compra usa correo capturado en Checkout; el Check mantiene su propio recorrido sin magic link.
 
