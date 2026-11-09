@@ -1,0 +1,22 @@
+{% load static %}
+<section class="copilot-card copilot-card--{{ variant }}" aria-labelledby="copilot-{{ variant }}-title">
+  <div class="copilot-card-body">
+    <div class="copilot-card-copy">
+    {% if variant == 'editorial' %}
+      <p class="copilot-label">Del concepto a la práctica</p>
+      <h2 id="copilot-editorial-title">¿Cuánto ha cambiado el valor de tu dinero?</h2>
+      <p>La inflación no solo es una cifra. También modifica lo que puedes comprar con tus ingresos y ahorros.</p>
+      <p>Con Inflación Copilot MX puedes explorar información del INPC, consultar periodos y formular preguntas sobre la evolución de los precios.</p>
+    {% else %}
+      <span class="small-status">Herramienta externa</span>
+      <h2 id="copilot-tool-title">Inflación Copilot MX</h2>
+      <p>Explora cómo cambia el poder adquisitivo del dinero y consulta información sobre inflación e INPC mediante una herramienta interactiva.</p>
+    {% endif %}
+    </div>
+    <div class="copilot-card-action">
+      <a class="tool-action {% if variant == 'editorial' %}tool-action-secondary{% else %}tool-action-primary{% endif %}" href="https://fluted-oath-477301-c1.web.app" target="_blank" rel="noopener noreferrer" aria-label="{% if variant == 'editorial' %}Explorar{% else %}Abrir{% endif %} Inflación Copilot MX en una aplicación externa, en otra pestaña">{% if variant == 'editorial' %}Explorar{% else %}Abrir{% endif %} Inflación Copilot MX <span aria-hidden="true">↗</span></a>
+      <p class="copilot-card-note">{% if variant == 'editorial' %}Herramienta externa · Se abre en otra pestaña{% else %}Se abrirá otra aplicación en una pestaña nueva. Saldrás de Método Productivo.{% endif %}</p>
+    </div>
+  </div>
+  {% if variant == 'tool' %}<div class="copilot-card-visual"><img src="{% static 'copilot/inflacion-copilot-preview.webp' %}" alt="Captura de Inflación Copilot MX con el rango del INPC y el formulario para hacer una consulta." width="496" height="470" loading="lazy"></div>{% endif %}
+</section>

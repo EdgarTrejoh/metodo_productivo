@@ -64,6 +64,34 @@ class EditorialTableTests(TestCase):
 
 
 class EditorialTests(TestCase):
+    def test_external_copilot_reference_is_visible_without_articles(self):
+        self.assertEqual(Article.objects.count(), 0)
+        for url in (reverse('blog'), reverse('blog') + '?categoria=finance'):
+            with self.subTest(url=url):
+                response = self.client.get(url)
+                self.assertEqual(response.status_code, 200)
+                self.assertContains(response, 'Herramienta externa')
+                self.assertContains(response, 'Inflación Copilot MX')
+                self.assertContains(response, 'Del concepto a la práctica')
+                self.assertContains(response, '¿Cuánto ha cambiado el valor de tu dinero?')
+                self.assertContains(response, 'La inflación no solo es una cifra. También modifica lo que puedes comprar con tus ingresos y ahorros.')
+                self.assertContains(response, 'Con Inflación Copilot MX puedes explorar información del INPC, consultar periodos y formular preguntas sobre la evolución de los precios.')
+                self.assertContains(response, 'Herramienta externa · Se abre en otra pestaña')
+                self.assertContains(response,
+                    'href="https://fluted-oath-477301-c1.web.app" target="_blank" rel="noopener noreferrer" '
+                    'aria-label="Explorar Inflación Copilot MX en una aplicación externa, en otra pestaña"', count=1)
+                if 'categoria=' in url:
+                    self.assertContains(response, 'No hay artículos publicados en esta categoría.', count=1)
+                else:
+                    self.assertContains(response, 'Próximamente encontrarás artículos sobre finanzas, negocios, datos y tecnología', count=1)
+                self.assertNotContains(response, 'class="article-card"')
+                html = response.content.decode()
+                self.assertLess(html.index('id="articles-title"'), html.index('id="copilot-editorial-title"'))
+                self.assertLess(html.index('id="copilot-editorial-title"'), html.index('id="videos-title"'))
+                self.assertNotIn('Las líneas editoriales', html)
+                self.assertNotIn('class="editorial-area', html)
+        self.assertEqual(Article.objects.count(), 0)
+
     def article(self, **overrides):
         values = {
             'title': 'Artículo sintético de prueba',
@@ -85,13 +113,18 @@ class EditorialTests(TestCase):
         values.update(overrides)
         return Video.objects.create(**values)
 
-    def test_empty_index_has_four_lines_and_no_fake_content(self):
+    def test_empty_index_has_no_static_editorial_cards_or_fake_content(self):
         response = self.client.get(reverse('blog'))
         self.assertEqual(response.status_code, 200)
-        for label in ('Finanzas', 'Negocios', 'Datos', 'Tecnología'):
-            self.assertContains(response, label)
-        self.assertContains(response, 'Todavía no hay artículos publicados')
-        self.assertContains(response, 'Todavía no hay videos publicados')
+        self.assertNotContains(response, 'Las líneas editoriales')
+        self.assertNotContains(response, 'class="editorial-area')
+        self.assertContains(response, 'Próximamente encontrarás artículos sobre finanzas, negocios, datos y tecnología', count=1)
+        self.assertContains(response, 'Próximamente, contenido audiovisual para complementar nuestras publicaciones', count=1)
+        self.assertNotContains(response, 'class="content-empty"')
+        self.assertNotContains(response, 'Todavía no hay artículos publicados')
+        self.assertNotContains(response, 'Todavía no hay videos publicados')
+        self.assertNotContains(response, 'Reproducción desde un proveedor externo, al solicitarla.')
+        self.assertNotContains(response, 'Aquí encontrarás artículos y videos cuando estén publicados.')
         self.assertNotContains(response, 'aria-label="Filtrar artículos por categoría"')
         self.assertNotContains(response, 'Contenido editorial revisado y publicado.')
         self.assertNotContains(response, '<iframe')
@@ -134,6 +167,13 @@ class EditorialTests(TestCase):
         self.assertNotContains(response, '<script>alert(1)</script>')
         self.assertContains(response, 'aria-current="location">Contenidos</a>')
         self.assertEqual(len(Article.Category.choices), 4)
+        index = self.client.get(reverse('blog'))
+        self.assertContains(index, 'aria-label="Filtrar artículos por categoría"')
+        self.assertContains(index, 'class="article-card"')
+        self.assertNotContains(index, 'Próximamente encontrarás artículos sobre finanzas, negocios, datos y tecnología')
+        for category, label in Article.Category.choices:
+            self.assertContains(index, f'?categoria={category}')
+            self.assertContains(index, f'>{label}</a>')
         with self.assertRaises(ValidationError):
             self.article(slug='articulo-sintetico')
         with self.assertRaises(ValidationError):
@@ -150,6 +190,8 @@ class EditorialTests(TestCase):
         self.assertNotContains(response, draft.title)
         self.assertNotContains(response, '<iframe')
         self.assertContains(response, f'data-video-id="{VIDEO_ID}"')
+        self.assertContains(response, 'Reproducción desde un proveedor externo, al solicitarla.', count=1)
+        self.assertNotContains(response, 'Próximamente, contenido audiovisual para complementar nuestras publicaciones')
         self.assertContains(response, '/static/video_embed.js')
         self.assertContains(response, f'https://www.youtube.com/watch?v={VIDEO_ID}')
         article = self.article(status=PublicationStatus.PUBLISHED, featured_video=video)
@@ -157,7 +199,10 @@ class EditorialTests(TestCase):
         self.assertContains(detail, video.title)
         video.status = PublicationStatus.RETIRED
         video.save()
-        self.assertNotContains(self.client.get(reverse('blog')), video.title)
+        empty_response = self.client.get(reverse('blog'))
+        self.assertNotContains(empty_response, video.title)
+        self.assertContains(empty_response, 'Próximamente, contenido audiovisual para complementar nuestras publicaciones', count=1)
+        self.assertNotContains(empty_response, 'Reproducción desde un proveedor externo, al solicitarla.')
         self.assertNotContains(self.client.get(reverse('article_detail', args=[article.slug])), video.title)
 
     def test_youtube_source_validation(self):
