@@ -5,9 +5,9 @@
 {% block content %}
 {% include 'includes/breadcrumb.html' with current='Contenidos' %}
 <section class="blog-intro" aria-labelledby="page-title">
-  <p class="eyebrow">Contenidos · Fase A</p>
+  <p class="eyebrow">Contenidos</p>
   <h1 id="page-title">Ideas para gestionar con más claridad.</h1>
-  <p class="interior-lead">Finanzas, negocios, datos y tecnología aplicados a proyectos, trabajo y negocios. {% if has_live_articles or videos %}Explora las publicaciones disponibles.{% else %}Este espacio reunirá artículos y videos después de su revisión editorial.{% endif %}</p>
+  <p class="interior-lead">Finanzas, negocios, datos y tecnología aplicados a proyectos, trabajo y negocios. {% if has_live_articles or videos %}Explora las publicaciones disponibles.{% else %}Aquí encontrarás artículos y videos cuando estén publicados.{% endif %}</p>
 </section>
 <section class="editorial-areas" aria-labelledby="areas-title">
   <h2 id="areas-title">Las líneas editoriales</h2>
@@ -20,7 +20,7 @@
 </section>
 
 <section class="published-content" aria-labelledby="articles-title">
-  <div class="content-section-head"><div><p class="eyebrow">Lecturas</p><h2 id="articles-title">Artículos</h2></div><p>{% if has_live_articles %}Explora las lecturas publicadas.{% else %}Las primeras lecturas están en preparación editorial.{% endif %}</p></div>
+  <div class="content-section-head"><div><p class="eyebrow">Lecturas</p><h2 id="articles-title">Artículos</h2></div><p>{% if has_live_articles %}Explora las lecturas publicadas.{% else %}Todavía no hay artículos publicados.{% endif %}</p></div>
   {% if has_live_articles %}<nav class="category-nav" aria-label="Filtrar artículos por categoría">
     <a href="{% url 'blog' %}"{% if not selected_category %} aria-current="page"{% endif %}>Todas</a>
     {% for value,label in categories %}<a href="{% url 'blog' %}?categoria={{ value }}"{% if selected_category == value %} aria-current="page"{% endif %}>{{ label }}</a>{% endfor %}
@@ -42,14 +42,14 @@
       <span>Página {{ articles.number }} de {{ articles.paginator.num_pages }}</span>
       {% if articles.has_next %}<a href="?{% if selected_category %}categoria={{ selected_category }}&amp;{% endif %}pagina={{ articles.next_page_number }}">Siguiente →</a>{% endif %}
     </nav>{% endif %}
-  {% else %}<p class="content-empty">{% if selected_category %}Todavía no hay artículos publicados en esta categoría. Puedes explorar las demás líneas editoriales.{% else %}Todavía no hay artículos publicados. Esta sección mostrará lecturas cuando hayan pasado la revisión editorial.{% endif %}</p>{% endif %}
+  {% else %}<p class="content-empty">{% if selected_category %}Todavía no hay artículos publicados en esta categoría. Puedes explorar las demás líneas editoriales.{% else %}Todavía no hay artículos publicados.{% endif %}</p>{% endif %}
 </section>
 
 <section class="published-content video-section" aria-labelledby="videos-title">
   <div class="content-section-head"><div><p class="eyebrow">Multimedia</p><h2 id="videos-title">Videos destacados</h2></div><p>Reproducción desde un proveedor externo, al solicitarla.</p></div>
   {% if videos %}<div class="video-grid">
     {% for video in videos %}{% include 'includes/video_card.html' with video=video %}{% endfor %}
-  </div>{% else %}<p class="content-empty">Todavía no hay videos publicados. Los incorporaremos después de su revisión editorial.</p>{% endif %}
+  </div>{% else %}<p class="content-empty">Todavía no hay videos publicados.</p>{% endif %}
 </section>
 {% endblock %}
 {% block extra_scripts %}<script src="{% static 'video_embed.js' %}" defer></script>{% endblock %}

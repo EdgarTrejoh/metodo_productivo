@@ -5,29 +5,29 @@
 {% block content %}
 <section class="hero" aria-labelledby="hero-title">
   <div class="hero-copy">
-    <p class="hero-kicker">Método Productivo · Conocimiento aplicable</p>
-    <h1 id="hero-title">Conocimiento práctico para <span>decidir mejor.</span></h1>
-    <p class="hero-lead">Finanzas, negocios, datos y tecnología explicados con claridad. Ideas y herramientas que puedes aplicar a proyectos, trabajo y negocios.</p>
+    <p class="hero-kicker">MÉTODO PRODUCTIVO · FINANZAS CON CLARIDAD</p>
+    <h1 id="hero-title">Entiende tus finanzas. <span>Decide con más claridad.</span></h1>
+    <p class="hero-lead">Artículos, herramientas y guías descargables para personas y negocios, explicados sin tecnicismos y pensados para aplicarse desde hoy.</p>
     <div class="hero-actions">
-      <a class="button" href="#explorar" data-home-cta="explore">Explorar el portal <span aria-hidden="true">↓</span></a>
+      <a class="button" href="{% url 'blog' %}" data-home-cta="content">Explorar contenidos <span aria-hidden="true">→</span></a>
+      <a class="button hero-button-secondary" href="{% url 'entry' %}" data-home-cta="check">¿Tienes una PyME? Haz el Check PyME <span aria-hidden="true">→</span></a>
     </div>
   </div>
-  <div class="hero-visual">
-    <p class="hero-visual-kicker">Cuatro perspectivas</p>
-    <p class="hero-visual-title">Una forma más completa de mirar tu negocio.</p>
-    <div class="hero-visual-lines"><span>Finanzas</span><span>Negocios</span><span>Datos</span><span>Tecnología</span></div>
-  </div>
-</section>
-
-<section class="intro-section" aria-labelledby="pillars-title">
-  <div class="section-heading">
-    <div><p class="eyebrow">Áreas de conocimiento</p><h2 id="pillars-title">Cuatro miradas para un mismo negocio.</h2></div>
-  </div>
-  <div class="pillar-grid">
-    <div class="pillar pillar-finance"><span class="pillar-number">01</span><h3>Finanzas</h3><p>Flujos, costos y decisiones de inversión.</p></div>
-    <div class="pillar pillar-business"><span class="pillar-number">02</span><h3>Negocios</h3><p>Márgenes, procesos y estrategia comercial.</p></div>
-    <div class="pillar pillar-data"><span class="pillar-number">03</span><h3>Datos</h3><p>Indicadores para entender qué está cambiando.</p></div>
-    <div class="pillar pillar-tech"><span class="pillar-number">04</span><h3>Tecnología</h3><p>Herramientas digitales aplicadas a la operación.</p></div>
+  <div class="hero-visual" aria-hidden="true">
+    <svg viewBox="0 0 440 270" xmlns="http://www.w3.org/2000/svg">
+      <path d="M70 90 C120 90 120 180 175 180 S230 90 270 90 S320 180 370 180" fill="none" stroke="#68dec7" stroke-width="2" stroke-dasharray="4 7" opacity=".7"/>
+      <circle cx="70" cy="90" r="37" fill="#124a6d" stroke="#8ce9d7" stroke-width="1.5"/>
+      <path d="M62 81a9 9 0 1 1 14 7c-4 3-6 5-6 9m0 7v1" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="175" cy="180" r="37" fill="#124a6d" stroke="#8ce9d7" stroke-width="1.5"/>
+      <path d="M160 191v-10m10 10v-21m10 21v-15m10 15v-27" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="270" cy="90" r="37" fill="#124a6d" stroke="#8ce9d7" stroke-width="1.5"/>
+      <circle cx="266" cy="85" r="12" fill="none" stroke="#fff" stroke-width="3"/><path d="m275 94 9 9" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="370" cy="180" r="37" fill="#00a987" stroke="#9cebdd" stroke-width="1.5"/>
+      <path d="m357 180 9 9 18-20" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <g fill="#d7f4ed" font-family="Inter, Segoe UI, sans-serif" font-size="13" font-weight="700" text-anchor="middle">
+        <text x="70" y="151">Pregunta</text><text x="175" y="240">Datos</text><text x="270" y="151">Análisis</text><text x="370" y="240">Decisión</text>
+      </g>
+    </svg>
   </div>
 </section>
 
@@ -35,23 +35,23 @@
   <div class="section-heading section-heading-stack"><p class="eyebrow">Explora el portal</p><h2 id="explore-title">Elige lo que necesitas hoy.</h2></div>
   <div class="feature-grid">
     <article class="feature-card">
-      <div class="feature-top"><span class="feature-symbol" aria-hidden="true">◈</span><span class="status-pill status-live">Disponible en desarrollo</span></div>
-      <h3>Calculadoras</h3><p>Prueba el punto de equilibrio mensual para un producto o servicio.</p>
-      <a href="{% url 'tools' %}" data-home-cta="tools">Ver calculadoras <span aria-hidden="true">→</span></a>
+      <div class="feature-top"><span class="feature-symbol" aria-hidden="true">◈</span><span class="status-pill">Calculadora gratuita</span></div>
+      <h3>Punto de equilibrio</h3><p>Prueba el punto de equilibrio mensual para un producto o servicio.</p>
+      <a href="{% url 'tools' %}" data-home-cta="tools">Conocer la calculadora <span aria-hidden="true">→</span></a>
     </article>
     <article class="feature-card">
-      <div class="feature-top"><span class="feature-symbol" aria-hidden="true">✳</span><span class="status-pill">Artículos pendientes</span></div>
-      <h3>Contenidos</h3><p>Lecturas prácticas de finanzas, negocios, datos y tecnología.</p>
-      <a href="{% url 'blog' %}" data-home-cta="content">Explorar contenidos <span aria-hidden="true">→</span></a>
+      <div class="feature-top"><span class="feature-symbol" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5c3-1 5.5-.7 8 1v13c-2.5-1.7-5-2-8-1zM20 5.5c-3-1-5.5-.7-8 1v13c2.5-1.7 5-2 8-1z"/></svg></span><span class="status-pill">Catálogo digital</span></div>
+      <h3>Guías y artículos digitales</h3><p>Material descargable para profundizar: guías paso a paso y plantillas que puedes usar en tu propia situación.</p>
+      <a href="{% url 'store' %}" data-home-cta="store">Ver la tienda <span aria-hidden="true">→</span></a>
     </article>
     <article class="feature-card feature-check">
-      <div class="feature-top"><span class="feature-symbol" aria-hidden="true">↗</span><span class="status-pill status-live">Disponible en desarrollo</span></div>
-      <h3>Diagnóstico inicial</h3><p>El Check PyME ofrece una primera lectura de tus prácticas de gestión en ocho preguntas.</p>
+      <div class="feature-top"><span class="feature-symbol" aria-hidden="true">↗</span><span class="status-pill">Lectura inicial</span></div>
+      <h3>Check PyME</h3><p>El Check PyME ofrece una primera lectura de tus prácticas de gestión en ocho preguntas.</p>
       <a href="{% url 'entry' %}" data-home-cta="check">Conocer el Check PyME <span aria-hidden="true">→</span></a>
     </article>
     <article class="feature-card">
-      <div class="feature-top"><span class="feature-symbol" aria-hidden="true">▤</span><span class="status-pill">Entrega pendiente</span></div>
-      <h3>Recursos</h3><p>Conoce la plantilla gratuita de flujo de efectivo de 13 semanas prevista para Fase A.</p>
+      <div class="feature-top"><span class="feature-symbol" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M4 9h16M10 9v12M4 15h16"/></svg></span><span class="status-pill">Plantilla gratuita</span></div>
+      <h3>Recursos</h3><p>Conoce el Mapa de Caja PyME, una plantilla gratuita para organizar tus entradas y salidas de efectivo durante 13 semanas.</p>
       <a href="{% url 'resources' %}" data-home-cta="resources">Ver recursos <span aria-hidden="true">→</span></a>
     </article>
   </div>

@@ -18,7 +18,7 @@ PUBLIC_PAGES = frozenset({
     'blog', 'article_detail', 'store', 'store_detail', 'contact',
     'about', 'privacy', 'terms', 'entry',
 })
-HOME_CTAS = frozenset({'explore', 'tools', 'content', 'check', 'resources'})
+HOME_CTAS = frozenset({'explore', 'tools', 'content', 'check', 'resources', 'store'})
 BOT_MARKERS = ('bot', 'crawler', 'spider', 'headless')
 
 

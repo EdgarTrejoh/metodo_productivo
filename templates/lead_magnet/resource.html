@@ -12,7 +12,7 @@
   <section class="contact-panel" aria-labelledby="lead-form-title">
     <h2 id="lead-form-title">Recibe la plantilla gratuita</h2>
     {% if not available %}
-      <p class="calculator-notice" role="status">El archivo Excel definitivo aún no está disponible en este entorno. La solicitud por correo está temporalmente deshabilitada; no se enviará un enlace ficticio.</p>
+      <p class="calculator-notice" role="status">La plantilla no está disponible temporalmente. La solicitud por correo está deshabilitada; vuelve a consultar esta página más adelante.</p>
     {% else %}
       <p>Proporciona tu nombre y correo para recibir un enlace privado. Dura tres días y permite hasta tres accesos autorizados.</p>
       {% if form.non_field_errors %}<div class="contact-error-summary" role="alert">{{ form.non_field_errors }}</div>{% endif %}

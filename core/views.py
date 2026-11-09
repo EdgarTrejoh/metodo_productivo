@@ -11,6 +11,7 @@ from analytics.tracking import record_tool
 
 from analytics.models import ProductEvent
 from leads.forms import ContactForm
+from leads.lead_magnet import RESOURCE_KEY, storage
 from leads.notifications import notify_contact
 from .break_even import BreakEvenForm, calculate
 
@@ -28,8 +29,8 @@ PAGES = {
     'tools': {
         'template': 'tools.html',
         'eyebrow': 'Herramientas · Fase A',
-        'title': 'Calculadoras para preguntas concretas.',
-        'intro': 'Usa modelos sencillos para explorar decisiones de tu negocio. Comienza con el punto de equilibrio mensual.',
+        'title': 'Calcula el punto de equilibrio de tu negocio.',
+        'intro': 'Descubre cuántas unidades de un producto o servicio necesitas vender al mes para cubrir sus costos.',
         'status': 'Calculadora funcional · A-02 aprobada con salvedades',
         'note': 'El cálculo de punto de equilibrio funciona en este entorno de desarrollo; la medición transversal O-08 sigue pendiente.',
         'cards': [
@@ -41,7 +42,7 @@ PAGES = {
         'template': 'resources.html',
         'eyebrow': 'Recursos · Fase A',
         'title': 'Materiales para trabajar a tu ritmo.',
-        'intro': 'Recursos prácticos que podrás llevar a tu operación. El primero será una plantilla Excel de flujo de efectivo de 13 semanas.',
+        'intro': 'Conoce el Mapa de Caja PyME, una plantilla de flujo de efectivo de 13 semanas para apoyar tu operación.',
         'status': 'Estructura en desarrollo',
         'note': 'La captura y entrega del primer recurso aún no están operativas. Se implementarán en A-03.',
         'cards': [
@@ -60,19 +61,7 @@ PAGES = {
             {'title': 'Entrega futura', 'text': 'La solicitud y el acceso al archivo tendrán su propio recorrido cuando A-03 esté implementada.'},
         ],
     },
-    'about': {
-        'eyebrow': 'Método Productivo',
-        'title': 'Productividad con sentido.',
-        'intro': 'Método Productivo reúne conocimiento práctico de finanzas, negocios, datos y tecnología. Sus contenidos y herramientas ayudan a entender opciones y tomar decisiones; el Check PyME se enfoca en prácticas empresariales.',
-        'status': 'Contenido editorial provisional',
-        'note': 'La presentación institucional definitiva está pendiente de revisión editorial para A-08.',
-        'section_heading': 'Qué encontrarás aquí',
-        'cards': [
-            {'title': 'Aprender', 'text': 'Contenido claro para entender decisiones financieras y empresariales.'},
-            {'title': 'Aplicar', 'text': 'Herramientas prácticas y recursos para pasar a la acción.'},
-            {'title': 'Orientarse', 'text': 'Un Check inicial que puede abrir una conversación sobre los siguientes pasos.'},
-        ],
-    },
+    'about': {'template': 'about.html'},
     'privacy': {
         'eyebrow': 'Privacidad',
         'title': 'Aviso de privacidad en preparación.',
@@ -98,7 +87,8 @@ def section(request, page):
     context = PAGES[page]
     if page == 'privacy' and settings.DJANGO_ENV == 'local':
         return render(request, 'privacy.html', {'page': context})
-    return render(request, context.get('template', 'section.html'), {'page': context})
+    extra = {'resource_available': storage.available(RESOURCE_KEY)} if page == 'resources' else {}
+    return render(request, context.get('template', 'section.html'), {'page': context, **extra})
 
 
 @require_http_methods(['GET', 'POST'])
