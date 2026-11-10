@@ -1,7 +1,9 @@
 import re
+import uuid
 
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import connection, models, transaction
+from django.db.models import Q
 from django.utils import timezone
 
 from content.models import MediaAsset, PublicationStatus
@@ -92,3 +94,253 @@ class DigitalProduct(models.Model):
             self.stripe_environment == self.StripeEnvironment.TEST
             and TEST_PAYMENT_LINK.fullmatch(self.stripe_test_payment_url or '')
         )
+
+
+class ProtectedWriteQuerySet(models.QuerySet):
+    protected_fields = frozenset()
+
+    def update(self, **kwargs):
+        if self.protected_fields.intersection(kwargs):
+            raise ValidationError('Esta operación requiere el servicio transaccional.')
+        return super().update(**kwargs)
+
+    def bulk_update(self, objs, fields, batch_size=None):
+        if self.protected_fields.intersection(fields):
+            raise ValidationError('Esta operación requiere el servicio transaccional.')
+        return super().bulk_update(objs, fields, batch_size=batch_size)
+
+    def bulk_create(self, objs, *args, **kwargs):
+        raise ValidationError('La creación masiva requiere un proceso transaccional auditado.')
+
+
+class OrderQuerySet(ProtectedWriteQuerySet):
+    protected_fields = frozenset((
+        'public_id', 'creation_key', 'product', 'product_id', 'environment',
+        'product_name_snapshot', 'product_version_snapshot', 'amount_minor', 'currency',
+        'delivery_terms_snapshot', 'stripe_product_id_snapshot', 'stripe_price_id_snapshot',
+        'file_key_snapshot', 'file_revision_snapshot', 'file_sha256_snapshot',
+        'state', 'paid_at', 'closed_at', 'closed_reason',
+    ))
+
+
+class PaymentAttemptQuerySet(ProtectedWriteQuerySet):
+    protected_fields = frozenset((
+        'order', 'order_id', 'operation_id', 'request_idempotency_key', 'attempt_number',
+        'provider', 'provider_account_id', 'environment', 'amount_minor', 'currency',
+        'state', 'completed_at', 'result_code',
+    ))
+
+
+class AuditEventQuerySet(models.QuerySet):
+    def update(self, **kwargs):
+        raise ValidationError('Los eventos de auditoría no pueden modificarse.')
+
+    def bulk_update(self, objs, fields, batch_size=None):
+        raise ValidationError('Los eventos de auditoría no pueden modificarse.')
+
+    def delete(self):
+        raise ValidationError('Los eventos de auditoría no pueden eliminarse.')
+
+    def bulk_create(self, objs, *args, **kwargs):
+        raise ValidationError('Los eventos de auditoría requieren inserción individual.')
+
+
+class Order(models.Model):
+    class State(models.TextChoices):
+        CREATED = 'created', 'Creada'
+        AWAITING_PAYMENT = 'awaiting_payment', 'En espera de pago'
+        PAID = 'paid', 'Pagada'
+        CLOSED_UNPAID = 'closed_unpaid', 'Cerrada sin pago'
+        REVIEW = 'review', 'Revisión'
+
+    IMMUTABLE_FIELDS = (
+        'public_id', 'creation_key', 'product_id', 'environment', 'product_name_snapshot',
+        'product_version_snapshot', 'amount_minor', 'currency',
+        'delivery_terms_snapshot', 'stripe_product_id_snapshot',
+        'stripe_price_id_snapshot', 'file_key_snapshot',
+        'file_revision_snapshot', 'file_sha256_snapshot',
+    )
+
+    public_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    creation_key = models.UUIDField(unique=True, editable=False)
+    product = models.ForeignKey(DigitalProduct, on_delete=models.PROTECT, related_name='orders')
+    environment = models.CharField(max_length=4, choices=DigitalProduct.StripeEnvironment.choices)
+    state = models.CharField(max_length=20, choices=State.choices, default=State.CREATED)
+    product_name_snapshot = models.CharField(max_length=180)
+    product_version_snapshot = models.CharField(max_length=40)
+    amount_minor = models.PositiveBigIntegerField()
+    currency = models.CharField(max_length=3, default='MXN')
+    delivery_terms_snapshot = models.TextField()
+    stripe_product_id_snapshot = models.CharField(max_length=100, blank=True)
+    stripe_price_id_snapshot = models.CharField(max_length=100, blank=True)
+    file_key_snapshot = models.CharField(max_length=180)
+    # B-02A no dispone aún de un objeto privado versionado. Vacío significa no verificable.
+    file_revision_snapshot = models.CharField(max_length=180, blank=True)
+    file_sha256_snapshot = models.CharField(max_length=64, blank=True)
+    buyer_email = models.EmailField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    paid_at = models.DateTimeField(null=True, blank=True)
+    closed_at = models.DateTimeField(null=True, blank=True)
+    closed_reason = models.CharField(max_length=80, blank=True)
+    objects = OrderQuerySet.as_manager()
+
+    class Meta:
+        indexes = [models.Index(fields=['state', 'created_at'], name='store_order_state_created_idx')]
+        constraints = [
+            models.CheckConstraint(condition=Q(amount_minor__gt=0), name='store_order_positive_amount'),
+            models.CheckConstraint(condition=Q(currency='MXN'), name='store_order_mxn_only'),
+            models.CheckConstraint(condition=Q(environment__in=['test', 'live']), name='store_order_valid_environment'),
+            models.CheckConstraint(condition=Q(state__in=['created', 'awaiting_payment', 'paid', 'closed_unpaid', 'review']), name='store_order_valid_state'),
+            models.CheckConstraint(condition=~Q(state='paid') | Q(paid_at__isnull=False), name='store_order_paid_has_date'),
+            models.CheckConstraint(condition=~Q(state='closed_unpaid') | Q(closed_at__isnull=False), name='store_order_closed_has_date'),
+        ]
+
+    def save(self, *args, **kwargs):
+        creating = self._state.adding
+        if self.pk:
+            original = type(self).objects.get(pk=self.pk)
+            if any(getattr(self, field) != getattr(original, field) for field in self.IMMUTABLE_FIELDS):
+                raise ValidationError('La fotografía comercial de la orden no puede modificarse.')
+            if any(getattr(self, field) != getattr(original, field) for field in
+                   ('state', 'paid_at', 'closed_at', 'closed_reason')):
+                raise ValidationError('El estado de la orden requiere el servicio transaccional.')
+        elif self.state != self.State.CREATED or self.paid_at or self.closed_at or self.closed_reason:
+            raise ValidationError('B-02A solo permite crear órdenes en estado CREATED.')
+        self.full_clean(validate_unique=False, validate_constraints=False)
+        with transaction.atomic():
+            super().save(*args, **kwargs)
+            if creating and connection.vendor != 'postgresql':
+                OrderAuditEvent.objects.create(
+                    order=self, operation_id=uuid.uuid4(), subject=OrderAuditEvent.Subject.ORDER,
+                    actor=OrderAuditEvent.Actor.SYSTEM, action='created',
+                    to_state=self.State.CREATED, correlation_id=self.creation_key,
+                )
+
+
+class PaymentAttempt(models.Model):
+    class State(models.TextChoices):
+        PREPARED = 'prepared', 'Preparado'
+        SESSION_OPEN = 'session_open', 'Sesión abierta'
+        PROCESSING = 'processing', 'Procesando'
+        SUCCEEDED = 'succeeded', 'Exitoso'
+        FAILED = 'failed', 'Fallido'
+        EXPIRED = 'expired', 'Vencido'
+        REVIEW = 'review', 'Revisión'
+
+    ACTIVE_STATES = (State.PREPARED, State.SESSION_OPEN, State.PROCESSING)
+
+    order = models.ForeignKey(Order, on_delete=models.PROTECT, related_name='payment_attempts')
+    operation_id = models.UUIDField(unique=True, editable=False)
+    request_idempotency_key = models.UUIDField(editable=False)
+    attempt_number = models.PositiveSmallIntegerField()
+    provider = models.CharField(max_length=16, default='stripe')
+    provider_account_id = models.CharField(max_length=100)
+    environment = models.CharField(max_length=4, choices=DigitalProduct.StripeEnvironment.choices)
+    state = models.CharField(max_length=16, choices=State.choices, default=State.PREPARED)
+    checkout_session_id = models.CharField(max_length=255, blank=True)
+    payment_intent_id = models.CharField(max_length=255, blank=True)
+    amount_minor = models.PositiveBigIntegerField()
+    currency = models.CharField(max_length=3, default='MXN')
+    result_code = models.CharField(max_length=80, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    bound_at = models.DateTimeField(null=True, blank=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    objects = PaymentAttemptQuerySet.as_manager()
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['order', 'created_at'], name='store_att_order_created_idx'),
+            models.Index(fields=['environment', 'state', 'created_at'], name='store_attempt_env_state_idx'),
+        ]
+        constraints = [
+            models.CheckConstraint(condition=Q(attempt_number__gt=0), name='store_attempt_positive_number'),
+            models.CheckConstraint(condition=Q(amount_minor__gt=0), name='store_attempt_positive_amount'),
+            models.CheckConstraint(condition=Q(currency='MXN'), name='store_attempt_mxn_only'),
+            models.CheckConstraint(condition=Q(environment__in=['test', 'live']), name='store_attempt_valid_environment'),
+            models.CheckConstraint(condition=Q(provider='stripe'), name='store_attempt_stripe_only'),
+            models.CheckConstraint(condition=~Q(provider_account_id=''), name='store_attempt_has_account'),
+            models.CheckConstraint(condition=Q(state__in=['prepared', 'session_open', 'processing', 'succeeded', 'failed', 'expired', 'review']), name='store_attempt_valid_state'),
+            models.UniqueConstraint(fields=['order', 'attempt_number'], name='store_attempt_order_number_unique'),
+            models.UniqueConstraint(fields=['provider', 'provider_account_id', 'environment', 'request_idempotency_key'], name='store_attempt_request_unique'),
+            models.UniqueConstraint(fields=['provider', 'provider_account_id', 'environment', 'checkout_session_id'], condition=~Q(checkout_session_id=''), name='store_attempt_session_unique'),
+            models.UniqueConstraint(fields=['provider', 'provider_account_id', 'environment', 'payment_intent_id'], condition=~Q(payment_intent_id=''), name='store_attempt_intent_unique'),
+            models.UniqueConstraint(fields=['order'], condition=Q(state__in=['prepared', 'session_open', 'processing']), name='store_attempt_one_active'),
+        ]
+
+    def clean(self):
+        super().clean()
+        if self.order_id and (
+            self.environment != self.order.environment
+            or self.amount_minor != self.order.amount_minor
+            or self.currency != self.order.currency
+        ):
+            raise ValidationError('El intento debe coincidir con el entorno, importe y moneda de la orden.')
+
+    def save(self, *args, **kwargs):
+        creating = self._state.adding
+        if self.pk:
+            original = type(self).objects.get(pk=self.pk)
+            if any(getattr(self, field) != getattr(original, field) for field in
+                   ('order_id', 'operation_id', 'request_idempotency_key', 'attempt_number',
+                    'provider', 'provider_account_id', 'environment', 'amount_minor',
+                    'currency', 'state', 'completed_at', 'result_code')):
+                raise ValidationError('El intento requiere el servicio transaccional.')
+        elif (self.state != self.State.PREPARED or self.completed_at or self.result_code
+              or self.checkout_session_id or self.payment_intent_id or self.bound_at):
+            raise ValidationError('B-02A solo permite preparar intentos sin referencias externas.')
+        if self.order_id and not self.pk and Order.objects.get(pk=self.order_id).state not in (
+            Order.State.CREATED, Order.State.AWAITING_PAYMENT
+        ):
+            raise ValidationError('No se permiten intentos nuevos en una orden cerrada.')
+        self.full_clean(validate_unique=False, validate_constraints=False)
+        with transaction.atomic():
+            super().save(*args, **kwargs)
+            if creating and connection.vendor != 'postgresql':
+                OrderAuditEvent.objects.create(
+                    order=self.order, attempt=self, operation_id=uuid.uuid4(),
+                    subject=OrderAuditEvent.Subject.ATTEMPT,
+                    actor=OrderAuditEvent.Actor.SYSTEM, action='prepared',
+                    to_state=self.State.PREPARED, correlation_id=self.operation_id,
+                )
+
+
+class OrderAuditEvent(models.Model):
+    class Actor(models.TextChoices):
+        SYSTEM = 'system', 'Sistema'
+        ADMIN = 'admin', 'Administrador'
+
+    class Subject(models.TextChoices):
+        ORDER = 'order', 'Orden'
+        ATTEMPT = 'attempt', 'Intento'
+
+    order = models.ForeignKey(Order, on_delete=models.PROTECT, related_name='audit_events')
+    attempt = models.ForeignKey(PaymentAttempt, null=True, blank=True, on_delete=models.PROTECT, related_name='audit_events')
+    operation_id = models.UUIDField(unique=True, editable=False)
+    subject = models.CharField(max_length=12, choices=Subject.choices)
+    actor = models.CharField(max_length=12, choices=Actor.choices)
+    actor_ref = models.CharField(max_length=80, blank=True)
+    action = models.CharField(max_length=48)
+    from_state = models.CharField(max_length=20, blank=True)
+    to_state = models.CharField(max_length=20, blank=True)
+    reason = models.CharField(max_length=200, blank=True)
+    correlation_id = models.UUIDField(null=True, blank=True)
+    occurred_at = models.DateTimeField(auto_now_add=True)
+    objects = AuditEventQuerySet.as_manager()
+
+    class Meta:
+        indexes = [models.Index(fields=['order', 'occurred_at'], name='store_audit_order_date_idx')]
+        constraints = [
+            models.CheckConstraint(condition=Q(actor__in=['system', 'admin']), name='store_audit_valid_actor'),
+            models.CheckConstraint(condition=Q(subject__in=['order', 'attempt']), name='store_audit_valid_subject'),
+            models.CheckConstraint(condition=Q(subject='order') | Q(attempt__isnull=False), name='store_audit_attempt_required'),
+        ]
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            raise ValidationError('Los eventos de auditoría son inmutables.')
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError('Los eventos de auditoría no pueden eliminarse.')
