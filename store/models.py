@@ -400,6 +400,64 @@ class CheckoutRequest(models.Model):
         super().save(*args, **kwargs)
 
 
+class PaymentProviderEvent(models.Model):
+    """Recepción autenticada. No constituye autorización de pago."""
+
+    class State(models.TextChoices):
+        VERIFIED = 'verified', 'Firma verificada'
+        PENDING = 'pending_reconciliation', 'Pendiente de conciliación'
+        CONTRADICTION = 'contradiction', 'Contradicción'
+        APPLIED = 'applied', 'Aplicado por incremento posterior'
+
+    provider = models.CharField(max_length=16, default='stripe')
+    provider_account_id = models.CharField(max_length=100)
+    environment = models.CharField(max_length=4, choices=DigitalProduct.StripeEnvironment.choices)
+    external_event_id = models.CharField(max_length=255)
+    event_type = models.CharField(max_length=100)
+    external_object_id = models.CharField(max_length=255)
+    raw_sha256 = models.CharField(max_length=64)
+    provider_created_at = models.DateTimeField()
+    received_at = models.DateTimeField(auto_now_add=True)
+    verified_at = models.DateTimeField()
+    state = models.CharField(max_length=24, choices=State.choices, default=State.VERIFIED)
+    reason_code = models.CharField(max_length=80, blank=True)
+    order = models.ForeignKey(Order, null=True, blank=True, on_delete=models.PROTECT, related_name='provider_events')
+    attempt = models.ForeignKey(PaymentAttempt, null=True, blank=True, on_delete=models.PROTECT, related_name='provider_events')
+    claimed_operation_id = models.UUIDField(null=True, blank=True)
+    claimed_order_public_id = models.UUIDField(null=True, blank=True)
+    claimed_payment_intent_id = models.CharField(max_length=255, blank=True)
+    claimed_amount_minor = models.PositiveBigIntegerField(null=True, blank=True)
+    claimed_currency = models.CharField(max_length=3, blank=True)
+    claimed_payment_status = models.CharField(max_length=24, blank=True)
+    conflict_count = models.PositiveIntegerField(default=0)
+    retry_count = models.PositiveIntegerField(default=0)
+    last_attempt_at = models.DateTimeField(null=True, blank=True)
+    processed_at = models.DateTimeField(null=True, blank=True)
+
+    IMMUTABLE_FIELDS = ('provider', 'provider_account_id', 'environment', 'external_event_id',
+        'event_type', 'external_object_id', 'raw_sha256', 'provider_created_at',
+        'verified_at', 'claimed_operation_id', 'claimed_order_public_id',
+        'claimed_payment_intent_id', 'claimed_amount_minor', 'claimed_currency',
+        'claimed_payment_status')
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['provider', 'provider_account_id', 'environment', 'external_event_id'], name='store_provider_event_identity_unique'),
+            models.CheckConstraint(condition=Q(provider='stripe'), name='store_provider_event_stripe_only'),
+            models.CheckConstraint(condition=Q(environment__in=['test', 'live']), name='store_provider_event_environment'),
+            models.CheckConstraint(condition=Q(state__in=['verified', 'pending_reconciliation', 'contradiction', 'applied']), name='store_provider_event_state'),
+        ]
+        indexes = [models.Index(fields=['state', 'received_at'], name='store_event_state_received_idx')]
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            old = type(self).objects.get(pk=self.pk)
+            if any(getattr(self, field) != getattr(old, field) for field in self.IMMUTABLE_FIELDS):
+                raise ValidationError('La evidencia autenticada es inmutable.')
+        self.full_clean(validate_unique=False, validate_constraints=False)
+        super().save(*args, **kwargs)
+
+
 class OrderAuditEvent(models.Model):
     class Actor(models.TextChoices):
         SYSTEM = 'system', 'Sistema'
