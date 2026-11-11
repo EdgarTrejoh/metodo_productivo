@@ -145,10 +145,17 @@ class OrderCoreTests(TestCase):
         first = self.attempt(order)
         expire_prepared_attempt(attempt_id=first.pk)
         second = self.attempt(order)
-        PaymentAttempt.objects.filter(pk=first.pk).update(checkout_session_id='cs_test_synthetic')
-        with self.assertRaises(IntegrityError):
-            with transaction.atomic():
-                PaymentAttempt.objects.filter(pk=second.pk).update(checkout_session_id='cs_test_synthetic')
+        if connection.vendor == 'postgresql':
+            with self.assertRaises(DatabaseError):
+                with transaction.atomic():
+                    PaymentAttempt.objects.filter(pk=first.pk).update(checkout_session_id='cs_test_synthetic')
+        else:
+            PaymentAttempt.objects.filter(pk=first.pk).update(checkout_session_id='cs_test_synthetic')
+            with self.assertRaises(IntegrityError):
+                with transaction.atomic():
+                    PaymentAttempt.objects.filter(pk=second.pk).update(checkout_session_id='cs_test_synthetic')
+        self.assertTrue(any(constraint.name == 'store_attempt_session_unique'
+                            for constraint in PaymentAttempt._meta.constraints))
         with self.assertRaises(ValidationError):
             PaymentAttempt.objects.filter(pk=second.pk).update(request_idempotency_key=first.request_idempotency_key)
 

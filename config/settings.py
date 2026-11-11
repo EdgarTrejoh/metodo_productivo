@@ -48,6 +48,7 @@ else:
     ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1,testserver').split(',')
 
 STORE_TEST_CHECKOUT_ENABLED = os.getenv('STORE_TEST_CHECKOUT_ENABLED', '0') == '1'
+CHECKOUT_RETURN_ORIGIN = os.getenv('CHECKOUT_RETURN_ORIGIN', 'https://example.invalid' if DJANGO_ENV == 'local' else '')
 INSTALLED_APPS = ['django.contrib.admin', 'django.contrib.auth', 'django.contrib.contenttypes', 'django.contrib.sessions', 'django.contrib.messages', 'django.contrib.staticfiles', 'django_otp', 'django_otp.plugins.otp_totp', 'leads', 'diagnostics', 'analytics', 'content', 'store']
 MIDDLEWARE = ['django.middleware.security.SecurityMiddleware', 'django.contrib.sessions.middleware.SessionMiddleware', 'django.middleware.common.CommonMiddleware', 'django.middleware.csrf.CsrfViewMiddleware', 'django.contrib.auth.middleware.AuthenticationMiddleware', 'django_otp.middleware.OTPMiddleware', 'django.contrib.messages.middleware.MessageMiddleware', 'django.middleware.clickjacking.XFrameOptionsMiddleware', 'core.middleware.CheckContextMiddleware', 'analytics.middleware.PublicNavigationMiddleware']
 if DJANGO_ENV == 'staging':
