@@ -1,7 +1,9 @@
 import re
 import uuid
+from datetime import timedelta
 
 from django.core.exceptions import ValidationError
+from django.core.validators import RegexValidator
 from django.db import connection, models, transaction
 from django.db.models import Q
 from django.utils import timezone
@@ -119,6 +121,7 @@ class OrderQuerySet(ProtectedWriteQuerySet):
         'product_name_snapshot', 'product_version_snapshot', 'amount_minor', 'currency',
         'delivery_terms_snapshot', 'stripe_product_id_snapshot', 'stripe_price_id_snapshot',
         'file_key_snapshot', 'file_revision_snapshot', 'file_sha256_snapshot',
+        'file_size_bytes_snapshot',
         'state', 'paid_at', 'closed_at', 'closed_reason',
     ))
 
@@ -159,6 +162,7 @@ class Order(models.Model):
         'delivery_terms_snapshot', 'stripe_product_id_snapshot',
         'stripe_price_id_snapshot', 'file_key_snapshot',
         'file_revision_snapshot', 'file_sha256_snapshot',
+        'file_size_bytes_snapshot',
     )
 
     public_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
@@ -177,6 +181,8 @@ class Order(models.Model):
     # B-02A no dispone aún de un objeto privado versionado. Vacío significa no verificable.
     file_revision_snapshot = models.CharField(max_length=180, blank=True)
     file_sha256_snapshot = models.CharField(max_length=64, blank=True)
+    # B-02B: los registros anteriores carecen de una versión privada verificable.
+    file_size_bytes_snapshot = models.PositiveBigIntegerField(null=True, blank=True)
     buyer_email = models.EmailField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -191,6 +197,7 @@ class Order(models.Model):
             models.CheckConstraint(condition=Q(amount_minor__gt=0), name='store_order_positive_amount'),
             models.CheckConstraint(condition=Q(currency='MXN'), name='store_order_mxn_only'),
             models.CheckConstraint(condition=Q(environment__in=['test', 'live']), name='store_order_valid_environment'),
+            models.CheckConstraint(condition=Q(file_size_bytes_snapshot__isnull=True) | Q(file_size_bytes_snapshot__gt=0), name='store_order_file_size_positive'),
             models.CheckConstraint(condition=Q(state__in=['created', 'awaiting_payment', 'paid', 'closed_unpaid', 'review']), name='store_order_valid_state'),
             models.CheckConstraint(condition=~Q(state='paid') | Q(paid_at__isnull=False), name='store_order_paid_has_date'),
             models.CheckConstraint(condition=~Q(state='closed_unpaid') | Q(closed_at__isnull=False), name='store_order_closed_has_date'),
@@ -344,3 +351,106 @@ class OrderAuditEvent(models.Model):
 
     def delete(self, *args, **kwargs):
         raise ValidationError('Los eventos de auditoría no pueden eliminarse.')
+
+
+class DeliveryEntitlementQuerySet(models.QuerySet):
+    """B-02B solo define el derecho; sus cambios operativos llegan en B-03 a B-06."""
+
+    def update(self, **kwargs):
+        raise ValidationError('Los derechos todavía no admiten modificaciones operativas.')
+
+    def bulk_update(self, objs, fields, batch_size=None):
+        raise ValidationError('Los derechos todavía no admiten modificaciones operativas.')
+
+    def bulk_create(self, objs, *args, **kwargs):
+        raise ValidationError('Los derechos requieren una concesión transaccional auditada.')
+
+    def delete(self):
+        raise ValidationError('Los derechos no pueden eliminarse.')
+
+
+class DeliveryEntitlement(models.Model):
+    class Status(models.TextChoices):
+        ACTIVE = 'active', 'Activo'
+        SUSPENDED = 'suspended', 'Suspendido'
+        REVOKED = 'revoked', 'Revocado'
+
+    order = models.OneToOneField(Order, on_delete=models.PROTECT, related_name='delivery_entitlement')
+    source_attempt = models.OneToOneField(
+        PaymentAttempt, on_delete=models.PROTECT, related_name='delivery_entitlement',
+    )
+    grant_correlation_id = models.UUIDField(unique=True, editable=False)
+    environment = models.CharField(max_length=4, choices=DigitalProduct.StripeEnvironment.choices)
+    status = models.CharField(max_length=12, choices=Status.choices, default=Status.ACTIVE)
+    paid_at = models.DateTimeField()
+    expires_at = models.DateTimeField()
+    file_object_identifier = models.CharField(max_length=180)
+    file_version_id = models.CharField(max_length=180)
+    file_sha256 = models.CharField(
+        max_length=64, validators=[RegexValidator(r'\A[0-9a-f]{64}\Z', 'Indica un SHA-256 hexadecimal en minúsculas.')],
+    )
+    file_size_bytes = models.PositiveBigIntegerField()
+    download_limit = models.PositiveSmallIntegerField(default=3)
+    successful_downloads = models.PositiveSmallIntegerField(default=0)
+    suspended_at = models.DateTimeField(null=True, blank=True)
+    revoked_at = models.DateTimeField(null=True, blank=True)
+    status_reason_code = models.CharField(max_length=80, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    objects = DeliveryEntitlementQuerySet.as_manager()
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['environment', 'status', 'expires_at'], name='store_ent_env_status_exp_idx'),
+        ]
+        constraints = [
+            models.CheckConstraint(condition=Q(environment__in=['test', 'live']), name='store_ent_valid_environment'),
+            models.CheckConstraint(condition=Q(status__in=['active', 'suspended', 'revoked']), name='store_ent_valid_status'),
+            models.CheckConstraint(condition=Q(download_limit=3), name='store_ent_three_downloads'),
+            models.CheckConstraint(condition=Q(successful_downloads__gte=0, successful_downloads__lte=3), name='store_ent_download_range'),
+            models.CheckConstraint(condition=Q(file_size_bytes__gt=0), name='store_ent_positive_file_size'),
+            models.CheckConstraint(condition=~Q(file_object_identifier=''), name='store_ent_has_object'),
+            models.CheckConstraint(condition=~Q(file_version_id=''), name='store_ent_has_version'),
+            models.CheckConstraint(condition=Q(file_sha256__regex=r'^[0-9a-f]{64}$'), name='store_ent_valid_sha256'),
+            models.CheckConstraint(condition=Q(expires_at__gt=models.F('paid_at')), name='store_ent_positive_term'),
+        ]
+
+    def clean(self):
+        super().clean()
+        errors = {}
+        if self.order_id and self.source_attempt_id:
+            order = self.order
+            attempt = self.source_attempt
+            if order.state != Order.State.PAID or order.paid_at is None:
+                errors['order'] = 'El derecho requiere una orden pagada y verificada.'
+            if attempt.order_id != order.pk or attempt.state != PaymentAttempt.State.SUCCEEDED:
+                errors['source_attempt'] = 'El intento confirmado debe pertenecer a la orden.'
+            if self.environment != order.environment or self.environment != attempt.environment:
+                errors['environment'] = 'El entorno debe coincidir con orden e intento.'
+            if self.paid_at != order.paid_at:
+                errors['paid_at'] = 'La vigencia comienza en el pago efectivo de la orden.'
+            if self.file_object_identifier != order.file_key_snapshot or not order.file_revision_snapshot:
+                errors['file_object_identifier'] = 'La orden requiere un objeto privado versionado.'
+            if self.file_version_id != order.file_revision_snapshot:
+                errors['file_version_id'] = 'La versión debe coincidir con la orden.'
+            if self.file_sha256 != order.file_sha256_snapshot:
+                errors['file_sha256'] = 'El digest debe coincidir con la orden.'
+            if self.file_size_bytes != order.file_size_bytes_snapshot:
+                errors['file_size_bytes'] = 'El tamaño debe coincidir con la orden.'
+        if self.paid_at and self.expires_at != self.paid_at + timedelta(hours=336):
+            errors['expires_at'] = 'El vencimiento debe ser exactamente 336 horas después del pago.'
+        if self._state.adding and (self.status != self.Status.ACTIVE or self.successful_downloads != 0
+                                   or self.suspended_at or self.revoked_at or self.status_reason_code):
+            errors['status'] = 'B-02B solo define el estado inicial sin operaciones administrativas.'
+        if errors:
+            raise ValidationError(errors)
+
+    def save(self, *args, **kwargs):
+        if not self._state.adding:
+            raise ValidationError('Los derechos todavía no admiten modificaciones operativas.')
+        self.full_clean()
+        with transaction.atomic():
+            super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError('Los derechos no pueden eliminarse.')
