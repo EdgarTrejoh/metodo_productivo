@@ -9,7 +9,8 @@ from django.db.models import Max, QuerySet
 from django.utils import timezone
 
 from content.models import PublicationStatus
-from store.models import DigitalProduct, Order, OrderAuditEvent, PaymentAttempt
+from store.models import DigitalProduct, Order, OrderAuditEvent, PaymentAttempt, ProductFileVersion
+from store.file_versions import verify_file_version, FileVersionError
 
 
 class OrderConflict(ValueError):
@@ -87,6 +88,16 @@ def create_order(*, product_id, creation_key, environment):
             if product.currency != 'MXN' or product.stripe_environment != environment:
                 raise InvalidOrderOperation('Moneda o entorno del producto incompatibles.')
             amount_minor = _minor_units(product.price)
+            version = ProductFileVersion.objects.select_for_update().filter(
+                pk=product.sellable_file_version_id, product=product, available_for_sale=True,
+            ).first()
+            if product.sellable_file_version_id and version is None:
+                raise InvalidOrderOperation('La versión privada seleccionada no está apta para venta.')
+            if version:
+                try:
+                    verify_file_version(version)
+                except FileVersionError as exc:
+                    raise InvalidOrderOperation(str(exc)) from exc
             order = Order.objects.create(
                 creation_key=creation_key, product=product, environment=environment,
                 product_name_snapshot=product.name, product_version_snapshot=product.version,
@@ -94,7 +105,10 @@ def create_order(*, product_id, creation_key, environment):
                 delivery_terms_snapshot=product.delivery_terms,
                 stripe_product_id_snapshot=product.stripe_product_id,
                 stripe_price_id_snapshot=product.stripe_price_id,
-                file_key_snapshot=product.private_file_key,
+                file_key_snapshot=version.object_identifier if version else product.private_file_key,
+                file_revision_snapshot=version.version_id if version else '',
+                file_sha256_snapshot=version.sha256 if version else '',
+                file_size_bytes_snapshot=version.size_bytes if version else None,
             )
             return order
     except IntegrityError:
