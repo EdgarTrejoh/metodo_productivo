@@ -12,7 +12,7 @@ from django.test import TestCase, TransactionTestCase
 from django.utils import timezone
 
 from content.models import PublicationStatus
-from store.models import DigitalProduct, Order, OrderAuditEvent, PaymentAttempt
+from store.models import DeliveryEntitlement, DigitalProduct, Order, OrderAuditEvent, PaymentAttempt
 from store.order_services import (
     InvalidOrderOperation, OrderConflict, close_unpaid_order, create_order,
     expire_prepared_attempt, get_order_by_creation_key, prepare_payment_attempt,
@@ -167,7 +167,7 @@ class OrderCoreTests(TestCase):
         self.attempt(order)
         self.assertEqual(order.state, Order.State.CREATED)
         self.assertEqual(order.payment_attempts.count(), 1)
-        self.assertFalse(any(model.__name__ == 'DeliveryEntitlement' for model in Order._meta.apps.get_models()))
+        self.assertFalse(DeliveryEntitlement.objects.filter(order=order).exists())
 
 
 class OrderIntegrityR01Tests(TransactionTestCase):
