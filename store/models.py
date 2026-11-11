@@ -368,6 +368,38 @@ class PaymentAttempt(models.Model):
                 )
 
 
+class CheckoutRequest(models.Model):
+    """Una solicitud externa por intento; nunca representa pago confirmado."""
+
+    class State(models.TextChoices):
+        CALLING = 'calling', 'Solicitud iniciada'
+        UNCERTAIN = 'uncertain', 'Resultado incierto'
+        BOUND = 'bound', 'Sesión vinculada'
+
+    attempt = models.OneToOneField(PaymentAttempt, on_delete=models.PROTECT, related_name='checkout_request')
+    parameters_sha256 = models.CharField(max_length=64, validators=[RegexValidator(r'\A[0-9a-f]{64}\Z')])
+    state = models.CharField(max_length=12, choices=State.choices, default=State.CALLING)
+    session_id = models.CharField(max_length=255, blank=True)
+    session_expires_at = models.DateTimeField(null=True, blank=True)
+    started_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(condition=Q(state__in=['calling', 'uncertain', 'bound']), name='store_checkout_request_state'),
+            models.CheckConstraint(condition=~Q(state='bound') | ~Q(session_id=''), name='store_checkout_bound_has_session'),
+            models.CheckConstraint(condition=Q(state='bound') | Q(session_id=''), name='store_checkout_unbound_no_session'),
+        ]
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            old = type(self).objects.get(pk=self.pk)
+            if (self.attempt_id != old.attempt_id or self.parameters_sha256 != old.parameters_sha256):
+                raise ValidationError('La operación de Checkout es inmutable.')
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+
 class OrderAuditEvent(models.Model):
     class Actor(models.TextChoices):
         SYSTEM = 'system', 'Sistema'
