@@ -40,6 +40,7 @@ class DigitalProduct(models.Model):
         help_text='Solo para el piloto local. Usa un Payment Link HTTPS de buy.stripe.com/test_; no habilita ventas reales ni entrega archivos.',
     )
     private_file_key = models.SlugField('identificador lógico del archivo privado', max_length=180, blank=True)
+    sellable_file_version = models.ForeignKey('ProductFileVersion', null=True, blank=True, on_delete=models.PROTECT, related_name='+')
     created_at = models.DateTimeField('creado', auto_now_add=True)
     updated_at = models.DateTimeField('actualizado', auto_now=True)
     published_at = models.DateTimeField('publicado', null=True, blank=True)
@@ -76,6 +77,8 @@ class DigitalProduct(models.Model):
                 errors['price'] = 'Indica el precio antes de publicar.'
         if errors:
             raise ValidationError(errors)
+        if self.sellable_file_version_id and self.sellable_file_version.product_id != self.pk:
+            raise ValidationError({'sellable_file_version': 'La versión debe pertenecer al producto.'})
 
     def save(self, *args, **kwargs):
         self.full_clean()
@@ -96,6 +99,58 @@ class DigitalProduct(models.Model):
             self.stripe_environment == self.StripeEnvironment.TEST
             and TEST_PAYMENT_LINK.fullmatch(self.stripe_test_payment_url or '')
         )
+
+
+class ProductFileVersion(models.Model):
+    """Identidad privada; el binario permanece fuera de PostgreSQL."""
+
+    class Backend(models.TextChoices):
+        LOCAL = 'local', 'Local de pruebas'
+        GCS = 'gcs', 'Google Cloud Storage'
+
+    product = models.ForeignKey(DigitalProduct, on_delete=models.PROTECT, related_name='file_versions')
+    backend = models.CharField(max_length=12, choices=Backend.choices)
+    object_identifier = models.CharField(max_length=180)
+    version_id = models.CharField(max_length=180)
+    sha256 = models.CharField(max_length=64, validators=[RegexValidator(r'\A[0-9a-f]{64}\Z')])
+    size_bytes = models.PositiveBigIntegerField()
+    last_verified_at = models.DateTimeField(null=True, blank=True)
+    last_verification_result = models.CharField(max_length=24, blank=True)
+    available_for_sale = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    IMMUTABLE_FIELDS = ('product_id', 'backend', 'object_identifier', 'version_id', 'sha256', 'size_bytes')
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['object_identifier', 'version_id'], name='store_file_version_identity_unique'),
+            models.CheckConstraint(condition=Q(size_bytes__gt=0), name='store_file_version_size_positive'),
+            models.CheckConstraint(condition=Q(sha256__regex=r'^[0-9a-f]{64}$'), name='store_file_version_sha256_valid'),
+            models.CheckConstraint(condition=Q(backend__in=['local', 'gcs']), name='store_file_version_backend_valid'),
+            models.CheckConstraint(condition=~Q(object_identifier=''), name='store_file_version_object_required'),
+            models.CheckConstraint(condition=~Q(version_id=''), name='store_file_version_revision_required'),
+        ]
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            old = type(self).objects.get(pk=self.pk)
+            if any(getattr(self, field) != getattr(old, field) for field in self.IMMUTABLE_FIELDS):
+                raise ValidationError('La identidad de la versión es inmutable.')
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+
+class ProductFileSelectionEvent(models.Model):
+    product = models.ForeignKey(DigitalProduct, on_delete=models.PROTECT, related_name='file_selection_events')
+    previous_version = models.ForeignKey(ProductFileVersion, null=True, blank=True, on_delete=models.PROTECT, related_name='+')
+    selected_version = models.ForeignKey(ProductFileVersion, on_delete=models.PROTECT, related_name='+')
+    actor_ref = models.CharField(max_length=80, default='system')
+    occurred_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            raise ValidationError('El registro de selección es inmutable.')
+        super().save(*args, **kwargs)
 
 
 class ProtectedWriteQuerySet(models.QuerySet):

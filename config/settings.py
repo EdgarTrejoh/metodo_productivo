@@ -77,6 +77,7 @@ EMAIL_BACKEND = os.getenv('DJANGO_EMAIL_BACKEND', 'django.core.mail.backends.loc
 DEFAULT_FROM_EMAIL = 'notificaciones@localhost.invalid'
 CONTACT_NOTIFICATION_EMAIL = os.getenv('CONTACT_NOTIFICATION_EMAIL', '').strip()
 PRIVATE_RESOURCE_ROOT = Path(os.getenv('PRIVATE_RESOURCE_ROOT', BASE_DIR / 'private_resources')).resolve()
+PRIVATE_PRODUCT_ROOT = Path(os.getenv('PRIVATE_PRODUCT_ROOT', BASE_DIR / 'private_products')).resolve()
 
 if DJANGO_ENV == 'staging':
     SESSION_COOKIE_SECURE = True
