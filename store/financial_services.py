@@ -4,12 +4,13 @@ import uuid
 from dataclasses import dataclass
 from datetime import timedelta, timezone as dt_timezone
 
+from django.conf import settings
 from django.db import connection, models
 from django.utils import timezone
 
 from store.file_versions import (FileVersionMismatch, FileVersionTransientError,
                                  FileVersionUnavailable, verify_file_version)
-from store.financial_provider import SimulatedFinancialProvider, SimulatedProviderUnavailable
+from store.financial_provider import ProviderUnavailable, SimulatedFinancialProvider
 from store.models import (CheckoutRequest, DeliveryEntitlement, FinancialVerification, Order,
                           PaymentAttempt, PaymentProviderEvent, ProductFileVersion)
 
@@ -124,13 +125,29 @@ def _record_review(order, attempt, request, finance_connection, reason):
 
 
 def reconcile_simulated_payment(*, order_id, provider, finance_connection, provider_event_id=None):
+    if type(provider) is not SimulatedFinancialProvider:
+        raise FinancialConflict('simulator_required')
+    return _reconcile_payment(order_id=order_id, provider=provider,
+        finance_connection=finance_connection, provider_event_id=provider_event_id)
+
+
+def reconcile_test_payment(*, order_id, provider, finance_connection, provider_event_id=None):
+    """Conciliación TEST explícita, sin autoridad financiera en el proceso web."""
+    from store.stripe_test_provider import StripeTestProvider
+    if type(provider) is not StripeTestProvider or not settings.STRIPE_TEST_ADAPTER_ENABLED:
+        raise FinancialConflict('stripe_test_provider_disabled')
+    return _reconcile_payment(order_id=order_id, provider=provider,
+        finance_connection=finance_connection, provider_event_id=provider_event_id)
+
+
+def _reconcile_payment(*, order_id, provider, finance_connection, provider_event_id=None):
     """Consulta sin bloqueo de BD; la función SQL revalida y concede atómicamente.
 
     finance_connection es una conexión psycopg autenticada con un login distinto
     del usuario web y miembro solo de mp_b03d_executor_test.
     """
-    if connection.vendor != 'postgresql' or type(provider) is not SimulatedFinancialProvider:
-        raise FinancialConflict('postgresql_and_simulator_required')
+    if connection.vendor != 'postgresql':
+        raise FinancialConflict('postgresql_required')
     order = Order.objects.get(pk=order_id)
     if order.state == Order.State.PAID:
         entitlement = DeliveryEntitlement.objects.get(order=order)
@@ -159,8 +176,11 @@ def reconcile_simulated_payment(*, order_id, provider, finance_connection, provi
     except KeyError:
         return _record_review(order, attempt, request, finance_connection,
                               'provider_object_missing')
-    except SimulatedProviderUnavailable:
+    except ProviderUnavailable:
         return ReconciliationResult('pending', reason='provider_unavailable')
+    except ValueError as exc:
+        return _record_review(order, attempt, request, finance_connection,
+                              'provider_response_invalid')
     if issue == 'payment_pending':
         return ReconciliationResult('pending', reason=issue)
     event_row = None
