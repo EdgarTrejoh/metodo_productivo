@@ -458,6 +458,76 @@ class PaymentProviderEvent(models.Model):
         super().save(*args, **kwargs)
 
 
+class FinancialVerificationQuerySet(models.QuerySet):
+    def update(self, **kwargs):
+        raise ValidationError('La verificación financiera requiere la operación restringida.')
+
+    def bulk_update(self, objs, fields, batch_size=None):
+        raise ValidationError('La verificación financiera requiere la operación restringida.')
+
+    def bulk_create(self, objs, *args, **kwargs):
+        raise ValidationError('La verificación financiera requiere la operación restringida.')
+
+    def delete(self):
+        raise ValidationError('La verificación financiera es persistente.')
+
+
+class FinancialVerification(models.Model):
+    """Hechos saneados consultados al proveedor; no es por sí sola un derecho."""
+
+    class State(models.TextChoices):
+        PENDING_DELIVERY = 'pending_delivery', 'Pago observado, entrega pendiente'
+        READY = 'ready', 'Archivo verificado para concesión'
+        REVIEW = 'review', 'Revisión'
+        APPLIED = 'applied', 'Concesión aplicada'
+
+    source_key = models.UUIDField(unique=True)
+    order = models.ForeignKey(Order, on_delete=models.PROTECT, related_name='financial_verifications')
+    attempt = models.ForeignKey(PaymentAttempt, on_delete=models.PROTECT, related_name='financial_verifications')
+    provider_event = models.ForeignKey(PaymentProviderEvent, null=True, blank=True,
+        on_delete=models.PROTECT, related_name='financial_verifications')
+    provider_account_id = models.CharField(max_length=100)
+    environment = models.CharField(max_length=4, choices=DigitalProduct.StripeEnvironment.choices)
+    session_id = models.CharField(max_length=255)
+    payment_intent_id = models.CharField(max_length=255)
+    success_event_id = models.CharField(max_length=255, blank=True)
+    paid_at = models.DateTimeField(null=True, blank=True)
+    paid_at_source = models.CharField(max_length=60, blank=True)
+    amount_minor = models.PositiveBigIntegerField()
+    currency = models.CharField(max_length=3)
+    price_id = models.CharField(max_length=100)
+    product_id = models.CharField(max_length=100)
+    quantity = models.PositiveSmallIntegerField()
+    state = models.CharField(max_length=20, choices=State.choices)
+    reason_code = models.CharField(max_length=80, blank=True)
+    checked_at = models.DateTimeField()
+    applied_at = models.DateTimeField(null=True, blank=True)
+    objects = FinancialVerificationQuerySet.as_manager()
+
+    class Meta:
+        indexes = [models.Index(fields=['state', 'checked_at'], name='store_fin_state_checked_idx')]
+        constraints = [
+            models.CheckConstraint(condition=Q(environment__in=['test', 'live']), name='store_fin_environment'),
+            models.CheckConstraint(condition=Q(state__in=['pending_delivery', 'ready', 'review', 'applied']), name='store_fin_state'),
+            models.CheckConstraint(condition=Q(amount_minor__gt=0), name='store_fin_amount_positive'),
+            models.CheckConstraint(condition=Q(currency='MXN'), name='store_fin_mxn'),
+            models.CheckConstraint(condition=Q(quantity=1), name='store_fin_one_item'),
+            models.CheckConstraint(condition=Q(state='review') | (Q(paid_at__isnull=False) & ~Q(success_event_id='')),
+                name='store_fin_success_has_time'),
+            models.CheckConstraint(condition=(Q(paid_at__isnull=True) & Q(paid_at_source='')) |
+                (Q(paid_at__isnull=False) & Q(paid_at_source='stripe_pi_succeeded_event_created')),
+                name='store_fin_time_source'),
+            models.UniqueConstraint(fields=['attempt'], condition=Q(state='applied'), name='store_fin_one_applied_attempt'),
+            models.UniqueConstraint(fields=['order'], condition=Q(state='ready'), name='store_fin_one_ready_order'),
+        ]
+
+    def save(self, *args, **kwargs):
+        raise ValidationError('La verificación financiera requiere la operación restringida.')
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError('La verificación financiera es persistente.')
+
+
 class OrderAuditEvent(models.Model):
     class Actor(models.TextChoices):
         SYSTEM = 'system', 'Sistema'
