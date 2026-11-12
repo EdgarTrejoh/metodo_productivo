@@ -4,6 +4,7 @@ import hashlib
 import json
 import uuid
 from dataclasses import dataclass
+from datetime import timedelta
 from urllib.parse import urlsplit
 
 from django.conf import settings
@@ -11,6 +12,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from store.checkout_provider import ProviderUncertain, SimulatedCheckoutProvider
+from store.financial_provider import ProviderUnavailable
 from store.file_versions import assert_order_checkout_ready
 from store.models import CheckoutRequest, Order, OrderAuditEvent, PaymentAttempt
 from store.order_services import (InvalidOrderOperation, OrderConflict,
@@ -28,6 +30,18 @@ class CheckoutResult:
     url: str
 
 
+def _mark_uncertain(*, request, order_id, attempt_id, operation_id):
+    """Persiste la incertidumbre y su auditoría una sola vez."""
+    with transaction.atomic():
+        changed = CheckoutRequest.objects.select_for_update().filter(
+            pk=request.pk, state=CheckoutRequest.State.CALLING).update(
+                state=CheckoutRequest.State.UNCERTAIN)
+        if changed:
+            OrderAuditEvent.objects.create(order_id=order_id, attempt_id=attempt_id,
+                operation_id=uuid.uuid4(), subject='attempt', actor='system',
+                action='checkout_uncertain', correlation_id=operation_id)
+
+
 def _return_url(origin, path):
     parsed = urlsplit(origin)
     if parsed.scheme not in ('https', 'http') or not parsed.netloc or parsed.username or parsed.password or parsed.path or parsed.query or parsed.fragment:
@@ -40,12 +54,17 @@ def _return_url(origin, path):
 def start_checkout(*, order_id, operation_id, request_idempotency_key,
                    provider, return_origin):
     """Reserva, consulta y vincula sin mantener bloqueos durante el proveedor."""
-    if type(provider) is not SimulatedCheckoutProvider:
-        raise InvalidOrderOperation('B-03B solo admite el proveedor simulado.')
+    from store.stripe_test_provider import StripeTestProvider, StripeProviderDataError
+    real_test = type(provider) is StripeTestProvider
+    if type(provider) is not SimulatedCheckoutProvider and not (
+            real_test and settings.STRIPE_TEST_ADAPTER_ENABLED):
+        raise InvalidOrderOperation('Proveedor de Checkout no autorizado.')
     if not isinstance(operation_id, uuid.UUID) or not isinstance(request_idempotency_key, uuid.UUID):
         raise InvalidOrderOperation('La operación requiere UUID.')
     if not return_origin or return_origin != settings.CHECKOUT_RETURN_ORIGIN:
         raise InvalidOrderOperation('El retorno debe usar el origen configurado.')
+    if real_test and urlsplit(return_origin).scheme != 'https':
+        raise InvalidOrderOperation('Stripe TEST requiere retornos HTTPS.')
     success_url = _return_url(return_origin, '/tienda/resultado/?estado=pendiente')
     cancel_url = _return_url(return_origin, '/tienda/resultado/?estado=cancelado')
     order = assert_order_checkout_ready(order_id)
@@ -57,8 +76,10 @@ def start_checkout(*, order_id, operation_id, request_idempotency_key,
         raise InvalidOrderOperation('Cuenta o entorno incompatible.')
     try:
         price = provider.get_price(order.stripe_price_id_snapshot)
-    except KeyError as exc:
-        raise InvalidOrderOperation('Price ID desconocido.') from exc
+    except ProviderUnavailable as exc:
+        raise CheckoutPending('El precio no está disponible temporalmente; reintenta la misma intención.') from exc
+    except (KeyError, StripeProviderDataError) as exc:
+        raise InvalidOrderOperation('El Price ID es desconocido o incompatible.') from exc
     if (price.price_id != order.stripe_price_id_snapshot
             or price.product_id != order.stripe_product_id_snapshot
             or price.amount_minor != order.amount_minor or price.currency.upper() != 'MXN'
@@ -85,7 +106,14 @@ def start_checkout(*, order_id, operation_id, request_idempotency_key,
                 operation_id=uuid.uuid4(), subject='attempt', actor='system',
                 action='checkout_requested', correlation_id=operation_id)
     # Otro hilo puede seguir llamando al proveedor. La clave remota es estable.
-    session = provider.get_session(idempotency_key=str(request_idempotency_key))
+    try:
+        session = provider.get_session(idempotency_key=str(request_idempotency_key),
+            session_id=bound_session_id, expected=params)
+    except ProviderUnavailable as exc:
+        if not bound_session_id:
+            _mark_uncertain(request=request, order_id=order_id,
+                attempt_id=attempt.pk, operation_id=operation_id)
+        raise CheckoutPending('La consulta de la sesión no está disponible; requiere conciliación.') from exc
     if bound_session_id:
         if (session is None or session.session_id != bound_session_id
                 or session.status != 'open' or session.expires_at <= timezone.now()):
@@ -93,22 +121,24 @@ def start_checkout(*, order_id, operation_id, request_idempotency_key,
         return CheckoutResult(attempt.pk, session.session_id, session.url)
     if session is None:
         if not created:
-            raise CheckoutPending('La operación anterior aún no tiene respuesta verificable.')
+            elapsed = timezone.now() - request.started_at
+            if not real_test or (request.state == CheckoutRequest.State.CALLING
+                    and elapsed < timedelta(seconds=30)):
+                raise CheckoutPending('La operación anterior aún no tiene respuesta verificable.')
+            if elapsed >= timedelta(hours=23):
+                raise CheckoutPending('La ventana de reintento remoto terminó; requiere conciliación.')
+            if request.state == CheckoutRequest.State.CALLING:
+                _mark_uncertain(request=request, order_id=order_id,
+                    attempt_id=attempt.pk, operation_id=operation_id)
         try:
             session = provider.create_session(idempotency_key=str(request_idempotency_key), **params)
         except ProviderUncertain as exc:
-            with transaction.atomic():
-                CheckoutRequest.objects.select_for_update().filter(pk=request.pk, state='calling').update(state='uncertain')
-                OrderAuditEvent.objects.create(order_id=order_id, attempt_id=attempt.pk,
-                    operation_id=uuid.uuid4(), subject='attempt', actor='system',
-                    action='checkout_uncertain', correlation_id=operation_id)
+            _mark_uncertain(request=request, order_id=order_id,
+                attempt_id=attempt.pk, operation_id=operation_id)
             raise CheckoutPending('La respuesta se perdió; se requiere conciliación.') from exc
         except Exception as exc:
-            with transaction.atomic():
-                CheckoutRequest.objects.select_for_update().filter(pk=request.pk, state='calling').update(state='uncertain')
-                OrderAuditEvent.objects.create(order_id=order_id, attempt_id=attempt.pk,
-                    operation_id=uuid.uuid4(), subject='attempt', actor='system',
-                    action='checkout_uncertain', correlation_id=operation_id)
+            _mark_uncertain(request=request, order_id=order_id,
+                attempt_id=attempt.pk, operation_id=operation_id)
             raise CheckoutPending('El resultado del proveedor es incierto.') from exc
     if (session.account_id != provider.account_id or session.environment != order.environment
             or session.status != 'open' or session.expires_at <= timezone.now()):

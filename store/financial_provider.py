@@ -4,7 +4,11 @@ from dataclasses import dataclass
 from datetime import datetime
 
 
-class SimulatedProviderUnavailable(Exception):
+class ProviderUnavailable(Exception):
+    """La consulta autoritativa no pudo completarse; es recuperable."""
+
+
+class SimulatedProviderUnavailable(ProviderUnavailable):
     pass
 
 

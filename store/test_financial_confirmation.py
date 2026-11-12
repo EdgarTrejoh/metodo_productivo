@@ -7,6 +7,7 @@ from dataclasses import replace
 from datetime import timedelta
 from pathlib import Path
 from threading import Barrier
+from unittest.mock import Mock
 
 import psycopg
 from psycopg import sql
@@ -18,7 +19,9 @@ from django.utils import timezone
 from store.checkout_services import start_checkout
 from store.financial_provider import (ProviderEvent, ProviderIntent, ProviderLine,
                                       ProviderSession, SimulatedFinancialProvider)
-from store.financial_services import reconcile_simulated_payment
+from store.financial_services import reconcile_simulated_payment, reconcile_test_payment
+from store.stripe_test_provider import StripeTestProvider
+from store.test_stripe_test_provider import Page
 from store.models import (DeliveryEntitlement, FinancialVerification, Order, OrderAuditEvent,
                           PaymentAttempt, PaymentProviderEvent)
 from store.test_checkout_sessions import checkout_fixture
@@ -100,6 +103,46 @@ class FinancialConfirmationTests(TransactionTestCase):
         finance = finance or self.role_connection('mp_b03d_test_finance')
         return reconcile_simulated_payment(order_id=self.order.pk, provider=self.provider,
             finance_connection=finance, provider_event_id=provider_event_id)
+
+    @override_settings(STRIPE_TEST_ADAPTER_ENABLED=True)
+    def test_sdk_contract_confirms_synthetic_payment_via_restricted_role(self):
+        """La normalización TEST llega a las guardas B-03D sin contactar Stripe."""
+        session = self.provider.sessions[self.session_id]
+        intent = self.provider.intents[self.intent_id]
+        event = self.provider.events['evt_success']
+        sdk = Mock()
+        sdk.v1.accounts.retrieve_current.return_value = {
+            'id': 'acct_synthetic', 'livemode': False}
+        sdk.v1.checkout.sessions.retrieve.return_value = dict(
+            id=session.id, livemode=False, url='', status='complete',
+            expires_at=int(session.created.timestamp()) + 3600,
+            created=int(session.created.timestamp()), payment_status='paid',
+            mode='payment', payment_intent=self.intent_id,
+            amount_total=49900, currency='mxn', client_reference_id=str(self.order.public_id),
+            total_details={'amount_discount': 0, 'amount_tax': 0, 'amount_shipping': 0},
+            automatic_tax={'enabled': False}, payment_method_types=['card'],
+            allow_promotion_codes=False, adaptive_pricing={'enabled': False})
+        sdk.v1.payment_intents.retrieve.return_value = dict(
+            id=intent.id, livemode=False, created=int(intent.created.timestamp()),
+            status='succeeded', capture_method='automatic', amount=49900,
+            amount_received=49900, currency='mxn')
+        sdk.v1.checkout.sessions.line_items.list.return_value = Page([dict(
+            price={'id': 'price_synthetic', 'product': 'prod_synthetic'},
+            quantity=1, amount_total=49900, currency='mxn')])
+        sdk.v1.events.list.return_value = Page([dict(id=event.id,
+            livemode=False, type='payment_intent.succeeded',
+            created=int(event.created.timestamp()), account=None,
+            data={'object': {'id': self.intent_id}})])
+        adapter = StripeTestProvider(client=sdk, account_id='acct_synthetic')
+        finance = self.role_connection('mp_b03d_test_finance')
+        first = reconcile_test_payment(order_id=self.order.pk, provider=adapter,
+            finance_connection=finance)
+        second = reconcile_test_payment(order_id=self.order.pk, provider=adapter,
+            finance_connection=finance)
+        self.assertEqual((first.state, second.state), ('applied', 'applied'))
+        self.assertEqual(first.entitlement_id, second.entitlement_id)
+        self.assertEqual(DeliveryEntitlement.objects.filter(order=self.order).count(), 1)
+        sdk.v1.accounts.retrieve_current.assert_called_once()
 
     def test_paid_purchase_without_webhook_and_idempotent_retry(self):
         first = self.reconcile()

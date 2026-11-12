@@ -67,5 +67,6 @@ class SimulatedCheckoutProvider:
             raise ProviderUncertain('La respuesta de creación se perdió.')
         return self.sessions[idempotency_key]
 
-    def get_session(self, *, idempotency_key):
-        return self.sessions.get(idempotency_key)
+    def get_session(self, *, idempotency_key, session_id=None, expected=None):
+        session = self.sessions.get(idempotency_key)
+        return session if session_id is None or (session and session.session_id == session_id) else None
